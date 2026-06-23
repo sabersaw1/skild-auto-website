@@ -5,25 +5,46 @@ portable across GitHub → Vercel → Neon → Skild OS.
 
 Project: `xukkcixylfasoerjnkra`
 
-## 1. Storage bucket
+## 1. Storage bucket — REQUIRED
 
 Bucket name: **`quote-photos`** — set to **Public**.
 
-Policy (Supabase Dashboard → Storage → quote-photos → Policies):
+> ⚠️ **If photos are not appearing in the bucket, this step has not been
+> done.** A bucket alone is not enough — `storage.objects` has RLS on by
+> default and silently rejects anon uploads with
+> `new row violates row-level security policy`. The frontend now logs
+> this error to the browser console and shows it in the quote form.
+
+Open **Supabase Dashboard → SQL Editor → New query**, paste this, run it
+once:
 
 ```sql
--- Anyone can upload (anon key) — used by the public quote form
+-- 1. Allow the public quote form (anon key) to upload into quote-photos
 create policy "Public upload to quote-photos"
 on storage.objects for insert
-to anon
+to anon, authenticated
 with check ( bucket_id = 'quote-photos' );
 
--- Anyone can read (so email recipients can open the photos)
+-- 2. Allow anyone with the link (email recipients) to view the photo
 create policy "Public read on quote-photos"
 on storage.objects for select
 to anon, authenticated
 using ( bucket_id = 'quote-photos' );
 ```
+
+Verify it worked — from any terminal:
+
+```bash
+curl -i -X POST \
+  "https://xukkcixylfasoerjnkra.supabase.co/storage/v1/object/quote-photos/test.txt" \
+  -H "apikey: <your anon key>" \
+  -H "Authorization: Bearer <your anon key>" \
+  -H "Content-Type: text/plain" \
+  --data "hello"
+```
+
+A `200` means uploads work. A `403` with `row-level security policy` means
+the SQL above has not been applied yet.
 
 If you later prefer a **private** bucket, drop the read policy and replace
 `getPublicUrl` with `createSignedUrl` in `src/lib/quote-photos.ts` (7-day
