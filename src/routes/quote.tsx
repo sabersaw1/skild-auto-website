@@ -278,7 +278,12 @@ function QuotePage() {
                     </label>
                   )}
                 </div>
-                <p className="mt-2 text-[11px] text-muted-foreground">Photos help us quote faster. Up to 4.</p>
+                <p className="mt-2 text-[11px] text-muted-foreground">
+                  {photoBusy ? "Uploading…" : "Photos help us quote faster. Up to 4."}
+                </p>
+                {photoError && (
+                  <p className="mt-1 text-[11px] text-brand-red">{photoError}</p>
+                )}
               </div>
             </StepShell>
           )}
@@ -316,10 +321,19 @@ function QuotePage() {
 
               <button
                 onClick={goSchedule}
-                className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-md bg-brand-red px-6 py-4 text-sm font-bold uppercase tracking-[0.16em] text-white shadow-glow hover:bg-brand-red-glow animate-pulse-red"
+                disabled={submitState === "sending"}
+                className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-md bg-brand-red px-6 py-4 text-sm font-bold uppercase tracking-[0.16em] text-white shadow-glow hover:bg-brand-red-glow animate-pulse-red disabled:opacity-60"
               >
-                Continue to scheduling <ChevronRight className="h-4 w-4" />
+                {submitState === "sending"
+                  ? "Sending your quote…"
+                  : (<>Continue to scheduling <ChevronRight className="h-4 w-4" /></>)}
               </button>
+              {submitState === "error" && (
+                <p className="mt-3 text-xs text-brand-red">
+                  Quote saved locally, but the notification email failed: {submitError}.
+                  You can still continue to scheduling — we'll see your details on the calendar.
+                </p>
+              )}
             </StepShell>
           )}
 
