@@ -38,6 +38,22 @@ function safeExt(file: File) {
   return "jpg";
 }
 
+/**
+ * Sanitize the customer's original filename for use as a Supabase Storage
+ * object key. Strips path separators, collapses unsafe characters, and
+ * keeps the original stem so the file in the bucket matches what the
+ * customer actually uploaded (e.g. `IMG_4821.jpg` → `IMG_4821.jpg`).
+ */
+function safeName(file: File): string {
+  const raw = (file.name || "").split(/[\\/]/).pop() ?? "";
+  const dot = raw.lastIndexOf(".");
+  const stem = (dot > 0 ? raw.slice(0, dot) : raw)
+    .replace(/[^a-zA-Z0-9._-]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 60) || "photo";
+  return `${stem}.${safeExt(file)}`;
+}
+
 /** Returns or creates a stable folder id for the current quote session. */
 export function quoteSessionId(): string {
   if (typeof window === "undefined") return slug();
@@ -52,7 +68,12 @@ export function quoteSessionId(): string {
 
 export async function uploadQuotePhoto(file: File): Promise<UploadedPhoto> {
   const folder = quoteSessionId();
-  const path = `${folder}/${Date.now()}-${slug()}.${safeExt(file)}`;
+  // Keep the customer's original filename in the storage path so the
+  // object in the `quote-photos` bucket is immediately recognizable.
+  // Prefix with a timestamp + short id to guarantee uniqueness within
+  // the session folder if the customer uploads two files with the same
+  // name (e.g. two `image.jpg` from a phone gallery).
+  const path = `${folder}/${Date.now()}-${slug()}-${safeName(file)}`;
 
   console.info("[quote-photos] uploading", {
     bucket: SKILD_QUOTE_BUCKET,

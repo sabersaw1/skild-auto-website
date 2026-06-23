@@ -282,8 +282,15 @@ function QuotePage() {
                       <Camera className="h-5 w-5" />
                       Add
                       <input
-                        type="file" accept="image/*" multiple className="hidden"
-                        onChange={(e) => onPhotoSelect(e.target.files)}
+                        type="file"
+                        accept="image/jpeg,image/jpg,image/png,image/heic,image/heif,.jpg,.jpeg,.png,.heic,.heif"
+                        multiple
+                        className="hidden"
+                        onChange={(e) => {
+                          onPhotoSelect(e.target.files);
+                          // Reset so the same file can be re-selected after removal.
+                          e.target.value = "";
+                        }}
                       />
                     </label>
                   )}
