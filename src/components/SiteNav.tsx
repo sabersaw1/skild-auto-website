@@ -22,12 +22,12 @@ export function SiteNav({ mode = "neutral" }: SiteNavProps) {
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-xl">
-      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
+      <div className="mx-auto flex h-24 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
         <Link to="/" aria-label="Skild Auto — Home" className="group flex min-w-0 items-center">
           <img
             src={skildLogo.url}
             alt="Skild Auto"
-            className="h-14 w-auto drop-shadow-[0_0_18px_rgba(220,30,40,0.35)] transition-transform duration-300 group-hover:scale-[1.04] sm:h-16"
+            className="h-16 w-auto drop-shadow-[0_0_18px_rgba(220,30,40,0.35)] transition-transform duration-300 group-hover:scale-[1.04] sm:h-20"
           />
         </Link>
 
