@@ -8,7 +8,7 @@
 //
 // Required env (set in Supabase dashboard → Edge Functions → Secrets):
 //   RESEND_API_KEY     — from https://resend.com/api-keys
-//   QUOTE_TO_EMAIL     — skildautoi@gmail.com
+//   QUOTE_TO_EMAIL     — skildauto@gmail.com
 //   QUOTE_FROM_EMAIL   — verified Resend sender, e.g. quotes@skildauto.com
 //                        (use onboarding@resend.dev for testing)
 //
