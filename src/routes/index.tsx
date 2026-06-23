@@ -70,7 +70,7 @@ function Splash() {
             src={skildLogo.url}
             alt="Skild Auto"
             className="mx-auto mt-2 w-auto sm:mt-4"
-            style={{ height: "clamp(7rem, 38vh, 22rem)" }}
+            style={{ height: "clamp(5.5rem, 26vh, 22rem)" }}
           />
           <p className="mx-auto mt-2 max-w-xl text-[10px] font-medium uppercase tracking-[0.24em] text-muted-foreground sm:mt-4 sm:text-sm">
             Helping you get back on the road with honest service and reliable solutions.
