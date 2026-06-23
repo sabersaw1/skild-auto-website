@@ -58,42 +58,42 @@ function Splash() {
       <div className="pointer-events-none absolute left-[10%] top-0 h-full w-[3px] bg-gradient-to-b from-transparent via-brand-red to-transparent opacity-60 animate-flicker" />
       <div className="pointer-events-none absolute right-[10%] top-0 h-full w-[3px] bg-gradient-to-b from-transparent via-brand-red to-transparent opacity-60 animate-flicker" style={{ animationDelay: "1s" }} />
 
-      <div className="relative z-10 mx-auto flex min-h-screen max-w-6xl flex-col items-center justify-center px-6 py-16 text-center">
+      <div className="relative z-10 mx-auto flex h-screen max-h-screen w-full max-w-6xl flex-col items-center justify-center gap-6 px-4 py-4 text-center sm:gap-8 sm:px-6 sm:py-8">
         <div
           className={`transition-all duration-1000 ${revealed ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
         >
-          <p className="text-xs font-semibold uppercase tracking-[0.4em] text-brand-red">Skild Auto Ecosystem</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.4em] text-brand-red sm:text-xs">Skild Auto Repair</p>
           <img
             src={skildLogo.url}
             alt="Skild Auto"
-            className="mx-auto mt-6 h-48 w-auto drop-shadow-[0_0_60px_rgba(220,30,40,0.45)] sm:h-64 md:h-80"
+            className="mx-auto mt-3 h-40 w-auto drop-shadow-[0_0_60px_rgba(220,30,40,0.45)] sm:mt-5 sm:h-72 md:h-96"
           />
-          <p className="mx-auto mt-6 max-w-xl text-sm font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-base">
-            Built for the road. Ready for anything.
+          <p className="mx-auto mt-3 max-w-xl text-[11px] font-medium uppercase tracking-[0.28em] text-muted-foreground sm:mt-5 sm:text-sm">
+            Helping you get back on the road with honest service and reliable solutions.
           </p>
         </div>
 
         <div
-          className={`mt-14 grid w-full max-w-3xl gap-4 transition-all delay-500 duration-1000 sm:grid-cols-2 ${revealed ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
+          className={`grid w-full max-w-3xl gap-3 transition-all delay-500 duration-1000 sm:gap-4 sm:grid-cols-2 ${revealed ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
         >
           <ModeCard
             label="Auto"
             sub="Mobile automotive repair"
-            icon={<Car className="h-7 w-7" />}
+            icon={<Car className="h-6 w-6 sm:h-7 sm:w-7" />}
             onClick={() => navigate({ to: "/auto" })}
             primary
           />
           <ModeCard
             label="Moto"
             sub="Motorcycle service & performance"
-            icon={<Bike className="h-7 w-7" />}
+            icon={<Bike className="h-6 w-6 sm:h-7 sm:w-7" />}
             onClick={() => navigate({ to: "/moto" })}
           />
         </div>
 
         <Link
           to="/services"
-          className={`mt-10 text-xs uppercase tracking-[0.3em] text-muted-foreground transition hover:text-brand-red ${revealed ? "opacity-100" : "opacity-0"}`}
+          className={`text-[10px] uppercase tracking-[0.3em] text-muted-foreground transition hover:text-brand-red sm:text-xs ${revealed ? "opacity-100" : "opacity-0"}`}
           style={{ transitionDelay: "1000ms" }}
         >
           Skip intro · Explore services →
