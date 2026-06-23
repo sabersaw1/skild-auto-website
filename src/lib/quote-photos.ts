@@ -68,7 +68,12 @@ export function quoteSessionId(): string {
 
 export async function uploadQuotePhoto(file: File): Promise<UploadedPhoto> {
   const folder = quoteSessionId();
-  const path = `${folder}/${Date.now()}-${slug()}.${safeExt(file)}`;
+  // Keep the customer's original filename in the storage path so the
+  // object in the `quote-photos` bucket is immediately recognizable.
+  // Prefix with a timestamp + short id to guarantee uniqueness within
+  // the session folder if the customer uploads two files with the same
+  // name (e.g. two `image.jpg` from a phone gallery).
+  const path = `${folder}/${Date.now()}-${slug()}-${safeName(file)}`;
 
   console.info("[quote-photos] uploading", {
     bucket: SKILD_QUOTE_BUCKET,
