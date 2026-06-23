@@ -10,6 +10,10 @@ import {
   EMPTY_QUOTE, loadQuote, saveQuote, type QuoteData,
 } from "@/lib/quote-storage";
 import { getMakes, getModels, getYears, OTHER } from "@/lib/vehicles";
+import { uploadQuotePhoto } from "@/lib/quote-photos";
+import {
+  submitQuote, markQuoteSubmitted, wasQuoteSubmitted,
+} from "@/lib/quote-submit";
 
 export const Route = createFileRoute("/quote")({
   head: () => ({
@@ -49,6 +53,10 @@ function QuotePage() {
   const [step, setStep] = useState(0);
   const [form, setForm] = useState<QuoteData>(EMPTY_QUOTE);
   const [hydrated, setHydrated] = useState(false);
+  const [photoBusy, setPhotoBusy] = useState(false);
+  const [photoError, setPhotoError] = useState<string | null>(null);
+  const [submitState, setSubmitState] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   // Hydrate from sessionStorage so customer data persists across visits.
   useEffect(() => {
@@ -91,26 +99,49 @@ function QuotePage() {
 
   const onPhotoSelect = async (files: FileList | null) => {
     if (!files) return;
-    // Store as data URLs (base64) so the actual image bytes travel with the
-    // submission and can be attached to email by a future backend/API
-    // without changing the customer experience.
-    const remaining = Math.max(0, 4 - form.photos.length);
-    const picked = Array.from(files).slice(0, remaining);
-    const encoded = await Promise.all(
-      picked.map(
-        (f) =>
-          new Promise<string>((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(String(reader.result));
-            reader.onerror = () => reject(reader.error);
-            reader.readAsDataURL(f);
-          }),
-      ),
-    );
-    update("photos", [...form.photos, ...encoded].slice(0, 4));
+    setPhotoError(null);
+    setPhotoBusy(true);
+    try {
+      const remaining = Math.max(0, 4 - form.photos.length);
+      const picked = Array.from(files).slice(0, remaining);
+      const uploads = await Promise.all(picked.map((f) => uploadQuotePhoto(f)));
+      const urls = uploads.map((u) => u.url);
+      update("photos", [...form.photos, ...urls].slice(0, 4));
+    } catch (err) {
+      console.error("photo upload failed", err);
+      setPhotoError(
+        err instanceof Error ? err.message : "Photo upload failed. Please try again.",
+      );
+    } finally {
+      setPhotoBusy(false);
+    }
   };
 
-  const goSchedule = () => navigate({ to: "/booking" });
+  const goSchedule = async () => {
+    // Fire-and-confirm the quote notification email before sending the
+    // customer to Calendly. Idempotent per saved quote: re-clicking from
+    // the same session won't send a duplicate email.
+    const fingerprint = JSON.stringify({
+      e: form.email, p: form.phone, s: form.service, d: form.description,
+    });
+    if (submitState !== "sent" && !wasQuoteSubmitted(fingerprint)) {
+      setSubmitState("sending");
+      setSubmitError(null);
+      try {
+        await submitQuote(form);
+        markQuoteSubmitted(fingerprint);
+        setSubmitState("sent");
+      } catch (err) {
+        console.error("quote submission failed", err);
+        setSubmitState("error");
+        setSubmitError(
+          err instanceof Error ? err.message : "Could not send quote notification.",
+        );
+        // Still let the customer continue — booking matters more than email.
+      }
+    }
+    navigate({ to: "/booking" });
+  };
 
   return (
     <PageLayout>
