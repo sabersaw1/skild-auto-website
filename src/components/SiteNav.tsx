@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Menu, X, Wrench } from "lucide-react";
+import { Menu, X } from "lucide-react";
+import skildLogo from "@/assets/skild-logo.png.asset.json";
 
 interface SiteNavProps {
   mode?: "auto" | "moto" | "neutral";
@@ -17,18 +18,17 @@ const links = [
 
 export function SiteNav({ mode = "neutral" }: SiteNavProps) {
   const [open, setOpen] = useState(false);
-  const home = mode === "moto" ? "/moto" : mode === "auto" ? "/auto" : "/";
+  void mode;
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-xl">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
-        <Link to={home} className="flex min-w-0 items-center gap-2.5 group">
-          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-md bg-gradient-to-br from-brand-red to-brand-red/40 shadow-glow">
-            <Wrench className="h-4 w-4 text-white" />
-          </span>
-          <span className="font-display text-xl tracking-wide">
-            SKILD <span className="text-brand-red">AUTO</span>
-          </span>
+      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
+        <Link to="/" aria-label="Skild Auto — Home" className="group flex min-w-0 items-center">
+          <img
+            src={skildLogo.url}
+            alt="Skild Auto"
+            className="h-14 w-auto drop-shadow-[0_0_18px_rgba(220,30,40,0.35)] transition-transform duration-300 group-hover:scale-[1.04] sm:h-16"
+          />
         </Link>
 
         <nav className="hidden items-center gap-7 lg:flex">
