@@ -135,7 +135,7 @@ function QuotePage() {
       setSubmitState("sending");
       setSubmitError(null);
       try {
-        await submitQuote(form);
+        await submitQuote(form, attachments);
         markQuoteSubmitted(fingerprint);
         setSubmitState("sent");
       } catch (err) {
