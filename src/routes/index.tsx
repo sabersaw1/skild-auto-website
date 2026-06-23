@@ -109,17 +109,17 @@ function ModeCard({
   return (
     <button
       onClick={onClick}
-      className={`shine-border group relative overflow-hidden rounded-xl border border-border bg-card/80 p-8 text-left backdrop-blur transition-all hover:-translate-y-1 hover:border-brand-red ${primary ? "shadow-glow" : ""}`}
+      className={`shine-border group relative overflow-hidden rounded-xl border border-border bg-card/80 p-5 text-left backdrop-blur transition-all hover:-translate-y-1 hover:border-brand-red sm:p-8 ${primary ? "shadow-glow" : ""}`}
     >
       <div className="absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-brand-red to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
       <div className="flex items-start justify-between">
-        <span className="grid h-14 w-14 place-items-center rounded-lg bg-brand-red/10 text-brand-red transition-all group-hover:bg-brand-red group-hover:text-white">
+        <span className="grid h-11 w-11 place-items-center rounded-lg bg-brand-red/10 text-brand-red transition-all group-hover:bg-brand-red group-hover:text-white sm:h-14 sm:w-14">
           {icon}
         </span>
         <ArrowRight className="h-5 w-5 text-muted-foreground transition-all group-hover:translate-x-1 group-hover:text-brand-red" />
       </div>
-      <div className="mt-6 font-display text-4xl">{label}</div>
-      <div className="mt-1 text-sm uppercase tracking-widest text-muted-foreground">{sub}</div>
+      <div className="mt-4 font-display text-2xl sm:mt-6 sm:text-4xl">{label}</div>
+      <div className="mt-1 text-[11px] uppercase tracking-widest text-muted-foreground sm:text-sm">{sub}</div>
     </button>
   );
 }
