@@ -263,12 +263,15 @@ function QuotePage() {
               <div className="mt-6">
                 <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">Photos (optional)</span>
                 <div className="mt-2 flex flex-wrap items-center gap-3">
-                  {form.photos.map((p) => (
+                  {form.photos.map((p, idx) => (
                     <div key={p} className="relative h-20 w-20 overflow-hidden rounded-md border border-border">
                       <img src={p} alt="Uploaded" className="h-full w-full object-cover" />
                       <button
                         type="button"
-                        onClick={() => update("photos", form.photos.filter((x) => x !== p))}
+                        onClick={() => {
+                          update("photos", form.photos.filter((x) => x !== p));
+                          setAttachments((prev) => prev.filter((_, i) => i !== idx));
+                        }}
                         className="absolute right-1 top-1 grid h-5 w-5 place-items-center rounded-full bg-background/80 text-foreground"
                         aria-label="Remove photo"
                       ><X className="h-3 w-3" /></button>
