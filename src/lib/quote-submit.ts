@@ -1,5 +1,5 @@
 // Sends the completed quote to the Supabase Edge Function that emails
-// skildautoi@gmail.com. Email composition + delivery (Resend) live in
+// skildauto@gmail.com. Email composition + delivery (Resend) live in
 // supabase/functions/send-quote-notification/index.ts so credentials
 // never touch the client and the system stays portable to GitHub,
 // Vercel, Neon, and Skild OS.

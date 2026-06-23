@@ -31,14 +31,14 @@ links work well for the email).
 
 ## 2. Edge Function — `send-quote-notification`
 
-Sends the notification email to `skildautoi@gmail.com` via Resend.
+Sends the notification email to `skildauto@gmail.com` via Resend.
 
 ### Secrets (Supabase Dashboard → Edge Functions → Secrets)
 
 | Name              | Value                                                |
 | ----------------- | ---------------------------------------------------- |
 | `RESEND_API_KEY`  | From https://resend.com/api-keys                     |
-| `QUOTE_TO_EMAIL`  | `skildautoi@gmail.com`                               |
+| `QUOTE_TO_EMAIL`  | `skildauto@gmail.com`                               |
 | `QUOTE_FROM_EMAIL`| `Skild Auto <quotes@skildauto.com>` (verified sender)|
 
 For testing without a verified domain, use `onboarding@resend.dev` as the
@@ -68,7 +68,7 @@ project. To override on Vercel set:
 Customer fills /quote
    ├─ photos → POST → Supabase Storage (quote-photos/<session>/<file>)
    └─ Continue to scheduling
-        ├─ POST quote JSON + photo URLs → Edge Fn → Resend → skildautoi@gmail.com
+        ├─ POST quote JSON + photo URLs → Edge Fn → Resend → skildauto@gmail.com
         └─ Redirect to /booking → Calendly (pre-filled)
 ```
 
