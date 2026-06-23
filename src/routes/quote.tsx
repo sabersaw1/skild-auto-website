@@ -55,6 +55,7 @@ function QuotePage() {
   const [hydrated, setHydrated] = useState(false);
   const [photoBusy, setPhotoBusy] = useState(false);
   const [photoError, setPhotoError] = useState<string | null>(null);
+  const [attachments, setAttachments] = useState<QuoteAttachment[]>([]);
   const [submitState, setSubmitState] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [submitError, setSubmitError] = useState<string | null>(null);
 
