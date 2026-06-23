@@ -1,8 +1,15 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { PageLayout } from "@/components/PageLayout";
 import { Reveal } from "@/components/Reveal";
-import { useMemo, useState } from "react";
-import { Car, Bike, ChevronLeft, ChevronRight, CheckCircle2, Wrench, Zap, Gauge, Stethoscope, Sparkles, Settings } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import {
+  Car, Bike, ChevronLeft, ChevronRight, Wrench, Zap, Gauge, Stethoscope,
+  Sparkles, Settings, Camera, X, Calendar,
+} from "lucide-react";
+import {
+  EMPTY_QUOTE, loadQuote, saveQuote, type QuoteData,
+} from "@/lib/quote-storage";
+import { getMakes, getModels, getYears, OTHER } from "@/lib/vehicles";
 
 export const Route = createFileRoute("/quote")({
   head: () => ({
@@ -18,22 +25,7 @@ export const Route = createFileRoute("/quote")({
   component: QuotePage,
 });
 
-type Form = {
-  type: "auto" | "moto" | null;
-  service: string;
-  year: string;
-  make: string;
-  model: string;
-  mileage: string;
-  description: string;
-  name: string;
-  phone: string;
-  email: string;
-  zip: string;
-  preferredDate: string;
-};
-
-const steps = ["Type", "Service", "Vehicle", "Details", "Location", "Schedule"];
+const steps = ["Type", "Service", "Vehicle", "Details", "Contact", "Schedule"];
 
 const autoServices = [
   { icon: Stethoscope, name: "Diagnostics" },
@@ -53,40 +45,60 @@ const motoServices = [
 ];
 
 function QuotePage() {
+  const navigate = useNavigate();
   const [step, setStep] = useState(0);
-  const [done, setDone] = useState(false);
-  const [form, setForm] = useState<Form>({
-    type: null, service: "", year: "", make: "", model: "", mileage: "",
-    description: "", name: "", phone: "", email: "", zip: "", preferredDate: "",
-  });
+  const [form, setForm] = useState<QuoteData>(EMPTY_QUOTE);
+  const [hydrated, setHydrated] = useState(false);
+
+  // Hydrate from sessionStorage so customer data persists across visits.
+  useEffect(() => {
+    setForm(loadQuote());
+    setHydrated(true);
+  }, []);
+  useEffect(() => {
+    if (hydrated) saveQuote(form);
+  }, [form, hydrated]);
 
   const services = useMemo(() => (form.type === "moto" ? motoServices : autoServices), [form.type]);
-  const update = <K extends keyof Form>(k: K, v: Form[K]) => setForm((f) => ({ ...f, [k]: v }));
+  const makes = useMemo(() => (form.type ? getMakes(form.type) : []), [form.type]);
+  const models = useMemo(
+    () => (form.type && form.make ? getModels(form.type, form.make) : []),
+    [form.type, form.make],
+  );
+  const years = useMemo(() => (form.type ? getYears(form.type) : []), [form.type]);
+
+  const update = <K extends keyof QuoteData>(k: K, v: QuoteData[K]) =>
+    setForm((f) => ({ ...f, [k]: v }));
 
   const next = () => setStep((s) => Math.min(s + 1, steps.length - 1));
   const prev = () => setStep((s) => Math.max(s - 1, 0));
 
-  const submit = () => {
-    // Future: POST to /api/leads -> Neon DB
-    console.info("[skild-auto] lead captured", form);
-    setDone(true);
+  const canNext = () => {
+    switch (step) {
+      case 0: return form.type !== null;
+      case 1: return !!form.service;
+      case 2:
+        return !!form.year && !!form.make && !!form.model
+          && (form.make !== OTHER || !!form.makeOther.trim())
+          && (form.model !== OTHER || !!form.modelOther.trim());
+      case 3: return true; // description optional
+      case 4:
+        return !!form.firstName.trim() && !!form.lastName.trim()
+          && !!form.phone.trim() && !!form.email.trim();
+      default: return true;
+    }
   };
 
-  if (done) {
-    return (
-      <PageLayout>
-        <section className="mx-auto flex max-w-2xl flex-col items-center px-4 py-32 text-center sm:px-6">
-          <span className="grid h-20 w-20 place-items-center rounded-full bg-brand-red/10 text-brand-red shadow-glow">
-            <CheckCircle2 className="h-10 w-10" />
-          </span>
-          <h1 className="mt-8 font-display text-4xl sm:text-5xl">Quote received</h1>
-          <p className="mt-4 text-muted-foreground">
-            Thanks {form.name || "—"}, we'll get back to you within a few hours with your honest quote and next steps.
-          </p>
-        </section>
-      </PageLayout>
-    );
-  }
+  const onPhotoSelect = (files: FileList | null) => {
+    if (!files) return;
+    const urls: string[] = [];
+    Array.from(files).slice(0, 4).forEach((f) => {
+      urls.push(URL.createObjectURL(f));
+    });
+    update("photos", [...form.photos, ...urls].slice(0, 4));
+  };
+
+  const goSchedule = () => navigate({ to: "/booking" });
 
   return (
     <PageLayout>
@@ -94,15 +106,22 @@ function QuotePage() {
         <Reveal>
           <p className="text-xs font-semibold uppercase tracking-[0.4em] text-brand-red">Interactive Quote</p>
           <h1 className="mt-3 font-display text-4xl sm:text-5xl">Let's get you a number.</h1>
+          <p className="mt-3 text-sm text-muted-foreground">
+            Answer once — your info follows you all the way to scheduling.
+          </p>
         </Reveal>
 
         {/* Stepper */}
         <div className="mt-10 flex items-center justify-between gap-2 overflow-x-auto pb-2">
           {steps.map((label, i) => (
             <div key={label} className="flex min-w-0 flex-1 items-center gap-2">
-              <div className={`grid h-8 w-8 shrink-0 place-items-center rounded-full border text-xs font-bold ${
-                i <= step ? "border-brand-red bg-brand-red text-white shadow-glow" : "border-border bg-card text-muted-foreground"
-              }`}>{i + 1}</div>
+              <button
+                type="button"
+                onClick={() => i < step && setStep(i)}
+                className={`grid h-8 w-8 shrink-0 place-items-center rounded-full border text-xs font-bold transition ${
+                  i <= step ? "border-brand-red bg-brand-red text-white shadow-glow" : "border-border bg-card text-muted-foreground"
+                }`}
+              >{i + 1}</button>
               <span className={`hidden truncate text-[10px] font-bold uppercase tracking-widest sm:inline ${
                 i === step ? "text-brand-red" : "text-muted-foreground"
               }`}>{label}</span>
@@ -115,9 +134,9 @@ function QuotePage() {
           {step === 0 && (
             <StepShell title="What needs service?">
               <div className="grid gap-4 sm:grid-cols-2">
-                <ChoiceBig active={form.type === "auto"} onClick={() => { update("type", "auto"); next(); }}
+                <ChoiceBig active={form.type === "auto"} onClick={() => { update("type", "auto"); update("make", ""); update("model", ""); next(); }}
                   icon={<Car className="h-7 w-7" />} label="Auto" sub="Cars, trucks, SUVs" />
-                <ChoiceBig active={form.type === "moto"} onClick={() => { update("type", "moto"); next(); }}
+                <ChoiceBig active={form.type === "moto"} onClick={() => { update("type", "moto"); update("make", ""); update("model", ""); next(); }}
                   icon={<Bike className="h-7 w-7" />} label="Moto" sub="Motorcycles" />
               </div>
             </StepShell>
@@ -130,7 +149,7 @@ function QuotePage() {
                   const Icon = s.icon;
                   const active = form.service === s.name;
                   return (
-                    <button key={s.name} onClick={() => { update("service", s.name); }}
+                    <button key={s.name} type="button" onClick={() => update("service", s.name)}
                       className={`flex flex-col items-center gap-2 rounded-lg border p-5 transition-all ${
                         active ? "border-brand-red bg-brand-red/10 shadow-glow" : "border-border bg-background hover:border-brand-red/60"
                       }`}>
@@ -146,62 +165,133 @@ function QuotePage() {
           {step === 2 && (
             <StepShell title="Vehicle info">
               <div className="grid gap-4 sm:grid-cols-3">
-                <Field label="Year" value={form.year} onChange={(v) => update("year", v)} placeholder="2018" />
-                <Field label="Make" value={form.make} onChange={(v) => update("make", v)} placeholder="BMW" />
-                <Field label="Model" value={form.model} onChange={(v) => update("model", v)} placeholder="330i" />
-                <Field label="Mileage" value={form.mileage} onChange={(v) => update("mileage", v)} placeholder="62,000" />
+                <Select label="Year" value={form.year} onChange={(v) => update("year", v)} options={years} placeholder="Select year" />
+                <Select label="Make" value={form.make}
+                  onChange={(v) => { update("make", v); update("model", ""); update("modelOther", ""); }}
+                  options={makes} placeholder="Select make" />
+                <Select label="Model" value={form.model}
+                  onChange={(v) => update("model", v)} options={models}
+                  placeholder={form.make ? "Select model" : "Pick a make first"}
+                  disabled={!form.make} />
+                {form.make === OTHER && (
+                  <Field label="Make (please specify)" value={form.makeOther} onChange={(v) => update("makeOther", v)} placeholder="Enter make" />
+                )}
+                {form.model === OTHER && (
+                  <Field label="Model (please specify)" value={form.modelOther} onChange={(v) => update("modelOther", v)} placeholder="Enter model" />
+                )}
+                <Field label="Mileage (optional)" value={form.mileage} onChange={(v) => update("mileage", v)} placeholder="62,000" />
               </div>
+              <p className="mt-4 text-[11px] text-muted-foreground">
+                Don't see your vehicle? Choose <span className="text-brand-red">Other</span> and type it in.
+              </p>
             </StepShell>
           )}
 
           {step === 3 && (
             <StepShell title="Describe the issue">
-              <textarea
-                value={form.description}
-                onChange={(e) => update("description", e.target.value)}
-                rows={6}
-                placeholder="Symptoms, sounds, warning lights, when it started…"
-                className="w-full rounded-md border border-border bg-background px-4 py-3 text-sm placeholder:text-muted-foreground/60 focus:border-brand-red focus:outline-none"
-              />
+              <label className="block">
+                <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">Problem description</span>
+                <textarea
+                  value={form.description}
+                  onChange={(e) => update("description", e.target.value)}
+                  rows={5}
+                  placeholder="Symptoms, sounds, warning lights, when it started…"
+                  className="mt-2 w-full rounded-md border border-border bg-background px-4 py-3 text-sm placeholder:text-muted-foreground/60 focus:border-brand-red focus:outline-none"
+                />
+              </label>
+              <label className="mt-4 block">
+                <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">Additional notes (optional)</span>
+                <textarea
+                  value={form.notes}
+                  onChange={(e) => update("notes", e.target.value)}
+                  rows={3}
+                  placeholder="Access info, gate codes, preferred contact method…"
+                  className="mt-2 w-full rounded-md border border-border bg-background px-4 py-3 text-sm placeholder:text-muted-foreground/60 focus:border-brand-red focus:outline-none"
+                />
+              </label>
+
+              <div className="mt-6">
+                <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">Photos (optional)</span>
+                <div className="mt-2 flex flex-wrap items-center gap-3">
+                  {form.photos.map((p) => (
+                    <div key={p} className="relative h-20 w-20 overflow-hidden rounded-md border border-border">
+                      <img src={p} alt="Uploaded" className="h-full w-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => update("photos", form.photos.filter((x) => x !== p))}
+                        className="absolute right-1 top-1 grid h-5 w-5 place-items-center rounded-full bg-background/80 text-foreground"
+                        aria-label="Remove photo"
+                      ><X className="h-3 w-3" /></button>
+                    </div>
+                  ))}
+                  {form.photos.length < 4 && (
+                    <label className="flex h-20 w-20 cursor-pointer flex-col items-center justify-center gap-1 rounded-md border border-dashed border-border bg-background text-[10px] uppercase tracking-widest text-muted-foreground hover:border-brand-red hover:text-brand-red">
+                      <Camera className="h-5 w-5" />
+                      Add
+                      <input
+                        type="file" accept="image/*" multiple className="hidden"
+                        onChange={(e) => onPhotoSelect(e.target.files)}
+                      />
+                    </label>
+                  )}
+                </div>
+                <p className="mt-2 text-[11px] text-muted-foreground">Photos help us quote faster. Up to 4.</p>
+              </div>
             </StepShell>
           )}
 
           {step === 4 && (
-            <StepShell title="Where are we headed?">
+            <StepShell title="Contact & location">
               <div className="grid gap-4 sm:grid-cols-2">
-                <Field label="Full name" value={form.name} onChange={(v) => update("name", v)} placeholder="Johnny Green" />
-                <Field label="Phone" value={form.phone} onChange={(v) => update("phone", v)} placeholder="(801) 555-0100" />
-                <Field label="Email" value={form.email} onChange={(v) => update("email", v)} placeholder="you@email.com" />
-                <Field label="ZIP code" value={form.zip} onChange={(v) => update("zip", v)} placeholder="84070" />
+                <Field label="First name" value={form.firstName} onChange={(v) => update("firstName", v)} placeholder="Johnny" />
+                <Field label="Last name" value={form.lastName} onChange={(v) => update("lastName", v)} placeholder="Green" />
+                <Field label="Phone" value={form.phone} onChange={(v) => update("phone", v)} placeholder="(801) 555-0100" type="tel" />
+                <Field label="Email" value={form.email} onChange={(v) => update("email", v)} placeholder="you@email.com" type="email" />
+                <div className="sm:col-span-2">
+                  <Field label="Service location / address" value={form.location} onChange={(v) => update("location", v)} placeholder="Street, city, ZIP — where we should meet you" />
+                </div>
               </div>
             </StepShell>
           )}
 
           {step === 5 && (
-            <StepShell title="Preferred date">
-              <Field label="When works?" type="date" value={form.preferredDate} onChange={(v) => update("preferredDate", v)} />
-              <p className="mt-4 text-xs text-muted-foreground">We'll confirm via call or text within a few hours.</p>
+            <StepShell title="Schedule your appointment">
+              <div className="rounded-xl border border-border bg-background p-6">
+                <div className="flex items-start gap-3">
+                  <span className="grid h-11 w-11 shrink-0 place-items-center rounded-md bg-brand-red/10 text-brand-red">
+                    <Calendar className="h-5 w-5" />
+                  </span>
+                  <div>
+                    <h3 className="font-display text-lg">You're all set, {form.firstName || "rider"}.</h3>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      Pick a date and time on the next screen. Everything you entered will be passed
+                      straight into the booking — you won't need to repeat anything.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onClick={goSchedule}
+                className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-md bg-brand-red px-6 py-4 text-sm font-bold uppercase tracking-[0.16em] text-white shadow-glow hover:bg-brand-red-glow animate-pulse-red"
+              >
+                Continue to scheduling <ChevronRight className="h-4 w-4" />
+              </button>
             </StepShell>
           )}
 
-          <div className="mt-10 flex items-center justify-between gap-4">
-            <button onClick={prev} disabled={step === 0}
-              className="inline-flex items-center gap-2 rounded-md border border-border bg-background px-5 py-2.5 text-xs font-bold uppercase tracking-[0.16em] disabled:opacity-30">
-              <ChevronLeft className="h-4 w-4" /> Back
-            </button>
-
-            {step < steps.length - 1 ? (
-              <button onClick={next}
-                className="inline-flex items-center gap-2 rounded-md bg-brand-red px-6 py-3 text-xs font-bold uppercase tracking-[0.16em] text-white shadow-glow hover:bg-brand-red-glow">
+          {step < steps.length - 1 && (
+            <div className="mt-10 flex items-center justify-between gap-4">
+              <button onClick={prev} disabled={step === 0}
+                className="inline-flex items-center gap-2 rounded-md border border-border bg-background px-5 py-2.5 text-xs font-bold uppercase tracking-[0.16em] disabled:opacity-30">
+                <ChevronLeft className="h-4 w-4" /> Back
+              </button>
+              <button onClick={next} disabled={!canNext()}
+                className="inline-flex items-center gap-2 rounded-md bg-brand-red px-6 py-3 text-xs font-bold uppercase tracking-[0.16em] text-white shadow-glow hover:bg-brand-red-glow disabled:opacity-40">
                 Next Step <ChevronRight className="h-4 w-4" />
               </button>
-            ) : (
-              <button onClick={submit}
-                className="inline-flex items-center gap-2 rounded-md bg-brand-red px-6 py-3 text-xs font-bold uppercase tracking-[0.16em] text-white shadow-glow hover:bg-brand-red-glow animate-pulse-red">
-                Submit Quote
-              </button>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </section>
     </PageLayout>
@@ -219,7 +309,7 @@ function StepShell({ title, children }: { title: string; children: React.ReactNo
 
 function ChoiceBig({ icon, label, sub, active, onClick }: { icon: React.ReactNode; label: string; sub: string; active: boolean; onClick: () => void }) {
   return (
-    <button onClick={onClick}
+    <button onClick={onClick} type="button"
       className={`group flex items-center gap-4 rounded-xl border p-6 text-left transition-all ${
         active ? "border-brand-red bg-brand-red/10 shadow-glow" : "border-border bg-background hover:border-brand-red/60 hover:-translate-y-0.5"
       }`}>
@@ -240,6 +330,27 @@ function Field({ label, value, onChange, placeholder, type = "text" }: { label: 
         type={type} value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder}
         className="mt-2 w-full rounded-md border border-border bg-background px-4 py-2.5 text-sm placeholder:text-muted-foreground/50 focus:border-brand-red focus:outline-none"
       />
+    </label>
+  );
+}
+
+function Select({
+  label, value, onChange, options, placeholder, disabled,
+}: { label: string; value: string; onChange: (v: string) => void; options: string[]; placeholder?: string; disabled?: boolean }) {
+  return (
+    <label className="block">
+      <span className="block text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">{label}</span>
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        disabled={disabled}
+        className="mt-2 w-full rounded-md border border-border bg-background px-3 py-2.5 text-sm focus:border-brand-red focus:outline-none disabled:opacity-50"
+      >
+        <option value="">{placeholder ?? "Select"}</option>
+        {options.map((o) => (
+          <option key={o} value={o}>{o}</option>
+        ))}
+      </select>
     </label>
   );
 }
