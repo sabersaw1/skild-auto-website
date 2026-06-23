@@ -69,14 +69,11 @@ Deno.serve(async (req) => {
 
   const subject = `New Skild Auto quote — ${c.fullName || "Customer"} · ${s.requested || "Service"}`;
 
-  const photoHtml = photos.length
+  const photoCount = attachments.length || photos.length;
+  const photoHtml = photoCount
     ? `<h3 style="margin:24px 0 8px;font-family:Arial,sans-serif;font-size:14px;color:#dc1e28;text-transform:uppercase;letter-spacing:.18em">Photos</h3>
-       <div>${photos.map((u) => `
-         <a href="${esc(u)}" target="_blank" rel="noopener" style="display:inline-block;margin:0 8px 8px 0">
-           <img src="${esc(u)}" alt="Customer photo" width="160" style="display:block;border:1px solid #222;border-radius:6px"/>
-         </a>`).join("")}</div>
-       <p style="font-family:Arial,sans-serif;font-size:12px;color:#666">
-         ${photos.map((u, i) => `<a href="${esc(u)}">Photo ${i + 1}</a>`).join(" · ")}
+       <p style="margin:0;font-family:Arial,sans-serif;font-size:13px;color:#fff">
+         ${photoCount} photo${photoCount === 1 ? "" : "s"} attached to this email${photos.length ? ` &middot; also stored in Supabase: ${photos.map((u, i) => `<a href="${esc(u)}" style="color:#dc1e28">link ${i + 1}</a>`).join(" · ")}` : ""}.
        </p>`
     : `<p style="font-family:Arial,sans-serif;font-size:13px;color:#666">No photos uploaded.</p>`;
 
