@@ -123,15 +123,6 @@ function QuotePage() {
       setPhotoBusy(false);
     }
   };
-    } catch (err) {
-      console.error("photo upload failed", err);
-      setPhotoError(
-        err instanceof Error ? err.message : "Photo upload failed. Please try again.",
-      );
-    } finally {
-      setPhotoBusy(false);
-    }
-  };
 
   const goSchedule = async () => {
     // Fire-and-confirm the quote notification email before sending the
