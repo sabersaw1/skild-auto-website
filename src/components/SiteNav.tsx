@@ -27,7 +27,7 @@ export function SiteNav({ mode = "neutral" }: SiteNavProps) {
           <img
             src={skildLogo.url}
             alt="Skild Auto"
-            className="h-16 w-auto drop-shadow-[0_0_18px_rgba(220,30,40,0.35)] transition-transform duration-300 group-hover:scale-[1.04] sm:h-20"
+            className="h-16 w-auto transition-transform duration-300 group-hover:scale-[1.04] sm:h-20"
           />
         </Link>
 
