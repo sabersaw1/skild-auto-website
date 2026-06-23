@@ -40,7 +40,14 @@ export async function uploadQuotePhoto(file: File): Promise<UploadedPhoto> {
   const folder = quoteSessionId();
   const path = `${folder}/${Date.now()}-${slug()}.${safeExt(file)}`;
 
-  const { error } = await skildSupabase.storage
+  console.info("[quote-photos] uploading", {
+    bucket: SKILD_QUOTE_BUCKET,
+    path,
+    size: file.size,
+    type: file.type,
+  });
+
+  const { data: upData, error } = await skildSupabase.storage
     .from(SKILD_QUOTE_BUCKET)
     .upload(path, file, {
       cacheControl: "3600",
@@ -48,11 +55,43 @@ export async function uploadQuotePhoto(file: File): Promise<UploadedPhoto> {
       contentType: file.type || "image/jpeg",
     });
 
-  if (error) throw error;
+  if (error) {
+    // Surface the full Supabase error — the most common failure is a
+    // missing storage RLS policy ("new row violates row-level security
+    // policy"). Without this log, the upload appears to silently fail.
+    console.error("[quote-photos] upload failed", {
+      bucket: SKILD_QUOTE_BUCKET,
+      path,
+      name: (error as { name?: string }).name,
+      message: error.message,
+      // @ts-expect-error supabase attaches status/statusCode on StorageError
+      status: error.status ?? error.statusCode,
+      error,
+    });
+    const status =
+      // @ts-expect-error see above
+      error.status ?? error.statusCode;
+    const hint =
+      typeof error.message === "string" &&
+      error.message.toLowerCase().includes("row-level security")
+        ? " — Supabase Storage is rejecting the upload. Add the anon INSERT policy on the 'quote-photos' bucket (see supabase/README.md)."
+        : "";
+    throw new Error(
+      `Photo upload failed${status ? ` (${status})` : ""}: ${error.message}${hint}`,
+    );
+  }
+
+  // Verify the object exists before we hand back a URL — guarantees we
+  // never email a link to a file that wasn't actually stored.
+  if (!upData?.path) {
+    console.error("[quote-photos] upload returned no path", { upData });
+    throw new Error("Photo upload failed: storage did not return a path.");
+  }
 
   const { data } = skildSupabase.storage
     .from(SKILD_QUOTE_BUCKET)
-    .getPublicUrl(path);
+    .getPublicUrl(upData.path);
 
-  return { path, url: data.publicUrl };
+  console.info("[quote-photos] uploaded", { path: upData.path, url: data.publicUrl });
+  return { path: upData.path, url: data.publicUrl };
 }
