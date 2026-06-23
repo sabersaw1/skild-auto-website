@@ -28,7 +28,7 @@ function Splash() {
   }, []);
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-background">
+    <div className="relative overflow-hidden bg-background" style={{ height: "100svh" }}>
       {/* Background image */}
       <div className="absolute inset-0">
         <img src={mainBg.url} alt="" className="h-full w-full object-cover opacity-50" />
@@ -58,17 +58,21 @@ function Splash() {
       <div className="pointer-events-none absolute left-[10%] top-0 h-full w-[3px] bg-gradient-to-b from-transparent via-brand-red to-transparent opacity-60 animate-flicker" />
       <div className="pointer-events-none absolute right-[10%] top-0 h-full w-[3px] bg-gradient-to-b from-transparent via-brand-red to-transparent opacity-60 animate-flicker" style={{ animationDelay: "1s" }} />
 
-      <div className="relative z-10 mx-auto flex h-screen max-h-screen w-full max-w-6xl flex-col items-center justify-center gap-6 px-4 py-4 text-center sm:gap-8 sm:px-6 sm:py-8">
+      <div
+        className="relative z-10 mx-auto flex w-full max-w-6xl flex-col items-center justify-center gap-3 px-4 py-3 text-center sm:gap-5 sm:px-6 sm:py-6"
+        style={{ minHeight: "100svh", height: "100svh" }}
+      >
         <div
-          className={`transition-all duration-1000 ${revealed ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
+          className={`flex flex-col items-center transition-all duration-1000 ${revealed ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
         >
           <p className="text-[10px] font-semibold uppercase tracking-[0.4em] text-brand-red sm:text-xs">Skild Auto Repair</p>
           <img
             src={skildLogo.url}
             alt="Skild Auto"
-            className="mx-auto mt-3 h-40 w-auto drop-shadow-[0_0_60px_rgba(220,30,40,0.45)] sm:mt-5 sm:h-72 md:h-96"
+            className="mx-auto mt-2 w-auto sm:mt-4"
+            style={{ height: "clamp(7rem, 38vh, 22rem)" }}
           />
-          <p className="mx-auto mt-3 max-w-xl text-[11px] font-medium uppercase tracking-[0.28em] text-muted-foreground sm:mt-5 sm:text-sm">
+          <p className="mx-auto mt-2 max-w-xl text-[10px] font-medium uppercase tracking-[0.24em] text-muted-foreground sm:mt-4 sm:text-sm">
             Helping you get back on the road with honest service and reliable solutions.
           </p>
         </div>
