@@ -107,7 +107,22 @@ function QuotePage() {
       const picked = Array.from(files).slice(0, remaining);
       const uploads = await Promise.all(picked.map((f) => uploadQuotePhoto(f)));
       const urls = uploads.map((u) => u.url);
+      const newAttachments: QuoteAttachment[] = uploads.map((u) => ({
+        filename: u.filename,
+        contentType: u.contentType,
+        base64: u.base64,
+      }));
+      setAttachments((prev) => [...prev, ...newAttachments].slice(0, 4));
       update("photos", [...form.photos, ...urls].slice(0, 4));
+    } catch (err) {
+      console.error("photo upload failed", err);
+      setPhotoError(
+        err instanceof Error ? err.message : "Photo upload failed. Please try again.",
+      );
+    } finally {
+      setPhotoBusy(false);
+    }
+  };
     } catch (err) {
       console.error("photo upload failed", err);
       setPhotoError(
