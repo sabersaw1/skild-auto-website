@@ -84,13 +84,21 @@ export function SiteNav({ mode = "neutral" }: SiteNavProps) {
                 {l.label}
               </Link>
             ))}
+            <a
+              href={telHref}
+              onClick={() => setOpen(false)}
+              className="mt-4 inline-flex items-center justify-center gap-2 rounded-md border border-border bg-card px-4 py-3 text-sm font-bold uppercase tracking-[0.16em] text-foreground"
+            >
+              <Phone className="h-4 w-4 text-brand-red" /> {BUSINESS.phone}
+            </a>
             <Link
               to="/quote"
               onClick={() => setOpen(false)}
-              className="mt-4 inline-flex items-center justify-center rounded-md bg-brand-red px-4 py-3 text-sm font-bold uppercase tracking-[0.16em] text-white shadow-glow"
+              className="mt-2 inline-flex items-center justify-center rounded-md bg-brand-red px-4 py-3 text-sm font-bold uppercase tracking-[0.16em] text-white shadow-glow"
             >
               Get Quote
             </Link>
+
           </nav>
         </div>
       )}
