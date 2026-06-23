@@ -26,6 +26,12 @@ export function wasQuoteSubmitted(id: string): boolean {
   return window.sessionStorage.getItem(SUBMITTED_FLAG) === id;
 }
 
+export type QuoteAttachment = {
+  filename: string;
+  contentType: string;
+  base64: string;
+};
+
 export type SubmitPayload = {
   submittedAt: string;
   customer: {
@@ -48,7 +54,8 @@ export type SubmitPayload = {
     description: string;
     notes: string;
   };
-  photos: string[]; // public URLs
+  photos: string[]; // public URLs (record only)
+  attachments: QuoteAttachment[]; // real email attachments
   summary: string; // pre-rendered text block
 };
 
