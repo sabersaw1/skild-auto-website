@@ -28,7 +28,7 @@ function Splash() {
   }, []);
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-background">
+    <div className="relative overflow-hidden bg-background" style={{ height: "100svh" }}>
       {/* Background image */}
       <div className="absolute inset-0">
         <img src={mainBg.url} alt="" className="h-full w-full object-cover opacity-50" />
