@@ -89,13 +89,25 @@ function QuotePage() {
     }
   };
 
-  const onPhotoSelect = (files: FileList | null) => {
+  const onPhotoSelect = async (files: FileList | null) => {
     if (!files) return;
-    const urls: string[] = [];
-    Array.from(files).slice(0, 4).forEach((f) => {
-      urls.push(URL.createObjectURL(f));
-    });
-    update("photos", [...form.photos, ...urls].slice(0, 4));
+    // Store as data URLs (base64) so the actual image bytes travel with the
+    // submission and can be attached to email by a future backend/API
+    // without changing the customer experience.
+    const remaining = Math.max(0, 4 - form.photos.length);
+    const picked = Array.from(files).slice(0, remaining);
+    const encoded = await Promise.all(
+      picked.map(
+        (f) =>
+          new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(String(reader.result));
+            reader.onerror = () => reject(reader.error);
+            reader.readAsDataURL(f);
+          }),
+      ),
+    );
+    update("photos", [...form.photos, ...encoded].slice(0, 4));
   };
 
   const goSchedule = () => navigate({ to: "/booking" });
