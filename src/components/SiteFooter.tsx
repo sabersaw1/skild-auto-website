@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { Instagram, Phone, Mail, MapPin, Clock, Wrench } from "lucide-react";
+import { Instagram, Phone, Mail, MapPin, Clock } from "lucide-react";
+import skildLogo from "@/assets/skild-logo.png.asset.json";
 
 export function SiteFooter() {
   return (
@@ -7,11 +8,8 @@ export function SiteFooter() {
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-red to-transparent" />
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 md:grid-cols-4">
         <div>
-          <Link to="/" className="flex items-center gap-2.5">
-            <span className="grid h-9 w-9 place-items-center rounded-md bg-gradient-to-br from-brand-red to-brand-red/40 shadow-glow">
-              <Wrench className="h-4 w-4 text-white" />
-            </span>
-            <span className="font-display text-xl">SKILD <span className="text-brand-red">AUTO</span></span>
+          <Link to="/" aria-label="Skild Auto — Home" className="inline-flex items-center">
+            <img src={skildLogo.url} alt="Skild Auto" className="h-16 w-auto" />
           </Link>
           <p className="mt-4 text-sm text-muted-foreground">
             Built for the road. Ready for anything. Mobile auto & moto repair across Salt Lake City.

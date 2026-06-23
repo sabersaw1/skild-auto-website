@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Bike, Car, ArrowRight } from "lucide-react";
 import mainBg from "@/assets/main-bg.png.asset.json";
+import skildLogo from "@/assets/skild-logo.png.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -62,9 +63,11 @@ function Splash() {
           className={`transition-all duration-1000 ${revealed ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
         >
           <p className="text-xs font-semibold uppercase tracking-[0.4em] text-brand-red">Skild Auto Ecosystem</p>
-          <h1 className="mt-6 font-display text-6xl leading-none text-glow sm:text-8xl md:text-9xl">
-            SKILD <span className="text-brand-red">AUTO</span>
-          </h1>
+          <img
+            src={skildLogo.url}
+            alt="Skild Auto"
+            className="mx-auto mt-6 h-48 w-auto drop-shadow-[0_0_60px_rgba(220,30,40,0.45)] sm:h-64 md:h-80"
+          />
           <p className="mx-auto mt-6 max-w-xl text-sm font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-base">
             Built for the road. Ready for anything.
           </p>
