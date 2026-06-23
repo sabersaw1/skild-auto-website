@@ -59,18 +59,16 @@ export async function uploadQuotePhoto(file: File): Promise<UploadedPhoto> {
     // Surface the full Supabase error — the most common failure is a
     // missing storage RLS policy ("new row violates row-level security
     // policy"). Without this log, the upload appears to silently fail.
+    const errAny = error as { name?: string; status?: number; statusCode?: number; message: string };
     console.error("[quote-photos] upload failed", {
       bucket: SKILD_QUOTE_BUCKET,
       path,
-      name: (error as { name?: string }).name,
-      message: error.message,
-      // @ts-expect-error supabase attaches status/statusCode on StorageError
-      status: error.status ?? error.statusCode,
+      name: errAny.name,
+      message: errAny.message,
+      status: errAny.status ?? errAny.statusCode,
       error,
     });
-    const status =
-      // @ts-expect-error see above
-      error.status ?? error.statusCode;
+    const status = errAny.status ?? errAny.statusCode;
     const hint =
       typeof error.message === "string" &&
       error.message.toLowerCase().includes("row-level security")
