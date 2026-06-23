@@ -124,7 +124,7 @@ function CtaBand() {
           to="/quote"
           className="inline-flex items-center gap-2 rounded-md bg-brand-red px-7 py-3.5 text-sm font-bold uppercase tracking-[0.16em] text-white shadow-glow hover:bg-brand-red-glow"
         >
-          Start Quiz <ArrowRight className="h-4 w-4" />
+          Get Quote <ArrowRight className="h-4 w-4" />
         </Link>
       </div>
     </section>
