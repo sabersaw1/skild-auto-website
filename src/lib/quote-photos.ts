@@ -9,7 +9,21 @@ import { skildSupabase, SKILD_QUOTE_BUCKET } from "./skild-supabase";
 export type UploadedPhoto = {
   path: string; // storage object path
   url: string; // public URL used in the notification email
+  filename: string; // original filename for the email attachment
+  contentType: string;
+  base64: string; // raw bytes, base64-encoded — used as the email attachment
 };
+
+async function fileToBase64(file: File): Promise<string> {
+  const buf = await file.arrayBuffer();
+  const bytes = new Uint8Array(buf);
+  let binary = "";
+  const chunk = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunk) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + chunk));
+  }
+  return btoa(binary);
+}
 
 function slug() {
   return Math.random().toString(36).slice(2, 10);
@@ -90,6 +104,10 @@ export async function uploadQuotePhoto(file: File): Promise<UploadedPhoto> {
     .from(SKILD_QUOTE_BUCKET)
     .getPublicUrl(upData.path);
 
+  const base64 = await fileToBase64(file);
+  const filename = file.name || `${upData.path.split("/").pop() ?? "photo.jpg"}`;
+  const contentType = file.type || "image/jpeg";
+
   console.info("[quote-photos] uploaded", { path: upData.path, url: data.publicUrl });
-  return { path: upData.path, url: data.publicUrl };
+  return { path: upData.path, url: data.publicUrl, filename, contentType, base64 };
 }

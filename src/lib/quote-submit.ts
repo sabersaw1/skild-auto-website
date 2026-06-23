@@ -26,6 +26,12 @@ export function wasQuoteSubmitted(id: string): boolean {
   return window.sessionStorage.getItem(SUBMITTED_FLAG) === id;
 }
 
+export type QuoteAttachment = {
+  filename: string;
+  contentType: string;
+  base64: string;
+};
+
 export type SubmitPayload = {
   submittedAt: string;
   customer: {
@@ -48,11 +54,12 @@ export type SubmitPayload = {
     description: string;
     notes: string;
   };
-  photos: string[]; // public URLs
+  photos: string[]; // public URLs (record only)
+  attachments: QuoteAttachment[]; // real email attachments
   summary: string; // pre-rendered text block
 };
 
-export function buildPayload(q: QuoteData): SubmitPayload {
+export function buildPayload(q: QuoteData, attachments: QuoteAttachment[] = []): SubmitPayload {
   return {
     submittedAt: new Date().toISOString(),
     customer: {
@@ -76,12 +83,13 @@ export function buildPayload(q: QuoteData): SubmitPayload {
       notes: q.notes,
     },
     photos: q.photos,
+    attachments,
     summary: quoteSummary(q),
   };
 }
 
-export async function submitQuote(q: QuoteData): Promise<void> {
-  const payload = buildPayload(q);
+export async function submitQuote(q: QuoteData, attachments: QuoteAttachment[] = []): Promise<void> {
+  const payload = buildPayload(q, attachments);
 
   const res = await fetch(SKILD_QUOTE_NOTIFY_URL, {
     method: "POST",

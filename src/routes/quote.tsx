@@ -12,7 +12,7 @@ import {
 import { getMakes, getModels, getYears, OTHER } from "@/lib/vehicles";
 import { uploadQuotePhoto } from "@/lib/quote-photos";
 import {
-  submitQuote, markQuoteSubmitted, wasQuoteSubmitted,
+  submitQuote, markQuoteSubmitted, wasQuoteSubmitted, type QuoteAttachment,
 } from "@/lib/quote-submit";
 
 export const Route = createFileRoute("/quote")({
@@ -55,6 +55,7 @@ function QuotePage() {
   const [hydrated, setHydrated] = useState(false);
   const [photoBusy, setPhotoBusy] = useState(false);
   const [photoError, setPhotoError] = useState<string | null>(null);
+  const [attachments, setAttachments] = useState<QuoteAttachment[]>([]);
   const [submitState, setSubmitState] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [submitError, setSubmitError] = useState<string | null>(null);
 
@@ -106,6 +107,12 @@ function QuotePage() {
       const picked = Array.from(files).slice(0, remaining);
       const uploads = await Promise.all(picked.map((f) => uploadQuotePhoto(f)));
       const urls = uploads.map((u) => u.url);
+      const newAttachments: QuoteAttachment[] = uploads.map((u) => ({
+        filename: u.filename,
+        contentType: u.contentType,
+        base64: u.base64,
+      }));
+      setAttachments((prev) => [...prev, ...newAttachments].slice(0, 4));
       update("photos", [...form.photos, ...urls].slice(0, 4));
     } catch (err) {
       console.error("photo upload failed", err);
@@ -128,7 +135,7 @@ function QuotePage() {
       setSubmitState("sending");
       setSubmitError(null);
       try {
-        await submitQuote(form);
+        await submitQuote(form, attachments);
         markQuoteSubmitted(fingerprint);
         setSubmitState("sent");
       } catch (err) {
@@ -256,12 +263,15 @@ function QuotePage() {
               <div className="mt-6">
                 <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">Photos (optional)</span>
                 <div className="mt-2 flex flex-wrap items-center gap-3">
-                  {form.photos.map((p) => (
+                  {form.photos.map((p, idx) => (
                     <div key={p} className="relative h-20 w-20 overflow-hidden rounded-md border border-border">
                       <img src={p} alt="Uploaded" className="h-full w-full object-cover" />
                       <button
                         type="button"
-                        onClick={() => update("photos", form.photos.filter((x) => x !== p))}
+                        onClick={() => {
+                          update("photos", form.photos.filter((x) => x !== p));
+                          setAttachments((prev) => prev.filter((_, i) => i !== idx));
+                        }}
                         className="absolute right-1 top-1 grid h-5 w-5 place-items-center rounded-full bg-background/80 text-foreground"
                         aria-label="Remove photo"
                       ><X className="h-3 w-3" /></button>
