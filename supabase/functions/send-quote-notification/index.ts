@@ -38,7 +38,7 @@ Deno.serve(async (req) => {
   }
 
   const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-  const TO = Deno.env.get("QUOTE_TO_EMAIL") ?? "skildautoi@gmail.com";
+  const TO = Deno.env.get("QUOTE_TO_EMAIL") ?? "skildauto@gmail.com";
   const FROM = Deno.env.get("QUOTE_FROM_EMAIL") ?? "Skild Auto <onboarding@resend.dev>";
 
   if (!RESEND_API_KEY) {
