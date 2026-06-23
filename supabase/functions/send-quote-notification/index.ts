@@ -124,6 +124,7 @@ Deno.serve(async (req) => {
       subject,
       html,
       text,
+      attachments: attachments.length ? attachments : undefined,
     }),
   });
 
