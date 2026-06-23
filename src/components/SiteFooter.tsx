@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Instagram, Phone, Mail, MapPin, Clock } from "lucide-react";
 import skildLogo from "@/assets/skild-logo.png.asset.json";
+import { BUSINESS, mailHref, telHref } from "@/lib/business";
 
 export function SiteFooter() {
   return (
@@ -30,21 +31,27 @@ export function SiteFooter() {
         <div>
           <h4 className="font-display text-sm tracking-widest text-brand-red">Get in touch</h4>
           <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
-            <li className="flex items-start gap-2"><Phone className="mt-0.5 h-4 w-4 text-brand-red" /> [ADD PHONE]</li>
-            <li className="flex items-start gap-2"><Mail className="mt-0.5 h-4 w-4 text-brand-red" /> [ADD EMAIL]</li>
-            <li className="flex items-start gap-2"><MapPin className="mt-0.5 h-4 w-4 text-brand-red" /> Salt Lake City, UT</li>
-            <li className="flex items-start gap-2"><Clock className="mt-0.5 h-4 w-4 text-brand-red" /> Mon–Sat 7AM–7PM</li>
+            <li className="flex items-start gap-2">
+              <Phone className="mt-0.5 h-4 w-4 text-brand-red" />
+              <a href={telHref} className="hover:text-foreground">{BUSINESS.phone}</a>
+            </li>
+            <li className="flex items-start gap-2">
+              <Mail className="mt-0.5 h-4 w-4 text-brand-red" />
+              <a href={mailHref} className="hover:text-foreground">{BUSINESS.email}</a>
+            </li>
+            <li className="flex items-start gap-2"><MapPin className="mt-0.5 h-4 w-4 text-brand-red" /> {BUSINESS.location}</li>
+            <li className="flex items-start gap-2"><Clock className="mt-0.5 h-4 w-4 text-brand-red" /> {BUSINESS.hours}</li>
           </ul>
         </div>
 
         <div>
           <h4 className="font-display text-sm tracking-widest text-brand-red">Follow</h4>
           <a
-            href="https://instagram.com/skildauto"
+            href={BUSINESS.instagramUrl}
             target="_blank" rel="noreferrer"
             className="mt-4 inline-flex items-center gap-2 rounded-md border border-border bg-background px-4 py-2 text-sm hover:border-brand-red hover:text-brand-red"
           >
-            <Instagram className="h-4 w-4" /> @skildauto
+            <Instagram className="h-4 w-4" /> {BUSINESS.instagramHandle}
           </a>
           <Link
             to="/quote"
@@ -56,8 +63,8 @@ export function SiteFooter() {
       </div>
       <div className="border-t border-border">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 py-6 text-xs text-muted-foreground sm:flex-row sm:px-6">
-          <p>© {new Date().getFullYear()} Skild Auto. All rights reserved.</p>
-          <p>Salt Lake City, Utah — Owned by Johnny Green</p>
+          <p>© {new Date().getFullYear()} {BUSINESS.name}. All rights reserved.</p>
+          <p>{BUSINESS.location} — Owned by {BUSINESS.owner}</p>
         </div>
       </div>
     </footer>

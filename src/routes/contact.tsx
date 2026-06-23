@@ -3,6 +3,7 @@ import { PageLayout } from "@/components/PageLayout";
 import { Reveal } from "@/components/Reveal";
 import { useState } from "react";
 import { Phone, Mail, MapPin, Instagram, Send } from "lucide-react";
+import { BUSINESS, mailHref, telHref } from "@/lib/business";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -33,15 +34,15 @@ function ContactPage() {
         <div className="mt-12 grid gap-8 lg:grid-cols-2">
           <Reveal>
             <ul className="space-y-5">
-              <ContactRow icon={<Phone />} label="Phone" value="[ADD PHONE]" />
-              <ContactRow icon={<Mail />} label="Email" value="[ADD EMAIL]" />
-              <ContactRow icon={<MapPin />} label="Location" value="Salt Lake City, UT" />
-              <ContactRow icon={<Instagram />} label="Instagram" value="@skildauto" href="https://instagram.com/skildauto" />
+              <ContactRow icon={<Phone />} label="Phone" value={BUSINESS.phone} href={telHref} />
+              <ContactRow icon={<Mail />} label="Email" value={BUSINESS.email} href={mailHref} />
+              <ContactRow icon={<MapPin />} label="Location" value={BUSINESS.location} />
+              <ContactRow icon={<Instagram />} label="Instagram" value={BUSINESS.instagramHandle} href={BUSINESS.instagramUrl} external />
             </ul>
 
             <div className="mt-8 rounded-xl border border-border bg-card p-6">
               <h4 className="font-display text-sm tracking-widest text-brand-red">Hours</h4>
-              <p className="mt-2 text-sm text-muted-foreground">Mon–Sat · 7:00 AM – 7:00 PM<br />Sunday · Closed</p>
+              <p className="mt-2 text-sm text-muted-foreground">{BUSINESS.hours}<br />Sunday · Closed</p>
             </div>
           </Reveal>
 
@@ -67,6 +68,9 @@ function ContactPage() {
                 className="mt-6 inline-flex items-center gap-2 rounded-md bg-brand-red px-6 py-3 text-xs font-bold uppercase tracking-[0.16em] text-white shadow-glow hover:bg-brand-red-glow">
                 <Send className="h-4 w-4" /> {sent ? "Message sent" : "Send message"}
               </button>
+              <p className="mt-3 text-[11px] text-muted-foreground">
+                Prefer to talk now? Call <a href={telHref} className="text-brand-red hover:underline">{BUSINESS.phone}</a>.
+              </p>
             </form>
           </Reveal>
         </div>
@@ -75,7 +79,7 @@ function ContactPage() {
   );
 }
 
-function ContactRow({ icon, label, value, href }: { icon: React.ReactNode; label: string; value: string; href?: string }) {
+function ContactRow({ icon, label, value, href, external }: { icon: React.ReactNode; label: string; value: string; href?: string; external?: boolean }) {
   const inner = (
     <div className="shine-border flex items-center gap-4 rounded-xl border border-border bg-card p-5 transition-colors hover:border-brand-red/60">
       <span className="grid h-11 w-11 place-items-center rounded-md bg-brand-red/10 text-brand-red">{icon}</span>
@@ -85,7 +89,17 @@ function ContactRow({ icon, label, value, href }: { icon: React.ReactNode; label
       </div>
     </div>
   );
-  return <li>{href ? <a href={href} target="_blank" rel="noreferrer">{inner}</a> : inner}</li>;
+  return (
+    <li>
+      {href ? (
+        <a href={href} {...(external ? { target: "_blank", rel: "noreferrer" } : {})}>
+          {inner}
+        </a>
+      ) : (
+        inner
+      )}
+    </li>
+  );
 }
 
 function Field({ label, type = "text", required }: { label: string; type?: string; required?: boolean }) {
