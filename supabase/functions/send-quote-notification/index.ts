@@ -58,6 +58,14 @@ Deno.serve(async (req) => {
   const v = p?.vehicle ?? {};
   const s = p?.service ?? {};
   const photos: string[] = Array.isArray(p?.photos) ? p.photos : [];
+  const rawAttachments: any[] = Array.isArray(p?.attachments) ? p.attachments : [];
+  const attachments = rawAttachments
+    .filter((a) => a && typeof a.base64 === "string" && a.base64.length > 0)
+    .map((a, i) => ({
+      filename: typeof a.filename === "string" && a.filename ? a.filename : `photo-${i + 1}.jpg`,
+      content: a.base64, // Resend accepts base64 string in `content`
+      content_type: typeof a.contentType === "string" ? a.contentType : "image/jpeg",
+    }));
 
   const subject = `New Skild Auto quote — ${c.fullName || "Customer"} · ${s.requested || "Service"}`;
 
