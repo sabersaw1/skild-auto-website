@@ -12,7 +12,7 @@ import {
 import { getMakes, getModels, getYears, OTHER } from "@/lib/vehicles";
 import { uploadQuotePhoto } from "@/lib/quote-photos";
 import {
-  submitQuote, markQuoteSubmitted, wasQuoteSubmitted,
+  submitQuote, markQuoteSubmitted, wasQuoteSubmitted, type QuoteAttachment,
 } from "@/lib/quote-submit";
 
 export const Route = createFileRoute("/quote")({
