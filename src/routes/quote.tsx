@@ -10,6 +10,10 @@ import {
   EMPTY_QUOTE, loadQuote, saveQuote, type QuoteData,
 } from "@/lib/quote-storage";
 import { getMakes, getModels, getYears, OTHER } from "@/lib/vehicles";
+import { uploadQuotePhoto } from "@/lib/quote-photos";
+import {
+  submitQuote, markQuoteSubmitted, wasQuoteSubmitted,
+} from "@/lib/quote-submit";
 
 export const Route = createFileRoute("/quote")({
   head: () => ({
@@ -49,6 +53,10 @@ function QuotePage() {
   const [step, setStep] = useState(0);
   const [form, setForm] = useState<QuoteData>(EMPTY_QUOTE);
   const [hydrated, setHydrated] = useState(false);
+  const [photoBusy, setPhotoBusy] = useState(false);
+  const [photoError, setPhotoError] = useState<string | null>(null);
+  const [submitState, setSubmitState] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   // Hydrate from sessionStorage so customer data persists across visits.
   useEffect(() => {
@@ -91,26 +99,49 @@ function QuotePage() {
 
   const onPhotoSelect = async (files: FileList | null) => {
     if (!files) return;
-    // Store as data URLs (base64) so the actual image bytes travel with the
-    // submission and can be attached to email by a future backend/API
-    // without changing the customer experience.
-    const remaining = Math.max(0, 4 - form.photos.length);
-    const picked = Array.from(files).slice(0, remaining);
-    const encoded = await Promise.all(
-      picked.map(
-        (f) =>
-          new Promise<string>((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(String(reader.result));
-            reader.onerror = () => reject(reader.error);
-            reader.readAsDataURL(f);
-          }),
-      ),
-    );
-    update("photos", [...form.photos, ...encoded].slice(0, 4));
+    setPhotoError(null);
+    setPhotoBusy(true);
+    try {
+      const remaining = Math.max(0, 4 - form.photos.length);
+      const picked = Array.from(files).slice(0, remaining);
+      const uploads = await Promise.all(picked.map((f) => uploadQuotePhoto(f)));
+      const urls = uploads.map((u) => u.url);
+      update("photos", [...form.photos, ...urls].slice(0, 4));
+    } catch (err) {
+      console.error("photo upload failed", err);
+      setPhotoError(
+        err instanceof Error ? err.message : "Photo upload failed. Please try again.",
+      );
+    } finally {
+      setPhotoBusy(false);
+    }
   };
 
-  const goSchedule = () => navigate({ to: "/booking" });
+  const goSchedule = async () => {
+    // Fire-and-confirm the quote notification email before sending the
+    // customer to Calendly. Idempotent per saved quote: re-clicking from
+    // the same session won't send a duplicate email.
+    const fingerprint = JSON.stringify({
+      e: form.email, p: form.phone, s: form.service, d: form.description,
+    });
+    if (submitState !== "sent" && !wasQuoteSubmitted(fingerprint)) {
+      setSubmitState("sending");
+      setSubmitError(null);
+      try {
+        await submitQuote(form);
+        markQuoteSubmitted(fingerprint);
+        setSubmitState("sent");
+      } catch (err) {
+        console.error("quote submission failed", err);
+        setSubmitState("error");
+        setSubmitError(
+          err instanceof Error ? err.message : "Could not send quote notification.",
+        );
+        // Still let the customer continue — booking matters more than email.
+      }
+    }
+    navigate({ to: "/booking" });
+  };
 
   return (
     <PageLayout>
@@ -247,7 +278,12 @@ function QuotePage() {
                     </label>
                   )}
                 </div>
-                <p className="mt-2 text-[11px] text-muted-foreground">Photos help us quote faster. Up to 4.</p>
+                <p className="mt-2 text-[11px] text-muted-foreground">
+                  {photoBusy ? "Uploading…" : "Photos help us quote faster. Up to 4."}
+                </p>
+                {photoError && (
+                  <p className="mt-1 text-[11px] text-brand-red">{photoError}</p>
+                )}
               </div>
             </StepShell>
           )}
@@ -285,10 +321,19 @@ function QuotePage() {
 
               <button
                 onClick={goSchedule}
-                className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-md bg-brand-red px-6 py-4 text-sm font-bold uppercase tracking-[0.16em] text-white shadow-glow hover:bg-brand-red-glow animate-pulse-red"
+                disabled={submitState === "sending"}
+                className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-md bg-brand-red px-6 py-4 text-sm font-bold uppercase tracking-[0.16em] text-white shadow-glow hover:bg-brand-red-glow animate-pulse-red disabled:opacity-60"
               >
-                Continue to scheduling <ChevronRight className="h-4 w-4" />
+                {submitState === "sending"
+                  ? "Sending your quote…"
+                  : (<>Continue to scheduling <ChevronRight className="h-4 w-4" /></>)}
               </button>
+              {submitState === "error" && (
+                <p className="mt-3 text-xs text-brand-red">
+                  Quote saved locally, but the notification email failed: {submitError}.
+                  You can still continue to scheduling — we'll see your details on the calendar.
+                </p>
+              )}
             </StepShell>
           )}
 
