@@ -21,6 +21,8 @@ import { Route as AutoRouteImport } from './routes/auto'
 import { Route as ApparelRouteImport } from './routes/apparel'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiPublicSendQuoteRouteImport } from './routes/api/public/send-quote'
+import { Route as ApiPublicCloudinarySignRouteImport } from './routes/api/public/cloudinary-sign'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -82,6 +84,16 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicSendQuoteRoute = ApiPublicSendQuoteRouteImport.update({
+  id: '/api/public/send-quote',
+  path: '/api/public/send-quote',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicCloudinarySignRoute = ApiPublicCloudinarySignRouteImport.update({
+  id: '/api/public/cloudinary-sign',
+  path: '/api/public/cloudinary-sign',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -96,6 +108,8 @@ export interface FileRoutesByFullPath {
   '/service-area': typeof ServiceAreaRoute
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/api/public/cloudinary-sign': typeof ApiPublicCloudinarySignRoute
+  '/api/public/send-quote': typeof ApiPublicSendQuoteRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -110,6 +124,8 @@ export interface FileRoutesByTo {
   '/service-area': typeof ServiceAreaRoute
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/api/public/cloudinary-sign': typeof ApiPublicCloudinarySignRoute
+  '/api/public/send-quote': typeof ApiPublicSendQuoteRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -125,6 +141,8 @@ export interface FileRoutesById {
   '/service-area': typeof ServiceAreaRoute
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/api/public/cloudinary-sign': typeof ApiPublicCloudinarySignRoute
+  '/api/public/send-quote': typeof ApiPublicSendQuoteRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -141,6 +159,8 @@ export interface FileRouteTypes {
     | '/service-area'
     | '/services'
     | '/sitemap.xml'
+    | '/api/public/cloudinary-sign'
+    | '/api/public/send-quote'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -155,6 +175,8 @@ export interface FileRouteTypes {
     | '/service-area'
     | '/services'
     | '/sitemap.xml'
+    | '/api/public/cloudinary-sign'
+    | '/api/public/send-quote'
   id:
     | '__root__'
     | '/'
@@ -169,6 +191,8 @@ export interface FileRouteTypes {
     | '/service-area'
     | '/services'
     | '/sitemap.xml'
+    | '/api/public/cloudinary-sign'
+    | '/api/public/send-quote'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -184,6 +208,8 @@ export interface RootRouteChildren {
   ServiceAreaRoute: typeof ServiceAreaRoute
   ServicesRoute: typeof ServicesRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  ApiPublicCloudinarySignRoute: typeof ApiPublicCloudinarySignRoute
+  ApiPublicSendQuoteRoute: typeof ApiPublicSendQuoteRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -272,6 +298,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/send-quote': {
+      id: '/api/public/send-quote'
+      path: '/api/public/send-quote'
+      fullPath: '/api/public/send-quote'
+      preLoaderRoute: typeof ApiPublicSendQuoteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/cloudinary-sign': {
+      id: '/api/public/cloudinary-sign'
+      path: '/api/public/cloudinary-sign'
+      fullPath: '/api/public/cloudinary-sign'
+      preLoaderRoute: typeof ApiPublicCloudinarySignRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -288,17 +328,9 @@ const rootRouteChildren: RootRouteChildren = {
   ServiceAreaRoute: ServiceAreaRoute,
   ServicesRoute: ServicesRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  ApiPublicCloudinarySignRoute: ApiPublicCloudinarySignRoute,
+  ApiPublicSendQuoteRoute: ApiPublicSendQuoteRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

@@ -10,9 +10,9 @@ import {
   EMPTY_QUOTE, loadQuote, saveQuote, type QuoteData,
 } from "@/lib/quote-storage";
 import { getMakes, getModels, getYears, OTHER } from "@/lib/vehicles";
-import { uploadQuotePhoto } from "@/lib/quote-photos";
+import { uploadQuotePhoto, type CloudinaryPhoto } from "@/lib/cloudinary-upload";
 import {
-  submitQuote, markQuoteSubmitted, wasQuoteSubmitted, type QuoteAttachment,
+  submitQuote, markQuoteSubmitted, wasQuoteSubmitted,
 } from "@/lib/quote-submit";
 
 export const Route = createFileRoute("/quote")({
@@ -55,7 +55,7 @@ function QuotePage() {
   const [hydrated, setHydrated] = useState(false);
   const [photoBusy, setPhotoBusy] = useState(false);
   const [photoError, setPhotoError] = useState<string | null>(null);
-  const [attachments, setAttachments] = useState<QuoteAttachment[]>([]);
+  const [photoRefs, setPhotoRefs] = useState<CloudinaryPhoto[]>([]);
   const [submitState, setSubmitState] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [submitError, setSubmitError] = useState<string | null>(null);
 
@@ -106,14 +106,11 @@ function QuotePage() {
       const remaining = Math.max(0, 4 - form.photos.length);
       const picked = Array.from(files).slice(0, remaining);
       const uploads = await Promise.all(picked.map((f) => uploadQuotePhoto(f)));
-      const urls = uploads.map((u) => u.url);
-      const newAttachments: QuoteAttachment[] = uploads.map((u) => ({
-        filename: u.filename,
-        contentType: u.contentType,
-        base64: u.base64,
-      }));
-      setAttachments((prev) => [...prev, ...newAttachments].slice(0, 4));
-      update("photos", [...form.photos, ...urls].slice(0, 4));
+      setPhotoRefs((prev) => [...prev, ...uploads].slice(0, 4));
+      update(
+        "photos",
+        [...form.photos, ...uploads.map((u) => u.secureUrl)].slice(0, 4),
+      );
     } catch (err) {
       console.error("photo upload failed", err);
       setPhotoError(
@@ -135,7 +132,7 @@ function QuotePage() {
       setSubmitState("sending");
       setSubmitError(null);
       try {
-        await submitQuote(form, attachments);
+        await submitQuote(form, photoRefs);
         markQuoteSubmitted(fingerprint);
         setSubmitState("sent");
       } catch (err) {
@@ -269,8 +266,8 @@ function QuotePage() {
                       <button
                         type="button"
                         onClick={() => {
-                          update("photos", form.photos.filter((x) => x !== p));
-                          setAttachments((prev) => prev.filter((_, i) => i !== idx));
+                          update("photos", form.photos.filter((_, i) => i !== idx));
+                          setPhotoRefs((prev) => prev.filter((_, i) => i !== idx));
                         }}
                         className="absolute right-1 top-1 grid h-5 w-5 place-items-center rounded-full bg-background/80 text-foreground"
                         aria-label="Remove photo"
