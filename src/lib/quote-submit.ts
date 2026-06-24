@@ -1,19 +1,18 @@
-// Sends the completed quote to the Supabase Edge Function that emails
-// skildauto@gmail.com. Email composition + delivery (Resend) live in
-// supabase/functions/send-quote-notification/index.ts so credentials
-// never touch the client and the system stays portable to GitHub,
-// Vercel, Neon, and Skild OS.
+// Sends the completed quote to the TanStack server route at
+// /api/public/send-quote, which emails skildauto@gmail.com via Resend
+// with the customer's Cloudinary photos as real downloadable
+// attachments.
+//
+// No Supabase, no Lovable Cloud — portable across GitHub, Vercel, Neon,
+// and the future Skild OS layer.
 
-import {
-  SKILD_QUOTE_NOTIFY_URL,
-  skildSupabaseAnonKey,
-} from "./skild-supabase";
 import {
   quoteSummary,
   resolvedMake,
   resolvedModel,
   type QuoteData,
 } from "./quote-storage";
+import type { CloudinaryPhoto } from "./cloudinary-upload";
 
 const SUBMITTED_FLAG = "skild.quote.submitted";
 
@@ -25,12 +24,6 @@ export function wasQuoteSubmitted(id: string): boolean {
   if (typeof window === "undefined") return false;
   return window.sessionStorage.getItem(SUBMITTED_FLAG) === id;
 }
-
-export type QuoteAttachment = {
-  filename: string;
-  contentType: string;
-  base64: string;
-};
 
 export type SubmitPayload = {
   submittedAt: string;
@@ -54,12 +47,13 @@ export type SubmitPayload = {
     description: string;
     notes: string;
   };
-  photos: string[]; // public URLs (record only)
-  attachments: QuoteAttachment[]; // real email attachments
-  summary: string; // pre-rendered text block
+  // Cloudinary references — server fetches each URL and attaches the
+  // raw bytes to the email. Also the shape future Neon rows will store.
+  photos: CloudinaryPhoto[];
+  summary: string;
 };
 
-export function buildPayload(q: QuoteData, attachments: QuoteAttachment[] = []): SubmitPayload {
+export function buildPayload(q: QuoteData, photos: CloudinaryPhoto[]): SubmitPayload {
   return {
     submittedAt: new Date().toISOString(),
     customer: {
@@ -82,23 +76,20 @@ export function buildPayload(q: QuoteData, attachments: QuoteAttachment[] = []):
       description: q.description,
       notes: q.notes,
     },
-    photos: q.photos,
-    attachments,
+    photos,
     summary: quoteSummary(q),
   };
 }
 
-export async function submitQuote(q: QuoteData, attachments: QuoteAttachment[] = []): Promise<void> {
-  const payload = buildPayload(q, attachments);
+export async function submitQuote(
+  q: QuoteData,
+  photos: CloudinaryPhoto[] = [],
+): Promise<void> {
+  const payload = buildPayload(q, photos);
 
-  const res = await fetch(SKILD_QUOTE_NOTIFY_URL, {
+  const res = await fetch("/api/public/send-quote", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      // Supabase Edge Functions require the anon key by default.
-      apikey: skildSupabaseAnonKey,
-      Authorization: `Bearer ${skildSupabaseAnonKey}`,
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
 
