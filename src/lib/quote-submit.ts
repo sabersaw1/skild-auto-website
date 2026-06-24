@@ -95,6 +95,10 @@ export async function submitQuote(
 
   if (!res.ok) {
     const text = await res.text().catch(() => "");
-    throw new Error(`Quote notification failed (${res.status}): ${text}`);
+    throw new Error(`Quote notification failed (${res.status}): ${text.slice(0, 300)}`);
+  }
+  const data = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string };
+  if (data.ok === false) {
+    throw new Error(data.error || "Quote notification failed");
   }
 }

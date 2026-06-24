@@ -94,8 +94,8 @@ export const Route = createFileRoute("/api/public/send-quote")({
 
         if (!RESEND_API_KEY) {
           return Response.json(
-            { error: "RESEND_API_KEY not configured" },
-            { status: 500, headers: CORS },
+            { ok: false, error: "RESEND_API_KEY not configured" },
+            { status: 200, headers: CORS },
           );
         }
 
@@ -103,7 +103,10 @@ export const Route = createFileRoute("/api/public/send-quote")({
         try {
           p = (await request.json()) as Payload;
         } catch {
-          return Response.json({ error: "Invalid JSON" }, { status: 400, headers: CORS });
+          return Response.json(
+            { ok: false, error: "Invalid JSON" },
+            { status: 200, headers: CORS },
+          );
         }
 
         const c = p.customer ?? {};
@@ -227,8 +230,8 @@ export const Route = createFileRoute("/api/public/send-quote")({
           const err = await resendRes.text().catch(() => "");
           console.error("[send-quote] resend failed", { status: resendRes.status, err });
           return Response.json(
-            { error: "Resend send failed", detail: err },
-            { status: 502, headers: CORS },
+            { ok: false, error: `Resend ${resendRes.status}: ${err.slice(0, 400)}` },
+            { status: 200, headers: CORS },
           );
         }
 
