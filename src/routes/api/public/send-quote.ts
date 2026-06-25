@@ -115,6 +115,26 @@ export const Route = createFileRoute("/api/public/send-quote")({
         const b = p.booking ?? {};
         const photos = Array.isArray(p.photos) ? p.photos : [];
 
+        // Best-effort Neon persistence. Failures are logged but never block
+        // the customer email — Cloudinary + Resend stay the critical path.
+        let quoteId: string | null = null;
+        try {
+          const { hasNeon, persistQuote } = await import("@/lib/neon.server");
+          if (hasNeon()) {
+            const res = await persistQuote({
+              customer: c as never,
+              vehicle: v as never,
+              service: s as never,
+              summary: p.summary,
+              photos: photos as never,
+            });
+            quoteId = res.quoteId;
+            console.info("[send-quote] persisted to Neon", res);
+          }
+        } catch (err) {
+          console.error("[send-quote] Neon persistence failed (continuing)", err);
+        }
+
         // Fetch every Cloudinary URL server-side and convert to a Resend
         // attachment. If one fails we log and continue — the email still
         // ships with the rest.
@@ -240,6 +260,7 @@ export const Route = createFileRoute("/api/public/send-quote")({
           {
             ok: true,
             id: data.id,
+            quoteId,
             attached: attachments.length,
             attachmentFailures: failures,
           },
