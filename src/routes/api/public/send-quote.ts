@@ -63,7 +63,19 @@ function safeFilename(name: string, fallbackExt: string, idx: number): string {
   return `${stem}.${(fallbackExt || "jpg").toLowerCase()}`.slice(0, 80);
 }
 
+function isAllowedPhotoUrl(url: string): boolean {
+  try {
+    const u = new URL(url);
+    return u.protocol === "https:" && u.hostname === "res.cloudinary.com";
+  } catch {
+    return false;
+  }
+}
+
 async function fetchAsBase64(url: string): Promise<{ base64: string; contentType: string; bytes: number }> {
+  if (!isAllowedPhotoUrl(url)) {
+    throw new Error("Disallowed photo URL");
+  }
   const res = await fetch(url);
   if (!res.ok) throw new Error(`fetch ${url} → ${res.status}`);
   const buf = new Uint8Array(await res.arrayBuffer());
