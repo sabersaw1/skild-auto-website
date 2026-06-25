@@ -12,10 +12,12 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ServicesRouteImport } from './routes/services'
 import { Route as ServiceAreaRouteImport } from './routes/service-area'
+import { Route as ScheduleRouteImport } from './routes/schedule'
 import { Route as ReviewsRouteImport } from './routes/reviews'
 import { Route as QuoteRouteImport } from './routes/quote'
 import { Route as MotoRouteImport } from './routes/moto'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as ConfirmRouteImport } from './routes/confirm'
 import { Route as BookingRouteImport } from './routes/booking'
 import { Route as AutoRouteImport } from './routes/auto'
 import { Route as ApparelRouteImport } from './routes/apparel'
@@ -40,6 +42,11 @@ const ServiceAreaRoute = ServiceAreaRouteImport.update({
   path: '/service-area',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ScheduleRoute = ScheduleRouteImport.update({
+  id: '/schedule',
+  path: '/schedule',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ReviewsRoute = ReviewsRouteImport.update({
   id: '/reviews',
   path: '/reviews',
@@ -58,6 +65,11 @@ const MotoRoute = MotoRouteImport.update({
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConfirmRoute = ConfirmRouteImport.update({
+  id: '/confirm',
+  path: '/confirm',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BookingRoute = BookingRouteImport.update({
@@ -108,10 +120,12 @@ export interface FileRoutesByFullPath {
   '/apparel': typeof ApparelRoute
   '/auto': typeof AutoRoute
   '/booking': typeof BookingRoute
+  '/confirm': typeof ConfirmRoute
   '/contact': typeof ContactRoute
   '/moto': typeof MotoRoute
   '/quote': typeof QuoteRoute
   '/reviews': typeof ReviewsRoute
+  '/schedule': typeof ScheduleRoute
   '/service-area': typeof ServiceAreaRoute
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -125,10 +139,12 @@ export interface FileRoutesByTo {
   '/apparel': typeof ApparelRoute
   '/auto': typeof AutoRoute
   '/booking': typeof BookingRoute
+  '/confirm': typeof ConfirmRoute
   '/contact': typeof ContactRoute
   '/moto': typeof MotoRoute
   '/quote': typeof QuoteRoute
   '/reviews': typeof ReviewsRoute
+  '/schedule': typeof ScheduleRoute
   '/service-area': typeof ServiceAreaRoute
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -143,10 +159,12 @@ export interface FileRoutesById {
   '/apparel': typeof ApparelRoute
   '/auto': typeof AutoRoute
   '/booking': typeof BookingRoute
+  '/confirm': typeof ConfirmRoute
   '/contact': typeof ContactRoute
   '/moto': typeof MotoRoute
   '/quote': typeof QuoteRoute
   '/reviews': typeof ReviewsRoute
+  '/schedule': typeof ScheduleRoute
   '/service-area': typeof ServiceAreaRoute
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -162,10 +180,12 @@ export interface FileRouteTypes {
     | '/apparel'
     | '/auto'
     | '/booking'
+    | '/confirm'
     | '/contact'
     | '/moto'
     | '/quote'
     | '/reviews'
+    | '/schedule'
     | '/service-area'
     | '/services'
     | '/sitemap.xml'
@@ -179,10 +199,12 @@ export interface FileRouteTypes {
     | '/apparel'
     | '/auto'
     | '/booking'
+    | '/confirm'
     | '/contact'
     | '/moto'
     | '/quote'
     | '/reviews'
+    | '/schedule'
     | '/service-area'
     | '/services'
     | '/sitemap.xml'
@@ -196,10 +218,12 @@ export interface FileRouteTypes {
     | '/apparel'
     | '/auto'
     | '/booking'
+    | '/confirm'
     | '/contact'
     | '/moto'
     | '/quote'
     | '/reviews'
+    | '/schedule'
     | '/service-area'
     | '/services'
     | '/sitemap.xml'
@@ -214,10 +238,12 @@ export interface RootRouteChildren {
   ApparelRoute: typeof ApparelRoute
   AutoRoute: typeof AutoRoute
   BookingRoute: typeof BookingRoute
+  ConfirmRoute: typeof ConfirmRoute
   ContactRoute: typeof ContactRoute
   MotoRoute: typeof MotoRoute
   QuoteRoute: typeof QuoteRoute
   ReviewsRoute: typeof ReviewsRoute
+  ScheduleRoute: typeof ScheduleRoute
   ServiceAreaRoute: typeof ServiceAreaRoute
   ServicesRoute: typeof ServicesRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -249,6 +275,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ServiceAreaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/schedule': {
+      id: '/schedule'
+      path: '/schedule'
+      fullPath: '/schedule'
+      preLoaderRoute: typeof ScheduleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/reviews': {
       id: '/reviews'
       path: '/reviews'
@@ -275,6 +308,13 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/confirm': {
+      id: '/confirm'
+      path: '/confirm'
+      fullPath: '/confirm'
+      preLoaderRoute: typeof ConfirmRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/booking': {
@@ -342,10 +382,12 @@ const rootRouteChildren: RootRouteChildren = {
   ApparelRoute: ApparelRoute,
   AutoRoute: AutoRoute,
   BookingRoute: BookingRoute,
+  ConfirmRoute: ConfirmRoute,
   ContactRoute: ContactRoute,
   MotoRoute: MotoRoute,
   QuoteRoute: QuoteRoute,
   ReviewsRoute: ReviewsRoute,
+  ScheduleRoute: ScheduleRoute,
   ServiceAreaRoute: ServiceAreaRoute,
   ServicesRoute: ServicesRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
