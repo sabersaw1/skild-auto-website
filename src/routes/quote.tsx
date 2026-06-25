@@ -122,29 +122,32 @@ function QuotePage() {
   };
 
   const goSchedule = async () => {
-    // Fire-and-confirm the quote notification email before sending the
-    // customer to Calendly. Idempotent per saved quote: re-clicking from
-    // the same session won't send a duplicate email.
+    // Persist the quote in Supabase, then forward to the custom scheduler
+    // with the quoteId so the customer doesn't re-enter anything.
     const fingerprint = JSON.stringify({
       e: form.email, p: form.phone, s: form.service, d: form.description,
     });
+    let quoteId: string | null = null;
     if (submitState !== "sent" && !wasQuoteSubmitted(fingerprint)) {
       setSubmitState("sending");
       setSubmitError(null);
       try {
-        await submitQuote(form, photoRefs);
+        const res = await submitQuote(form, photoRefs);
+        quoteId = res.quoteId;
         markQuoteSubmitted(fingerprint);
         setSubmitState("sent");
       } catch (err) {
         console.error("quote submission failed", err);
         setSubmitState("error");
         setSubmitError(
-          err instanceof Error ? err.message : "Could not send quote notification.",
+          err instanceof Error ? err.message : "Could not save your quote.",
         );
-        // Still let the customer continue — booking matters more than email.
+        return;
       }
     }
-    navigate({ to: "/booking" });
+    const { setQuoteId } = await import("@/lib/skild-booking");
+    if (quoteId) setQuoteId(quoteId);
+    navigate({ to: "/schedule" });
   };
 
   return (

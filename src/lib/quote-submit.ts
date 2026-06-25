@@ -84,7 +84,7 @@ export function buildPayload(q: QuoteData, photos: CloudinaryPhoto[]): SubmitPay
 export async function submitQuote(
   q: QuoteData,
   photos: CloudinaryPhoto[] = [],
-): Promise<void> {
+): Promise<{ quoteId: string | null }> {
   const payload = buildPayload(q, photos);
 
   const res = await fetch("/api/public/send-quote", {
@@ -97,8 +97,11 @@ export async function submitQuote(
     const text = await res.text().catch(() => "");
     throw new Error(`Quote notification failed (${res.status}): ${text.slice(0, 300)}`);
   }
-  const data = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string };
+  const data = (await res.json().catch(() => ({}))) as {
+    ok?: boolean; error?: string; quoteId?: string | null;
+  };
   if (data.ok === false) {
     throw new Error(data.error || "Quote notification failed");
   }
+  return { quoteId: data.quoteId ?? null };
 }
