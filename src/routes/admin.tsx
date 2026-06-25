@@ -81,6 +81,8 @@ function LoginScreen() {
   const [pw, setPw] = useState("");
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [bootBusy, setBootBusy] = useState(false);
+  const [bootMsg, setBootMsg] = useState<string | null>(null);
 
   async function submit(e: FormEvent) {
     e.preventDefault();
@@ -88,6 +90,20 @@ function LoginScreen() {
     const { error } = await signInWithPassword(email, pw);
     setBusy(false);
     if (error) setErr(error.message);
+  }
+
+  async function runBootstrap() {
+    setBootBusy(true); setBootMsg(null);
+    try {
+      const r = await bootstrapSkildAdmin();
+      setBootMsg(r.ok
+        ? `Admin ready (${r.email}). Sign in with the password from SKILD_ADMIN_PASSWORD.`
+        : `Failed: ${r.error}`);
+    } catch (e) {
+      setBootMsg(e instanceof Error ? e.message : "Bootstrap failed");
+    } finally {
+      setBootBusy(false);
+    }
   }
 
   return (
@@ -111,6 +127,17 @@ function LoginScreen() {
           {busy ? "Signing in…" : "Sign in"}
         </button>
       </form>
+      <div className="mt-6 border-t border-border pt-4 text-left">
+        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">First-time setup</p>
+        <button
+          onClick={runBootstrap}
+          disabled={bootBusy}
+          className="mt-2 w-full rounded-md border border-border bg-background px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] hover:border-brand-red hover:text-brand-red disabled:opacity-50"
+        >
+          {bootBusy ? "Provisioning…" : "Run admin bootstrap"}
+        </button>
+        {bootMsg && <p className="mt-2 text-[11px] text-muted-foreground">{bootMsg}</p>}
+      </div>
       <p className="mt-4 text-[11px] text-muted-foreground">Private portal. Access logged.</p>
     </CenterBox>
   );
