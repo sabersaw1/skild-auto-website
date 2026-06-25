@@ -63,7 +63,19 @@ function safeFilename(name: string, fallbackExt: string, idx: number): string {
   return `${stem}.${(fallbackExt || "jpg").toLowerCase()}`.slice(0, 80);
 }
 
+function isAllowedPhotoUrl(url: string): boolean {
+  try {
+    const u = new URL(url);
+    return u.protocol === "https:" && u.hostname === "res.cloudinary.com";
+  } catch {
+    return false;
+  }
+}
+
 async function fetchAsBase64(url: string): Promise<{ base64: string; contentType: string; bytes: number }> {
+  if (!isAllowedPhotoUrl(url)) {
+    throw new Error("Disallowed photo URL");
+  }
   const res = await fetch(url);
   if (!res.ok) throw new Error(`fetch ${url} → ${res.status}`);
   const buf = new Uint8Array(await res.arrayBuffer());
@@ -113,7 +125,12 @@ export const Route = createFileRoute("/api/public/send-quote")({
         const v = p.vehicle ?? {};
         const s = p.service ?? {};
         const b = p.booking ?? {};
-        const photos = Array.isArray(p.photos) ? p.photos : [];
+        const MAX_PHOTOS = 10;
+        const rawPhotos = Array.isArray(p.photos) ? p.photos : [];
+        const photos = rawPhotos.slice(0, MAX_PHOTOS).filter((ph) => {
+          const url = ph?.secureUrl || ph?.url;
+          return !!url && isAllowedPhotoUrl(url);
+        });
 
         // Best-effort Neon persistence. Failures are logged but never block
         // the customer email — Cloudinary + Resend stay the critical path.
@@ -250,7 +267,7 @@ export const Route = createFileRoute("/api/public/send-quote")({
           const err = await resendRes.text().catch(() => "");
           console.error("[send-quote] resend failed", { status: resendRes.status, err });
           return Response.json(
-            { ok: false, error: `Resend ${resendRes.status}: ${err.slice(0, 400)}` },
+            { ok: false, error: "Failed to send quote notification. Please try again." },
             { status: 200, headers: CORS },
           );
         }

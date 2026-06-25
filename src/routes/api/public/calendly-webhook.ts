@@ -85,18 +85,18 @@ export const Route = createFileRoute("/api/public/calendly-webhook")({
         const rawBody = await request.text();
         const signingKey = process.env.CALENDLY_WEBHOOK_SIGNING_KEY;
 
-        if (signingKey) {
-          const ok = await verifySignature(
-            rawBody,
-            request.headers.get("calendly-webhook-signature"),
-            signingKey,
-          );
-          if (!ok) {
-            console.warn("[calendly-webhook] signature verification failed");
-            return new Response("Invalid signature", { status: 401, headers: CORS });
-          }
-        } else {
-          console.warn("[calendly-webhook] no CALENDLY_WEBHOOK_SIGNING_KEY set — accepting unverified");
+        if (!signingKey) {
+          console.error("[calendly-webhook] CALENDLY_WEBHOOK_SIGNING_KEY not configured — rejecting");
+          return new Response("Webhook not configured", { status: 503, headers: CORS });
+        }
+        const ok = await verifySignature(
+          rawBody,
+          request.headers.get("calendly-webhook-signature"),
+          signingKey,
+        );
+        if (!ok) {
+          console.warn("[calendly-webhook] signature verification failed");
+          return new Response("Invalid signature", { status: 401, headers: CORS });
         }
 
         let payload: any;

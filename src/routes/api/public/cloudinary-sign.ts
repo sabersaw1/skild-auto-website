@@ -41,23 +41,30 @@ export const Route = createFileRoute("/api/public/cloudinary-sign")({
           );
         }
 
-        let body: { folder?: string; publicId?: string } = {};
+        let body: { folder?: string } = {};
         try {
           body = (await request.json()) as typeof body;
         } catch {
           /* empty body is fine */
         }
 
-        const folder = body.folder?.trim() || "skild-auto/quotes";
+        // Allowlist folder prefix; ignore client-supplied publicId entirely
+        // (Cloudinary auto-generates one) to prevent overwriting existing assets.
+        const FOLDER_PREFIX = "skild-auto/quotes";
+        const folder = body.folder?.trim() || FOLDER_PREFIX;
+        if (folder !== FOLDER_PREFIX && !folder.startsWith(`${FOLDER_PREFIX}/`)) {
+          return Response.json(
+            { error: "Invalid folder" },
+            { status: 400, headers: CORS },
+          );
+        }
         const timestamp = Math.floor(Date.now() / 1000);
 
         // Cloudinary signature: sha1(sorted_params + api_secret).
-        // We only sign the params we send with the upload.
         const params: Record<string, string | number> = {
           folder,
           timestamp,
         };
-        if (body.publicId) params.public_id = body.publicId;
 
         const toSign = Object.keys(params)
           .sort()
@@ -72,7 +79,7 @@ export const Route = createFileRoute("/api/public/cloudinary-sign")({
             timestamp,
             folder,
             signature,
-            publicId: body.publicId,
+
           },
           { headers: CORS },
         );
