@@ -30,6 +30,11 @@ function AdminLayout() {
 
 function Shell() {
   const router = useRouter();
+  const sess = useSkildSession();
+  const displayName =
+    (sess.user?.user_metadata as { display_name?: string } | undefined)?.display_name ||
+    sess.user?.email?.split("@")[0] ||
+    "skild";
   const links = [
     { to: "/admin", label: "Overview", icon: LayoutDashboard },
     { to: "/admin/quotes", label: "Quotes", icon: ClipboardList },
@@ -44,7 +49,7 @@ function Shell() {
         <div className="flex items-center justify-between p-5">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand-red">Skild Auto</p>
-            <p className="font-display text-lg">Command Center</p>
+            <p className="font-display text-lg">{displayName}</p>
           </div>
           <button
             onClick={async () => { await signOut(); router.navigate({ to: "/" }); }}
