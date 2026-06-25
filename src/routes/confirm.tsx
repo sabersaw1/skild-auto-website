@@ -45,7 +45,7 @@ function ConfirmPage() {
         return;
       }
       clearBooking();
-      navigate({ to: "/booking", search: { id: r.appointmentId } as never });
+      navigate({ to: "/booking" });
     } catch (e) {
       setErr(e instanceof Error ? e.message : "Submission failed.");
       setBusy(false);
