@@ -132,13 +132,16 @@ export const Route = createFileRoute("/api/public/send-quote")({
           return !!url && isAllowedPhotoUrl(url);
         });
 
-        // Best-effort Neon persistence. Failures are logged but never block
-        // the customer email — Cloudinary + Resend stay the critical path.
+        // Best-effort Supabase persistence. Failures are logged but never
+        // block the customer email — Cloudinary + Resend stay the critical
+        // path. Supabase is the source of truth once the row lands.
         let quoteId: string | null = null;
         try {
-          const { hasNeon, persistQuote } = await import("@/lib/neon.server");
-          if (hasNeon()) {
-            const res = await persistQuote({
+          const { hasSupabase, persistQuoteToSupabase } = await import(
+            "@/lib/skild-quote-store.server"
+          );
+          if (hasSupabase()) {
+            const res = await persistQuoteToSupabase({
               customer: c as never,
               vehicle: v as never,
               service: s as never,
@@ -146,10 +149,17 @@ export const Route = createFileRoute("/api/public/send-quote")({
               photos: photos as never,
             });
             quoteId = res.quoteId;
-            console.info("[send-quote] persisted to Neon", res);
+            console.info("[send-quote] persisted to Supabase", res);
+          } else {
+            console.warn(
+              "[send-quote] SKILD_SUPABASE_SERVICE_ROLE_KEY missing — skipping persistence",
+            );
           }
         } catch (err) {
-          console.error("[send-quote] Neon persistence failed (continuing)", err);
+          console.error(
+            "[send-quote] Supabase persistence failed (continuing)",
+            err,
+          );
         }
 
         // Fetch every Cloudinary URL server-side and convert to a Resend
