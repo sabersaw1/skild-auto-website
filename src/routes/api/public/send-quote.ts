@@ -267,7 +267,7 @@ export const Route = createFileRoute("/api/public/send-quote")({
           const err = await resendRes.text().catch(() => "");
           console.error("[send-quote] resend failed", { status: resendRes.status, err });
           return Response.json(
-            { ok: false, error: `Resend ${resendRes.status}: ${err.slice(0, 400)}` },
+            { ok: false, error: "Failed to send quote notification. Please try again." },
             { status: 200, headers: CORS },
           );
         }
