@@ -125,7 +125,12 @@ export const Route = createFileRoute("/api/public/send-quote")({
         const v = p.vehicle ?? {};
         const s = p.service ?? {};
         const b = p.booking ?? {};
-        const photos = Array.isArray(p.photos) ? p.photos : [];
+        const MAX_PHOTOS = 10;
+        const rawPhotos = Array.isArray(p.photos) ? p.photos : [];
+        const photos = rawPhotos.slice(0, MAX_PHOTOS).filter((ph) => {
+          const url = ph?.secureUrl || ph?.url;
+          return !!url && isAllowedPhotoUrl(url);
+        });
 
         // Best-effort Neon persistence. Failures are logged but never block
         // the customer email — Cloudinary + Resend stay the critical path.
