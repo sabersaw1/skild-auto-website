@@ -256,3 +256,43 @@ insert into public.business_hours (weekday, open_time, close_time, is_open) valu
   (5, '08:00', '18:00', true),
   (6, '09:00', '15:00', true)
 on conflict (weekday) do nothing;
+
+-- =========================================================================
+-- ADMIN TASKS (Phase 2 — booking system)
+-- =========================================================================
+create table if not exists public.admin_tasks (
+  id uuid primary key default gen_random_uuid(),
+  title text not null,
+  details text,
+  due_at timestamptz,
+  status text not null default 'open' check (status in ('open','done')),
+  quote_id uuid references public.quotes(id) on delete set null,
+  appointment_id uuid references public.appointments(id) on delete set null,
+  customer_id uuid references public.customers(id) on delete set null,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+create index if not exists admin_tasks_status_idx on public.admin_tasks(status);
+create index if not exists admin_tasks_due_idx on public.admin_tasks(due_at);
+grant select, insert, update, delete on public.admin_tasks to authenticated;
+grant all on public.admin_tasks to service_role;
+alter table public.admin_tasks enable row level security;
+
+drop policy if exists "admin/staff full access tasks" on public.admin_tasks;
+create policy "admin/staff full access tasks" on public.admin_tasks
+  for all to authenticated
+  using (public.has_role(auth.uid(), 'admin') or public.has_role(auth.uid(), 'staff'))
+  with check (public.has_role(auth.uid(), 'admin') or public.has_role(auth.uid(), 'staff'));
+
+-- Admin/staff write access to business_hours and blocked_times (schedule settings)
+drop policy if exists "admin/staff write business hours" on public.business_hours;
+create policy "admin/staff write business hours" on public.business_hours
+  for all to authenticated
+  using (public.has_role(auth.uid(), 'admin') or public.has_role(auth.uid(), 'staff'))
+  with check (public.has_role(auth.uid(), 'admin') or public.has_role(auth.uid(), 'staff'));
+
+drop policy if exists "admin/staff write blocked times" on public.blocked_times;
+create policy "admin/staff write blocked times" on public.blocked_times
+  for all to authenticated
+  using (public.has_role(auth.uid(), 'admin') or public.has_role(auth.uid(), 'staff'))
+  with check (public.has_role(auth.uid(), 'admin') or public.has_role(auth.uid(), 'staff'));
