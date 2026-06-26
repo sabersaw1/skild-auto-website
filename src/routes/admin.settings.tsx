@@ -59,6 +59,10 @@ function ScheduleSettings() {
     <div>
       <h1 className="font-display text-3xl">Schedule settings</h1>
 
+      <GoogleCalendarPanel />
+
+
+
       <section className="mt-8">
         <h2 className="font-display text-lg">Business hours</h2>
         <div className="mt-4 overflow-hidden rounded-xl border border-border bg-card">
