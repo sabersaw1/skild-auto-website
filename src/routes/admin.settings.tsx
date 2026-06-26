@@ -125,3 +125,105 @@ function ScheduleSettings() {
     </div>
   );
 }
+
+type GStatus =
+  | { connected: false }
+  | { connected: true; calendarId: string | null; connectedAt: string | null; scope: string | null };
+
+function GoogleCalendarPanel() {
+  const [status, setStatus] = useState<GStatus | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  async function refresh() {
+    try {
+      const s = (await getGoogleCalendarStatus()) as GStatus;
+      setStatus(s);
+    } catch {
+      setStatus({ connected: false });
+    }
+  }
+  useEffect(() => { refresh(); }, []);
+
+  async function connect() {
+    setBusy(true);
+    try {
+      const { url } = await getGoogleCalendarAuthUrl();
+      window.location.href = url;
+    } finally {
+      setBusy(false);
+    }
+  }
+  async function disconnect() {
+    if (!confirm("Disconnect Google Calendar? Existing events stay in Google but new bookings won't sync.")) return;
+    setBusy(true);
+    try {
+      await disconnectGoogleCalendar();
+      await refresh();
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  const connected = status?.connected === true;
+
+  return (
+    <section className="mt-8">
+      <h2 className="font-display text-lg flex items-center gap-2">
+        <CalendarIcon className="h-5 w-5 text-brand-red" />
+        Google Calendar
+      </h2>
+      <div className="mt-4 rounded-xl border border-border bg-card p-5">
+        {status === null ? (
+          <p className="text-sm text-muted-foreground">Checking connection…</p>
+        ) : connected ? (
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2 text-emerald-400">
+                <CheckCircle2 className="h-4 w-4" />
+                <span className="text-xs font-bold uppercase tracking-widest">Connected</span>
+              </div>
+              <p className="mt-2 text-sm">
+                Calendar: <span className="text-muted-foreground">{status.calendarId || "primary"}</span>
+              </p>
+              {status.connectedAt && (
+                <p className="text-xs text-muted-foreground">
+                  Linked {new Date(status.connectedAt).toLocaleString()}
+                </p>
+              )}
+              <p className="mt-2 text-xs text-muted-foreground">
+                New appointments sync to Google. Busy times block customer slots.
+              </p>
+            </div>
+            <button
+              onClick={disconnect}
+              disabled={busy}
+              className="rounded-md border border-border px-4 py-2 text-xs font-bold uppercase tracking-widest hover:border-brand-red hover:text-brand-red disabled:opacity-50"
+            >
+              Disconnect
+            </button>
+          </div>
+        ) : (
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <XCircle className="h-4 w-4" />
+                <span className="text-xs font-bold uppercase tracking-widest">Not connected</span>
+              </div>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Connect your Google Calendar to auto-create events for every booking and block customer slots
+                during busy times.
+              </p>
+            </div>
+            <button
+              onClick={connect}
+              disabled={busy}
+              className="rounded-md bg-brand-red px-4 py-2 text-xs font-bold uppercase tracking-widest text-white hover:bg-brand-red-glow disabled:opacity-50"
+            >
+              {busy ? "Opening…" : "Connect Google Calendar"}
+            </button>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
