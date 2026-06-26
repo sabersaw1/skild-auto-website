@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { ExternalLink } from "lucide-react";
 import { skildSupabase } from "@/lib/skild-supabase";
+import { setAppointmentStatus } from "@/lib/appointments.functions";
 
 export const Route = createFileRoute("/admin/appointments")({
   component: Appointments,
