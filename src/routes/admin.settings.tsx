@@ -1,7 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
-import { Trash2 } from "lucide-react";
+import { Trash2, Calendar as CalendarIcon, CheckCircle2, XCircle } from "lucide-react";
 import { skildSupabase } from "@/lib/skild-supabase";
+import {
+  getGoogleCalendarStatus,
+  getGoogleCalendarAuthUrl,
+  disconnectGoogleCalendar,
+} from "@/lib/google-calendar.functions";
 
 export const Route = createFileRoute("/admin/settings")({
   component: ScheduleSettings,
