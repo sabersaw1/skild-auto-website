@@ -2,10 +2,12 @@
 // Uses OAuth 2.0 refresh token stored in Supabase `business_settings`.
 // All API calls happen server-side; tokens never leave the server.
 
+import { createHmac, timingSafeEqual } from "crypto";
 import { getSkildAdmin } from "./skild-supabase.server";
 
 const TOKEN_URL = "https://oauth2.googleapis.com/token";
 const CAL_BASE = "https://www.googleapis.com/calendar/v3";
+const OAUTH_STATE_TTL_MS = 10 * 60_000;
 
 export type GoogleSettings = {
   refresh_token: string;
@@ -66,6 +68,24 @@ export function buildGoogleAuthUrl(state?: string): string {
   return `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
 }
 
+function getOauthStateSecret() {
+  const secret = process.env.GOOGLE_CLIENT_SECRET?.trim() || process.env.SKILD_SUPABASE_SERVICE_ROLE_KEY?.trim();
+  if (!secret) throw new Error("GOOGLE_CLIENT_SECRET is required to sign OAuth state");
+  return secret;
+}
+
+function signOauthStatePayload(payload: string) {
+  const signature = createHmac("sha256", getOauthStateSecret()).update(payload).digest("base64");
+  return signature.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+}
+
+export function createOauthState(): string {
+  const issuedAt = Date.now().toString(36);
+  const nonce = globalThis.crypto.randomUUID().replace(/-/g, "");
+  const payload = `v1.${issuedAt}.${nonce}`;
+  return `${payload}.${signOauthStatePayload(payload)}`;
+}
+
 /** Persist a one-time OAuth state token (CSRF protection). 10-minute window. */
 export async function saveOauthState(state: string) {
   const sb = getSkildAdmin();
@@ -91,6 +111,23 @@ export type OAuthStateConsumeResult =
 /** Consume and validate a one-time OAuth state token. Returns true if valid. */
 export async function consumeOauthStateDetailed(state: string | null): Promise<OAuthStateConsumeResult> {
   if (!state) return { valid: false, reason: "missing_callback_state" };
+
+  const parts = state.split(".");
+  if (parts.length === 4 && parts[0] === "v1") {
+    const issuedAt = Number.parseInt(parts[1], 36);
+    const ageMs = Number.isFinite(issuedAt) ? Date.now() - issuedAt : null;
+    if (ageMs === null || ageMs < 0) return { valid: false, reason: "state_mismatch", ageMs };
+    if (ageMs > OAUTH_STATE_TTL_MS) return { valid: false, reason: "state_expired", ageMs };
+
+    const payload = parts.slice(0, 3).join(".");
+    const expected = Buffer.from(signOauthStatePayload(payload));
+    const received = Buffer.from(parts[3]);
+    if (received.length !== expected.length || !timingSafeEqual(received, expected)) {
+      return { valid: false, reason: "state_mismatch", ageMs };
+    }
+    return { valid: true, ageMs };
+  }
+
   const sb = getSkildAdmin();
   const { data, error } = await sb
     .from("business_settings")
@@ -107,7 +144,7 @@ export async function consumeOauthStateDetailed(state: string | null): Promise<O
 
   if (!v?.state) return { valid: false, reason: "missing_saved_state", ageMs };
   if (v.state !== state) return { valid: false, reason: "state_mismatch", ageMs };
-  if (ageMs !== null && ageMs > 10 * 60_000) {
+  if (ageMs !== null && ageMs > OAUTH_STATE_TTL_MS) {
     const { error: deleteError } = await sb.from("business_settings").delete().eq("key", "google_oauth_state");
     if (deleteError) console.error("[google-oauth] expired state delete failed", deleteError);
     return { valid: false, reason: "state_expired", ageMs };
