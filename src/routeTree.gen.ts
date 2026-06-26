@@ -34,6 +34,7 @@ import { Route as ApiPublicSendQuoteRouteImport } from './routes/api/public/send
 import { Route as ApiPublicCloudinarySignRouteImport } from './routes/api/public/cloudinary-sign'
 import { Route as ApiPublicCalendlyWebhookRouteImport } from './routes/api/public/calendly-webhook'
 import { Route as ApiPublicGoogleOauthCallbackRouteImport } from './routes/api/public/google.oauth-callback'
+import { Route as ApiPublicGoogleDiagnoseRouteImport } from './routes/api/public/google.diagnose'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -162,6 +163,11 @@ const ApiPublicGoogleOauthCallbackRoute =
     path: '/api/public/google/oauth-callback',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicGoogleDiagnoseRoute = ApiPublicGoogleDiagnoseRouteImport.update({
+  id: '/api/public/google/diagnose',
+  path: '/api/public/google/diagnose',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -188,6 +194,7 @@ export interface FileRoutesByFullPath {
   '/api/public/calendly-webhook': typeof ApiPublicCalendlyWebhookRoute
   '/api/public/cloudinary-sign': typeof ApiPublicCloudinarySignRoute
   '/api/public/send-quote': typeof ApiPublicSendQuoteRoute
+  '/api/public/google/diagnose': typeof ApiPublicGoogleDiagnoseRoute
   '/api/public/google/oauth-callback': typeof ApiPublicGoogleOauthCallbackRoute
 }
 export interface FileRoutesByTo {
@@ -214,6 +221,7 @@ export interface FileRoutesByTo {
   '/api/public/calendly-webhook': typeof ApiPublicCalendlyWebhookRoute
   '/api/public/cloudinary-sign': typeof ApiPublicCloudinarySignRoute
   '/api/public/send-quote': typeof ApiPublicSendQuoteRoute
+  '/api/public/google/diagnose': typeof ApiPublicGoogleDiagnoseRoute
   '/api/public/google/oauth-callback': typeof ApiPublicGoogleOauthCallbackRoute
 }
 export interface FileRoutesById {
@@ -242,6 +250,7 @@ export interface FileRoutesById {
   '/api/public/calendly-webhook': typeof ApiPublicCalendlyWebhookRoute
   '/api/public/cloudinary-sign': typeof ApiPublicCloudinarySignRoute
   '/api/public/send-quote': typeof ApiPublicSendQuoteRoute
+  '/api/public/google/diagnose': typeof ApiPublicGoogleDiagnoseRoute
   '/api/public/google/oauth-callback': typeof ApiPublicGoogleOauthCallbackRoute
 }
 export interface FileRouteTypes {
@@ -271,6 +280,7 @@ export interface FileRouteTypes {
     | '/api/public/calendly-webhook'
     | '/api/public/cloudinary-sign'
     | '/api/public/send-quote'
+    | '/api/public/google/diagnose'
     | '/api/public/google/oauth-callback'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -297,6 +307,7 @@ export interface FileRouteTypes {
     | '/api/public/calendly-webhook'
     | '/api/public/cloudinary-sign'
     | '/api/public/send-quote'
+    | '/api/public/google/diagnose'
     | '/api/public/google/oauth-callback'
   id:
     | '__root__'
@@ -324,6 +335,7 @@ export interface FileRouteTypes {
     | '/api/public/calendly-webhook'
     | '/api/public/cloudinary-sign'
     | '/api/public/send-quote'
+    | '/api/public/google/diagnose'
     | '/api/public/google/oauth-callback'
   fileRoutesById: FileRoutesById
 }
@@ -346,6 +358,7 @@ export interface RootRouteChildren {
   ApiPublicCalendlyWebhookRoute: typeof ApiPublicCalendlyWebhookRoute
   ApiPublicCloudinarySignRoute: typeof ApiPublicCloudinarySignRoute
   ApiPublicSendQuoteRoute: typeof ApiPublicSendQuoteRoute
+  ApiPublicGoogleDiagnoseRoute: typeof ApiPublicGoogleDiagnoseRoute
   ApiPublicGoogleOauthCallbackRoute: typeof ApiPublicGoogleOauthCallbackRoute
 }
 
@@ -526,6 +539,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicGoogleOauthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/google/diagnose': {
+      id: '/api/public/google/diagnose'
+      path: '/api/public/google/diagnose'
+      fullPath: '/api/public/google/diagnose'
+      preLoaderRoute: typeof ApiPublicGoogleDiagnoseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -568,18 +588,9 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicCalendlyWebhookRoute: ApiPublicCalendlyWebhookRoute,
   ApiPublicCloudinarySignRoute: ApiPublicCloudinarySignRoute,
   ApiPublicSendQuoteRoute: ApiPublicSendQuoteRoute,
+  ApiPublicGoogleDiagnoseRoute: ApiPublicGoogleDiagnoseRoute,
   ApiPublicGoogleOauthCallbackRoute: ApiPublicGoogleOauthCallbackRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
