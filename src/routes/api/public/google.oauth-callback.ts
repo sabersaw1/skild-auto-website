@@ -11,6 +11,7 @@ export const Route = createFileRoute("/api/public/google/oauth-callback")({
       GET: async ({ request }) => {
         const url = new URL(request.url);
         const code = url.searchParams.get("code");
+        const state = url.searchParams.get("state");
         const error = url.searchParams.get("error");
         const errorDescription = url.searchParams.get("error_description");
 
@@ -24,6 +25,15 @@ export const Route = createFileRoute("/api/public/google/oauth-callback")({
         if (!code) {
           return new Response(
             `<h1>Missing authorization code</h1><p>Google did not return an authorization code.</p>`,
+            { status: 400, headers: { "Content-Type": "text/html" } },
+          );
+        }
+
+        const { consumeOauthState } = await import("@/lib/google-calendar.server");
+        const valid = await consumeOauthState(state);
+        if (!valid) {
+          return new Response(
+            `<h1>Invalid OAuth state</h1><p>The authorization state did not match. Start the connection again from /admin/settings.</p>`,
             { status: 400, headers: { "Content-Type": "text/html" } },
           );
         }

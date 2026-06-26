@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
 import { Trash2, Calendar as CalendarIcon, CheckCircle2, XCircle } from "lucide-react";
 import { skildSupabase } from "@/lib/skild-supabase";
+import { getAdminAccessToken } from "@/lib/skild-admin-token";
 import {
   getGoogleCalendarStatus,
   getGoogleCalendarAuthUrl,
@@ -136,7 +137,8 @@ function GoogleCalendarPanel() {
 
   async function refresh() {
     try {
-      const s = (await getGoogleCalendarStatus()) as GStatus;
+      const accessToken = await getAdminAccessToken();
+      const s = (await getGoogleCalendarStatus({ data: { accessToken } })) as GStatus;
       setStatus(s);
     } catch {
       setStatus({ connected: false });
@@ -147,7 +149,8 @@ function GoogleCalendarPanel() {
   async function connect() {
     setBusy(true);
     try {
-      const { url } = await getGoogleCalendarAuthUrl();
+      const accessToken = await getAdminAccessToken();
+      const { url } = await getGoogleCalendarAuthUrl({ data: { accessToken } });
       window.location.href = url;
     } finally {
       setBusy(false);
@@ -157,7 +160,8 @@ function GoogleCalendarPanel() {
     if (!confirm("Disconnect Google Calendar? Existing events stay in Google but new bookings won't sync.")) return;
     setBusy(true);
     try {
-      await disconnectGoogleCalendar();
+      const accessToken = await getAdminAccessToken();
+      await disconnectGoogleCalendar({ data: { accessToken } });
       await refresh();
     } finally {
       setBusy(false);

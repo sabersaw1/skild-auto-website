@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { ExternalLink } from "lucide-react";
 import { skildSupabase } from "@/lib/skild-supabase";
 import { setAppointmentStatus } from "@/lib/appointments.functions";
+import { getAdminAccessToken } from "@/lib/skild-admin-token";
 
 export const Route = createFileRoute("/admin/appointments")({
   component: Appointments,
@@ -49,8 +50,9 @@ function Appointments() {
   useEffect(() => { load(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [filter]);
 
   async function setStatus(id: string, status: string) {
+    const accessToken = await getAdminAccessToken();
     await setAppointmentStatus({
-      data: { appointmentId: id, status: status as "pending" | "confirmed" | "completed" | "cancelled" | "no_show" },
+      data: { appointmentId: id, accessToken, status: status as "pending" | "confirmed" | "completed" | "cancelled" | "no_show" },
     });
     load();
   }

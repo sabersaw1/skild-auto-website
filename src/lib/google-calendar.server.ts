@@ -41,7 +41,7 @@ export async function disconnectGoogle() {
   await sb.from("business_settings").delete().eq("key", "google_calendar");
 }
 
-export function buildGoogleAuthUrl(): string {
+export function buildGoogleAuthUrl(state?: string): string {
   const clientId = process.env.GOOGLE_CLIENT_ID;
   const redirectUri = process.env.GOOGLE_REDIRECT_URI;
   if (!clientId || !redirectUri) {
@@ -56,7 +56,38 @@ export function buildGoogleAuthUrl(): string {
     include_granted_scopes: "true",
     scope: "https://www.googleapis.com/auth/calendar.events",
   });
+  if (state) params.set("state", state);
   return `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
+}
+
+/** Persist a one-time OAuth state token (CSRF protection). 10-minute window. */
+export async function saveOauthState(state: string) {
+  const sb = getSkildAdmin();
+  await sb
+    .from("business_settings")
+    .upsert(
+      {
+        key: "google_oauth_state",
+        value: { state, created_at: new Date().toISOString() },
+      },
+      { onConflict: "key" },
+    );
+}
+
+/** Consume and validate a one-time OAuth state token. Returns true if valid. */
+export async function consumeOauthState(state: string | null): Promise<boolean> {
+  if (!state) return false;
+  const sb = getSkildAdmin();
+  const { data } = await sb
+    .from("business_settings")
+    .select("value")
+    .eq("key", "google_oauth_state")
+    .maybeSingle();
+  await sb.from("business_settings").delete().eq("key", "google_oauth_state");
+  const v = data?.value as { state?: string; created_at?: string } | undefined;
+  if (!v?.state || v.state !== state) return false;
+  if (v.created_at && Date.now() - new Date(v.created_at).getTime() > 10 * 60_000) return false;
+  return true;
 }
 
 async function getAccessToken(): Promise<{ token: string; calendarId: string } | null> {
