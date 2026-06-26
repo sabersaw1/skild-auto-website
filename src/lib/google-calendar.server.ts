@@ -69,7 +69,7 @@ export function buildGoogleAuthUrl(state?: string): string {
 /** Persist a one-time OAuth state token (CSRF protection). 10-minute window. */
 export async function saveOauthState(state: string) {
   const sb = getSkildAdmin();
-  await sb
+  const { error } = await sb
     .from("business_settings")
     .upsert(
       {
@@ -78,22 +78,52 @@ export async function saveOauthState(state: string) {
       },
       { onConflict: "key" },
     );
+  if (error) {
+    console.error("[google-oauth] state save failed", error);
+    throw new Error(`Google OAuth state save failed: ${error.message}`);
+  }
 }
 
+export type OAuthStateConsumeResult =
+  | { valid: true; ageMs: number | null }
+  | { valid: false; reason: "missing_callback_state" | "missing_saved_state" | "state_mismatch" | "state_expired" | "state_lookup_failed" | "state_delete_failed"; ageMs?: number | null; details?: string };
+
 /** Consume and validate a one-time OAuth state token. Returns true if valid. */
-export async function consumeOauthState(state: string | null): Promise<boolean> {
-  if (!state) return false;
+export async function consumeOauthStateDetailed(state: string | null): Promise<OAuthStateConsumeResult> {
+  if (!state) return { valid: false, reason: "missing_callback_state" };
   const sb = getSkildAdmin();
-  const { data } = await sb
+  const { data, error } = await sb
     .from("business_settings")
     .select("value")
     .eq("key", "google_oauth_state")
     .maybeSingle();
-  await sb.from("business_settings").delete().eq("key", "google_oauth_state");
+  if (error) {
+    console.error("[google-oauth] state lookup failed", error);
+    return { valid: false, reason: "state_lookup_failed", details: error.message };
+  }
+
   const v = data?.value as { state?: string; created_at?: string } | undefined;
-  if (!v?.state || v.state !== state) return false;
-  if (v.created_at && Date.now() - new Date(v.created_at).getTime() > 10 * 60_000) return false;
-  return true;
+  const ageMs = v?.created_at ? Date.now() - new Date(v.created_at).getTime() : null;
+
+  if (!v?.state) return { valid: false, reason: "missing_saved_state", ageMs };
+  if (v.state !== state) return { valid: false, reason: "state_mismatch", ageMs };
+  if (ageMs !== null && ageMs > 10 * 60_000) {
+    const { error: deleteError } = await sb.from("business_settings").delete().eq("key", "google_oauth_state");
+    if (deleteError) console.error("[google-oauth] expired state delete failed", deleteError);
+    return { valid: false, reason: "state_expired", ageMs };
+  }
+
+  const { error: deleteError } = await sb.from("business_settings").delete().eq("key", "google_oauth_state");
+  if (deleteError) {
+    console.error("[google-oauth] state delete failed", deleteError);
+    return { valid: false, reason: "state_delete_failed", ageMs, details: deleteError.message };
+  }
+  return { valid: true, ageMs };
+}
+
+/** Consume and validate a one-time OAuth state token. Returns true if valid. */
+export async function consumeOauthState(state: string | null): Promise<boolean> {
+  return (await consumeOauthStateDetailed(state)).valid;
 }
 
 async function getAccessToken(): Promise<{ token: string; calendarId: string } | null> {
