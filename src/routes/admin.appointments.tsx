@@ -95,6 +95,16 @@ function Appointments() {
               {a.quote?.description && (
                 <p className="mt-3 whitespace-pre-wrap text-xs text-muted-foreground">{a.quote.description}</p>
               )}
+              {a.google_event_id && (
+                <a
+                  href={`https://calendar.google.com/calendar/u/0/r/eventedit/${a.google_event_id}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-3 inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-widest text-brand-red hover:text-brand-red-glow"
+                >
+                  <ExternalLink className="h-3 w-3" /> View in Google Calendar
+                </a>
+              )}
             </li>
           );
         })}
