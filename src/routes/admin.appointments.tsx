@@ -29,7 +29,7 @@ function Appointments() {
   async function load() {
     let q = skildSupabase
       .from("appointments")
-      .select(`id, start_at, end_at, status, notes,
+      .select(`id, start_at, end_at, status, notes, google_event_id,
         customer:customer_id(full_name,email,phone,location),
         vehicle:vehicle_id(year,make,model),
         quote:quote_id(requested_service,description)`)
