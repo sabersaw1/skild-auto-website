@@ -151,11 +151,23 @@ function GoogleCalendarPanel() {
     try {
       const accessToken = await getAdminAccessToken();
       const { url } = await getGoogleCalendarAuthUrl({ data: { accessToken } });
-      window.location.href = url;
+      // Google's accounts.google.com sends X-Frame-Options: DENY, so navigating
+      // the Lovable preview iframe to it gets blocked by the browser and looks
+      // like a 403. Break out of the iframe (or open a new tab) so the OAuth
+      // consent screen loads as a top-level document.
+      const opened = window.open(url, "_blank", "noopener,noreferrer");
+      if (!opened) {
+        try {
+          window.top!.location.href = url;
+        } catch {
+          window.location.href = url;
+        }
+      }
     } finally {
       setBusy(false);
     }
   }
+
   async function disconnect() {
     if (!confirm("Disconnect Google Calendar? Existing events stay in Google but new bookings won't sync.")) return;
     setBusy(true);
