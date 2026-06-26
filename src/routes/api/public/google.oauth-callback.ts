@@ -5,6 +5,48 @@
 
 import { createFileRoute } from "@tanstack/react-router";
 
+const HTML_HEADERS = {
+  "Content-Type": "text/html; charset=utf-8",
+  "Cache-Control": "no-store",
+};
+
+function escapeHtml(value: string | null | undefined) {
+  return (value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function failureResponse(
+  title: string,
+  status: number,
+  details: Record<string, string | number | boolean | null | undefined>,
+) {
+  console.error("[google-oauth-callback] failure", { title, status, ...details });
+  const rows = Object.entries(details)
+    .map(([key, value]) => `<li><b>${escapeHtml(key)}:</b> ${escapeHtml(String(value ?? "(none)"))}</li>`)
+    .join("");
+  return new Response(
+    `<h1>${escapeHtml(title)}</h1><p>Google Calendar connection did not complete.</p><ul>${rows}</ul><p>Return to <a href="/admin/settings">Schedule settings</a> and try connecting again.</p>`,
+    { status, headers: HTML_HEADERS },
+  );
+}
+
+function redirectToSettings(requestUrl: URL) {
+  const location = new URL("/admin/settings", requestUrl.origin);
+  location.searchParams.set("google_calendar_connected", "true");
+  console.log("[google-oauth-callback] redirecting after success", { location: location.toString() });
+  return new Response(null, {
+    status: 303,
+    headers: {
+      Location: location.toString(),
+      "Cache-Control": "no-store",
+    },
+  });
+}
+
 export const Route = createFileRoute("/api/public/google/oauth-callback")({
   server: {
     handlers: {
@@ -15,14 +57,16 @@ export const Route = createFileRoute("/api/public/google/oauth-callback")({
         const error = url.searchParams.get("error");
         const errorDescription = url.searchParams.get("error_description");
 
+        console.log("[google-oauth-callback] callback received", {
+          callback_origin: url.origin,
+          callback_path: url.pathname,
+          code_present: !!code,
+          state_present: !!state,
+          error_present: !!error,
+        });
+
         if (error) {
           const errorUri = url.searchParams.get("error_uri");
-          console.error("[google-oauth-callback] google returned error", {
-            error,
-            errorDescription,
-            errorUri,
-            state,
-          });
           const hint =
             error === "access_denied"
               ? "The Google account that approved the consent screen is not on the Test users list, OR the user declined. In Google Cloud Console open APIs & Services → OAuth consent screen and add this Google account under Test users (while the app is in Testing)."
@@ -31,46 +75,60 @@ export const Route = createFileRoute("/api/public/google/oauth-callback")({
                 : error === "redirect_uri_mismatch"
                   ? "GOOGLE_REDIRECT_URI does not match an Authorized redirect URI on the OAuth client. They must match exactly (scheme, host, path, no trailing slash)."
                   : "See error_description for details.";
-          return new Response(
-            `<h1>Google Calendar connection failed</h1>
-             <p><b>error:</b> ${error}</p>
-             <p><b>error_description:</b> ${errorDescription ?? "(none)"}</p>
-             <p><b>error_uri:</b> ${errorUri ?? "(none)"}</p>
-             <p><b>state:</b> ${state ?? "(none)"}</p>
-             <p style="margin-top:1rem"><b>Next step:</b> ${hint}</p>`,
-            { status: 400, headers: { "Content-Type": "text/html" } },
-          );
+          return failureResponse("Google Calendar connection failed", 400, {
+            step: "google_authorization",
+            callback_received: true,
+            error,
+            error_description: errorDescription,
+            error_uri: errorUri,
+            state_present: !!state,
+            next_step: hint,
+          });
         }
 
         if (!code) {
-          return new Response(
-            `<h1>Missing authorization code</h1><p>Google did not return an authorization code.</p>`,
-            { status: 400, headers: { "Content-Type": "text/html" } },
-          );
+          return failureResponse("Missing authorization code", 400, {
+            step: "google_callback",
+            callback_received: true,
+            code_present: false,
+            state_present: !!state,
+            reason: "Google did not return a code parameter.",
+          });
         }
 
-        const { consumeOauthState } = await import("@/lib/google-calendar.server");
-        const valid = await consumeOauthState(state);
-        if (!valid) {
-          return new Response(
-            `<h1>Invalid OAuth state</h1><p>The authorization state did not match. Start the connection again from /admin/settings.</p>`,
-            { status: 400, headers: { "Content-Type": "text/html" } },
-          );
+        const { consumeOauthStateDetailed } = await import("@/lib/google-calendar.server");
+        const stateResult = await consumeOauthStateDetailed(state);
+        if (!stateResult.valid) {
+          return failureResponse("Invalid OAuth state", 400, {
+            step: "csrf_state_validation",
+            callback_received: true,
+            code_present: true,
+            state_present: !!state,
+            state_result: stateResult.reason,
+            state_age_ms: stateResult.ageMs,
+            details: stateResult.details,
+          });
         }
 
-        const clientId = process.env.GOOGLE_CLIENT_ID;
-        const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-        const redirectUri = process.env.GOOGLE_REDIRECT_URI;
-        const calendarId = process.env.GOOGLE_CALENDAR_ID;
+        const clientId = process.env.GOOGLE_CLIENT_ID?.trim();
+        const clientSecret = process.env.GOOGLE_CLIENT_SECRET?.trim();
+        const redirectUri = process.env.GOOGLE_REDIRECT_URI?.trim();
+        const calendarId = process.env.GOOGLE_CALENDAR_ID?.trim();
 
         if (!clientId || !clientSecret || !redirectUri) {
-          return new Response(
-            `<h1>Google Calendar is not configured</h1><p>GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, or GOOGLE_REDIRECT_URI is missing on the server.</p>`,
-            { status: 500, headers: { "Content-Type": "text/html" } },
-          );
+          return failureResponse("Google Calendar is not configured", 500, {
+            step: "server_configuration",
+            client_id_present: !!clientId,
+            client_secret_present: !!clientSecret,
+            redirect_uri_present: !!redirectUri,
+          });
         }
 
         try {
+          console.log("[google-oauth-callback] exchanging code for tokens", {
+            redirect_uri: redirectUri,
+            state_age_ms: stateResult.ageMs,
+          });
           const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -83,7 +141,8 @@ export const Route = createFileRoute("/api/public/google/oauth-callback")({
             }).toString(),
           });
 
-          const tokenData = (await tokenRes.json()) as {
+          const tokenText = await tokenRes.text();
+          let tokenData: {
             access_token?: string;
             refresh_token?: string;
             expires_in?: number;
@@ -91,33 +150,62 @@ export const Route = createFileRoute("/api/public/google/oauth-callback")({
             error?: string;
             error_description?: string;
           };
+          try {
+            tokenData = JSON.parse(tokenText);
+          } catch {
+            return failureResponse("Token exchange returned invalid JSON", 500, {
+              step: "google_token_exchange",
+              token_status: tokenRes.status,
+              token_response: tokenText.slice(0, 500),
+            });
+          }
 
-          if (!tokenRes.ok || tokenData.error) {
-            console.error("[google-oauth-callback] token exchange failed", tokenData);
-            return new Response(
-              `<h1>Token exchange failed</h1><p>${tokenData.error || "unknown"}: ${tokenData.error_description || ""}</p>`,
-              { status: 500, headers: { "Content-Type": "text/html" } },
-            );
+          console.log("[google-oauth-callback] token exchange result", {
+            ok: tokenRes.ok,
+            status: tokenRes.status,
+            access_token_present: !!tokenData.access_token,
+            refresh_token_present: !!tokenData.refresh_token,
+            expires_in: tokenData.expires_in ?? null,
+            scope: tokenData.scope ?? null,
+            error: tokenData.error ?? null,
+          });
+
+          if (!tokenRes.ok || tokenData.error || !tokenData.access_token) {
+            return failureResponse("Token exchange failed", 500, {
+              step: "google_token_exchange",
+              token_status: tokenRes.status,
+              google_error: tokenData.error,
+              google_error_description: tokenData.error_description,
+              access_token_present: !!tokenData.access_token,
+              refresh_token_present: !!tokenData.refresh_token,
+            });
           }
 
           if (!tokenData.refresh_token) {
-            return new Response(
-              `<h1>No refresh token received</h1><p>Google returned an access token but no refresh token. Re-authorize and make sure to include <code>access_type=offline</code> and <code>prompt=consent</code> in the authorization URL.</p>`,
-              { status: 500, headers: { "Content-Type": "text/html" } },
-            );
+            return failureResponse("No refresh token received", 500, {
+              step: "google_token_exchange",
+              access_token_present: true,
+              refresh_token_present: false,
+              access_type: "offline",
+              prompt: "consent",
+              reason: "Google returned an access token but no refresh token.",
+            });
           }
 
           // Store the refresh token and calendar ID server-side in Supabase.
           // The frontend never sees these values.
           const { getSkildAdmin } = await import("@/lib/skild-supabase.server");
           const sb = getSkildAdmin();
-          await sb
+          const expiresAt = new Date(Date.now() + (tokenData.expires_in ?? 3600) * 1000).toISOString();
+          const { error: saveError } = await sb
             .from("business_settings")
             .upsert(
               {
                 key: "google_calendar",
                 value: {
                   refresh_token: tokenData.refresh_token,
+                  access_token: tokenData.access_token,
+                  access_token_expires_at: expiresAt,
                   calendar_id: calendarId || null,
                   scope: tokenData.scope,
                   connected_at: new Date().toISOString(),
@@ -125,17 +213,44 @@ export const Route = createFileRoute("/api/public/google/oauth-callback")({
               },
               { onConflict: "key" },
             );
+          if (saveError) {
+            return failureResponse("Google token storage failed", 500, {
+              step: "supabase_business_settings_save",
+              database_error: saveError.message,
+              database_code: saveError.code,
+              database_hint: saveError.hint,
+              refresh_token_present: true,
+            });
+          }
 
-          return new Response(
-            `<h1>Google Calendar connected</h1><p>Refresh token stored server-side. You can close this tab and return to the admin dashboard.</p>`,
-            { status: 200, headers: { "Content-Type": "text/html" } },
-          );
+          const { data: saved, error: verifyError } = await sb
+            .from("business_settings")
+            .select("value")
+            .eq("key", "google_calendar")
+            .maybeSingle();
+          const savedValue = saved?.value as { refresh_token?: string; calendar_id?: string | null } | undefined;
+          if (verifyError || !savedValue?.refresh_token) {
+            return failureResponse("Google token storage verification failed", 500, {
+              step: "supabase_business_settings_verify",
+              database_error: verifyError?.message,
+              refresh_token_saved: !!savedValue?.refresh_token,
+            });
+          }
+
+          console.log("[google-oauth-callback] refresh token stored", {
+            step: "complete",
+            calendar_id_present: !!savedValue.calendar_id,
+            scope: tokenData.scope ?? null,
+            redirect_result: "/admin/settings?google_calendar_connected=true",
+          });
+
+          return redirectToSettings(url);
         } catch (err) {
           console.error("[google-oauth-callback] unexpected error", err);
-          return new Response(
-            `<h1>Unexpected error</h1><p>Could not complete Google Calendar connection. Check server logs.</p>`,
-            { status: 500, headers: { "Content-Type": "text/html" } },
-          );
+          return failureResponse("Unexpected Google OAuth callback error", 500, {
+            step: "unexpected_exception",
+            message: err instanceof Error ? err.message : String(err),
+          });
         }
       },
     },
