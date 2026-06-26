@@ -37,7 +37,20 @@ function failureResponse(
 function redirectToSettings(requestUrl: URL) {
   const location = new URL("/admin/settings", requestUrl.origin);
   location.searchParams.set("google_calendar_connected", "true");
-  console.log("[google-oauth-callback] redirecting after success", { location: location.toString() });
+  const href = location.toString();
+  console.log("[google-oauth-callback] redirecting after success", { location: href });
+  return new Response(
+    `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="refresh" content="0;url=${escapeHtml(href)}"><title>Google Calendar Connected</title></head><body><h1>Google Calendar Connected</h1><p>Redirecting back to Skild Auto settings…</p><p><a href="${escapeHtml(href)}">Return to Schedule settings</a></p><script>window.location.replace(${JSON.stringify(href)});</script></body></html>`,
+    {
+      status: 200,
+      headers: HTML_HEADERS,
+    },
+  );
+}
+
+function redirectFallback(requestUrl: URL) {
+  const location = new URL("/admin/settings", requestUrl.origin);
+  location.searchParams.set("google_calendar_connected", "true");
   return new Response(null, {
     status: 303,
     headers: {
@@ -220,6 +233,10 @@ export const Route = createFileRoute("/api/public/google/oauth-callback")({
               database_code: saveError.code,
               database_hint: saveError.hint,
               refresh_token_present: true,
+              next_step:
+                saveError.code === "PGRST205"
+                  ? "Apply docs/supabase/schema.sql in Supabase so public.business_settings exists, then reconnect Google Calendar."
+                  : "Check Supabase service-role access and business_settings RLS/grants.",
             });
           }
 
