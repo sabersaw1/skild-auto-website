@@ -28,9 +28,8 @@ export const getGoogleCalendarAuthUrl = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const { requireSkildAdmin } = await import("./admin-guard.server");
     await requireSkildAdmin(data.accessToken);
-    const { buildGoogleAuthUrl, saveOauthState } = await import("./google-calendar.server");
-    const state = crypto.randomUUID().replace(/-/g, "");
-    await saveOauthState(state);
+    const { buildGoogleAuthUrl, createOauthState } = await import("./google-calendar.server");
+    const state = createOauthState();
     return { url: buildGoogleAuthUrl(state) };
   });
 

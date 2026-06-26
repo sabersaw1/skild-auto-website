@@ -38,6 +38,31 @@ export const Route = createFileRoute("/api/public/google/diagnose")({
           : null;
 
         const expectedPath = "/api/public/google/oauth-callback";
+        let businessSettingsCheck:
+          | { reachable: true; tableExists: true }
+          | { reachable: false; tableExists: false; error: string; code?: string; hint?: string | null };
+        try {
+          const { getSkildAdmin } = await import("@/lib/skild-supabase.server");
+          const { error } = await getSkildAdmin()
+            .from("business_settings")
+            .select("key")
+            .limit(1);
+          businessSettingsCheck = error
+            ? {
+                reachable: false,
+                tableExists: false,
+                error: error.message,
+                code: error.code,
+                hint: error.hint,
+              }
+            : { reachable: true, tableExists: true };
+        } catch (err) {
+          businessSettingsCheck = {
+            reachable: false,
+            tableExists: false,
+            error: err instanceof Error ? err.message : String(err),
+          };
+        }
 
         // Build the same authorize URL the app uses, with a fake state, so we
         // can inspect exactly what gets sent to Google.
@@ -101,6 +126,10 @@ export const Route = createFileRoute("/api/public/google/diagnose")({
             redirect_uri_no_whitespace: !redirectHasWhitespace,
             redirect_uri_is_https: redirectIsHttps,
             redirect_uri_path_matches_app: redirectPath?.pathname === expectedPath,
+            business_settings_table_exists: businessSettingsCheck.tableExists,
+          },
+          storage: {
+            business_settings: businessSettingsCheck,
           },
           notes: [
             "If Google shows 403 'access_denied' on the consent screen: the signed-in Google account is NOT on the OAuth consent screen → Test users list (while the app is in Testing).",
