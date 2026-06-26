@@ -25,8 +25,9 @@ function ymd(d: Date): string {
 
 async function loadAvailability(fromISO: string, toISO: string) {
   const { getSkildAdmin } = await import("./skild-supabase.server");
+  const { getGoogleBusy } = await import("./google-calendar.server");
   const sb = getSkildAdmin();
-  const [hoursRes, blockedRes, apptsRes] = await Promise.all([
+  const [hoursRes, blockedRes, apptsRes, googleBusy] = await Promise.all([
     sb.from("business_hours").select("weekday, open_time, close_time, is_open"),
     sb
       .from("blocked_times")
@@ -39,6 +40,7 @@ async function loadAvailability(fromISO: string, toISO: string) {
       .lt("start_at", toISO)
       .gt("end_at", fromISO)
       .neq("status", "cancelled"),
+    getGoogleBusy(fromISO, toISO),
   ]);
   if (hoursRes.error) throw hoursRes.error;
   if (blockedRes.error) throw blockedRes.error;
@@ -48,6 +50,7 @@ async function loadAvailability(fromISO: string, toISO: string) {
     busy: [
       ...(blockedRes.data ?? []).map((b) => ({ start: new Date(b.start_at), end: new Date(b.end_at) })),
       ...(apptsRes.data ?? []).map((a) => ({ start: new Date(a.start_at), end: new Date(a.end_at) })),
+      ...googleBusy,
     ],
   };
 }
@@ -168,6 +171,14 @@ export const createAppointment = createServerFn({ method: "POST" })
 
     // Mark quote as scheduled.
     await sb.from("quotes").update({ status: "scheduled" }).eq("id", quote.id);
+
+    // Sync to Google Calendar (best-effort).
+    try {
+      const { syncAppointmentToGoogle } = await import("./appointments.functions");
+      await syncAppointmentToGoogle({ data: { appointmentId: appt.id } });
+    } catch (err) {
+      console.error("[createAppointment] google sync failed", err);
+    }
 
     // Fire email (best-effort).
     try {

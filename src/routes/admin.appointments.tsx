@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { ExternalLink } from "lucide-react";
 import { skildSupabase } from "@/lib/skild-supabase";
+import { setAppointmentStatus } from "@/lib/appointments.functions";
 
 export const Route = createFileRoute("/admin/appointments")({
   component: Appointments,
@@ -12,6 +14,7 @@ type Appt = {
   end_at: string;
   status: string;
   notes: string | null;
+  google_event_id: string | null;
   customer: { full_name: string | null; email: string | null; phone: string | null; location: string | null } | null;
   vehicle: { year: number | null; make: string | null; model: string | null } | null;
   quote: { requested_service: string | null; description: string | null } | null;
@@ -26,7 +29,7 @@ function Appointments() {
   async function load() {
     let q = skildSupabase
       .from("appointments")
-      .select(`id, start_at, end_at, status, notes,
+      .select(`id, start_at, end_at, status, notes, google_event_id,
         customer:customer_id(full_name,email,phone,location),
         vehicle:vehicle_id(year,make,model),
         quote:quote_id(requested_service,description)`)
@@ -46,7 +49,9 @@ function Appointments() {
   useEffect(() => { load(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [filter]);
 
   async function setStatus(id: string, status: string) {
-    await skildSupabase.from("appointments").update({ status }).eq("id", id);
+    await setAppointmentStatus({
+      data: { appointmentId: id, status: status as "pending" | "confirmed" | "completed" | "cancelled" | "no_show" },
+    });
     load();
   }
 
@@ -89,6 +94,16 @@ function Appointments() {
               </div>
               {a.quote?.description && (
                 <p className="mt-3 whitespace-pre-wrap text-xs text-muted-foreground">{a.quote.description}</p>
+              )}
+              {a.google_event_id && (
+                <a
+                  href={`https://calendar.google.com/calendar/u/0/r/eventedit/${a.google_event_id}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-3 inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-widest text-brand-red hover:text-brand-red-glow"
+                >
+                  <ExternalLink className="h-3 w-3" /> View in Google Calendar
+                </a>
               )}
             </li>
           );
