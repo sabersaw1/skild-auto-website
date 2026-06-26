@@ -16,8 +16,28 @@ export const Route = createFileRoute("/api/public/google/oauth-callback")({
         const errorDescription = url.searchParams.get("error_description");
 
         if (error) {
+          const errorUri = url.searchParams.get("error_uri");
+          console.error("[google-oauth-callback] google returned error", {
+            error,
+            errorDescription,
+            errorUri,
+            state,
+          });
+          const hint =
+            error === "access_denied"
+              ? "The Google account that approved the consent screen is not on the Test users list, OR the user declined. In Google Cloud Console open APIs & Services → OAuth consent screen and add this Google account under Test users (while the app is in Testing)."
+              : error === "admin_policy_enforced"
+                ? "A Google Workspace admin policy is blocking this OAuth client or the calendar.events scope."
+                : error === "redirect_uri_mismatch"
+                  ? "GOOGLE_REDIRECT_URI does not match an Authorized redirect URI on the OAuth client. They must match exactly (scheme, host, path, no trailing slash)."
+                  : "See error_description for details.";
           return new Response(
-            `<h1>Google Calendar connection failed</h1><p>${error}${errorDescription ? `: ${errorDescription}` : ""}</p>`,
+            `<h1>Google Calendar connection failed</h1>
+             <p><b>error:</b> ${error}</p>
+             <p><b>error_description:</b> ${errorDescription ?? "(none)"}</p>
+             <p><b>error_uri:</b> ${errorUri ?? "(none)"}</p>
+             <p><b>state:</b> ${state ?? "(none)"}</p>
+             <p style="margin-top:1rem"><b>Next step:</b> ${hint}</p>`,
             { status: 400, headers: { "Content-Type": "text/html" } },
           );
         }
