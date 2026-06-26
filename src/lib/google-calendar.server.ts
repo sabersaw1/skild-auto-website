@@ -42,8 +42,8 @@ export async function disconnectGoogle() {
 }
 
 export function buildGoogleAuthUrl(state?: string): string {
-  const clientId = process.env.GOOGLE_CLIENT_ID;
-  const redirectUri = process.env.GOOGLE_REDIRECT_URI;
+  const clientId = process.env.GOOGLE_CLIENT_ID?.trim();
+  const redirectUri = process.env.GOOGLE_REDIRECT_URI?.trim();
   if (!clientId || !redirectUri) {
     throw new Error("GOOGLE_CLIENT_ID or GOOGLE_REDIRECT_URI not configured");
   }
@@ -57,6 +57,12 @@ export function buildGoogleAuthUrl(state?: string): string {
     scope: "https://www.googleapis.com/auth/calendar.events",
   });
   if (state) params.set("state", state);
+  console.log("[google-oauth] authorize url built", {
+    client_id_tail: clientId.slice(-32),
+    redirect_uri: redirectUri,
+    scope: "calendar.events",
+    has_state: !!state,
+  });
   return `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
 }
 
