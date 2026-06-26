@@ -14,6 +14,7 @@ type Appt = {
   end_at: string;
   status: string;
   notes: string | null;
+  google_event_id: string | null;
   customer: { full_name: string | null; email: string | null; phone: string | null; location: string | null } | null;
   vehicle: { year: number | null; make: string | null; model: string | null } | null;
   quote: { requested_service: string | null; description: string | null } | null;
