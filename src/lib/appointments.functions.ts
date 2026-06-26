@@ -54,10 +54,15 @@ function eventInputFor(a: Awaited<ReturnType<typeof loadAppointmentForSync>>) {
 }
 
 export const syncAppointmentToGoogle = createServerFn({ method: "POST" })
-  .inputValidator((d: { appointmentId: string }) =>
-    z.object({ appointmentId: z.string().uuid() }).parse(d),
+  .inputValidator((d: { appointmentId: string; accessToken?: string }) =>
+    z.object({ appointmentId: z.string().uuid(), accessToken: z.string().optional() }).parse(d),
   )
   .handler(async ({ data }) => {
+    // Called both from admin UI (with token) and from createAppointment (server-to-server, no token).
+    if (data.accessToken) {
+      const { requireSkildAdmin } = await import("./admin-guard.server");
+      await requireSkildAdmin(data.accessToken);
+    }
     const a = await loadAppointmentForSync(data.appointmentId);
     const { createGoogleEvent, updateGoogleEvent, isGoogleConnected } =
       await import("./google-calendar.server");
@@ -76,15 +81,18 @@ export const syncAppointmentToGoogle = createServerFn({ method: "POST" })
   });
 
 export const setAppointmentStatus = createServerFn({ method: "POST" })
-  .inputValidator((d: { appointmentId: string; status: string }) =>
+  .inputValidator((d: { appointmentId: string; status: string; accessToken: string }) =>
     z
       .object({
         appointmentId: z.string().uuid(),
+        accessToken: z.string().min(20),
         status: z.enum(["pending", "confirmed", "completed", "cancelled", "no_show"]),
       })
       .parse(d),
   )
   .handler(async ({ data }) => {
+    const { requireSkildAdmin } = await import("./admin-guard.server");
+    await requireSkildAdmin(data.accessToken);
     const { getSkildAdmin } = await import("./skild-supabase.server");
     const sb = getSkildAdmin();
     const a = await loadAppointmentForSync(data.appointmentId);
@@ -113,16 +121,19 @@ export const setAppointmentStatus = createServerFn({ method: "POST" })
   });
 
 export const rescheduleAppointment = createServerFn({ method: "POST" })
-  .inputValidator((d: { appointmentId: string; startISO: string; minutes?: number }) =>
+  .inputValidator((d: { appointmentId: string; startISO: string; minutes?: number; accessToken: string }) =>
     z
       .object({
         appointmentId: z.string().uuid(),
+        accessToken: z.string().min(20),
         startISO: z.string(),
         minutes: z.number().min(15).max(480).optional(),
       })
       .parse(d),
   )
   .handler(async ({ data }) => {
+    const { requireSkildAdmin } = await import("./admin-guard.server");
+    await requireSkildAdmin(data.accessToken);
     const { getSkildAdmin } = await import("./skild-supabase.server");
     const sb = getSkildAdmin();
     const a = await loadAppointmentForSync(data.appointmentId);

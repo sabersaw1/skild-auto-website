@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
 import { Trash2, Calendar as CalendarIcon, CheckCircle2, XCircle } from "lucide-react";
 import { skildSupabase } from "@/lib/skild-supabase";
+import { getAdminAccessToken } from "@/lib/skild-admin-token";
 import {
   getGoogleCalendarStatus,
   getGoogleCalendarAuthUrl,
