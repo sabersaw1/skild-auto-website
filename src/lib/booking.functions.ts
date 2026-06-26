@@ -172,6 +172,14 @@ export const createAppointment = createServerFn({ method: "POST" })
     // Mark quote as scheduled.
     await sb.from("quotes").update({ status: "scheduled" }).eq("id", quote.id);
 
+    // Sync to Google Calendar (best-effort).
+    try {
+      const { syncAppointmentToGoogle } = await import("./appointments.functions");
+      await syncAppointmentToGoogle({ data: { appointmentId: appt.id } });
+    } catch (err) {
+      console.error("[createAppointment] google sync failed", err);
+    }
+
     // Fire email (best-effort).
     try {
       const { sendBookingEmails } = await import("./skild-email.server");
