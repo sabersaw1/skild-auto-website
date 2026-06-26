@@ -49,7 +49,9 @@ function Appointments() {
   useEffect(() => { load(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [filter]);
 
   async function setStatus(id: string, status: string) {
-    await skildSupabase.from("appointments").update({ status }).eq("id", id);
+    await setAppointmentStatus({
+      data: { appointmentId: id, status: status as "pending" | "confirmed" | "completed" | "cancelled" | "no_show" },
+    });
     load();
   }
 
