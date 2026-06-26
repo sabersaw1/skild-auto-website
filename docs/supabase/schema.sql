@@ -296,3 +296,20 @@ create policy "admin/staff write blocked times" on public.blocked_times
   for all to authenticated
   using (public.has_role(auth.uid(), 'admin') or public.has_role(auth.uid(), 'staff'))
   with check (public.has_role(auth.uid(), 'admin') or public.has_role(auth.uid(), 'staff'));
+
+-- =========================================================================
+-- BUSINESS SETTINGS (Google Calendar refresh token, etc.)
+-- Server-only access: only service_role can read/write. Never expose to anon.
+-- =========================================================================
+create table if not exists public.business_settings (
+  key text primary key,
+  value jsonb not null default '{}'::jsonb,
+  updated_at timestamptz not null default now()
+);
+grant all on public.business_settings to service_role;
+alter table public.business_settings enable row level security;
+-- No policies on purpose: only service_role (which bypasses RLS) can access.
+
+-- Ensure appointments.google_event_id exists for older deployments.
+alter table public.appointments
+  add column if not exists google_event_id text;
