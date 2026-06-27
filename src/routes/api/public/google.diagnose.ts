@@ -41,26 +41,32 @@ export const Route = createFileRoute("/api/public/google/diagnose")({
         let businessSettingsCheck:
           | { reachable: true; tableExists: true }
           | { reachable: false; tableExists: false; error: string; code?: string; hint?: string | null };
-        let supabaseUrlInUse: string | null = null;
+        let appointmentsCheck:
+          | { reachable: true; tableExists: true }
+          | { reachable: false; tableExists: false; error: string; code?: string };
+        let browserSupabaseUrl: string | null = null;
+        const serverSupabaseUrl = process.env.SKILD_SUPABASE_URL?.trim() ?? null;
+        const serviceRoleKey = process.env.SKILD_SUPABASE_SERVICE_ROLE_KEY ?? null;
         try {
           const mod = await import("@/lib/skild-supabase");
-          supabaseUrlInUse = mod.SKILD_SUPABASE_URL;
+          browserSupabaseUrl = mod.SKILD_SUPABASE_URL;
           const { getSkildAdmin } = await import("@/lib/skild-supabase.server");
-          const { error } = await getSkildAdmin()
-            .from("business_settings")
-            .select("key")
-            .limit(1);
+          const sb = getSkildAdmin();
+          const { error } = await sb.from("business_settings").select("key").limit(1);
           businessSettingsCheck = error
-            ? {
-                reachable: false,
-                tableExists: false,
-                error: error.message,
-                code: error.code,
-                hint: error.hint,
-              }
+            ? { reachable: false, tableExists: false, error: error.message, code: error.code, hint: error.hint }
+            : { reachable: true, tableExists: true };
+          const { error: aptErr } = await sb.from("appointments").select("id").limit(1);
+          appointmentsCheck = aptErr
+            ? { reachable: false, tableExists: false, error: aptErr.message, code: aptErr.code }
             : { reachable: true, tableExists: true };
         } catch (err) {
           businessSettingsCheck = {
+            reachable: false,
+            tableExists: false,
+            error: err instanceof Error ? err.message : String(err),
+          };
+          appointmentsCheck = {
             reachable: false,
             tableExists: false,
             error: err instanceof Error ? err.message : String(err),
