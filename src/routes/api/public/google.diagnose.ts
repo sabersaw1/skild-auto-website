@@ -41,7 +41,10 @@ export const Route = createFileRoute("/api/public/google/diagnose")({
         let businessSettingsCheck:
           | { reachable: true; tableExists: true }
           | { reachable: false; tableExists: false; error: string; code?: string; hint?: string | null };
+        let supabaseUrlInUse: string | null = null;
         try {
+          const mod = await import("@/lib/skild-supabase");
+          supabaseUrlInUse = mod.SKILD_SUPABASE_URL;
           const { getSkildAdmin } = await import("@/lib/skild-supabase.server");
           const { error } = await getSkildAdmin()
             .from("business_settings")
