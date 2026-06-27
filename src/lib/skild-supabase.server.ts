@@ -2,30 +2,45 @@
 // import this from a component or a route loader. Use only inside
 // createServerFn handlers or server route handlers (api/public/*).
 //
-// Required env:
-//   SKILD_SUPABASE_SERVICE_ROLE_KEY  (stored via the secure secrets system)
-//
-// Public URL is shared with the browser client.
+// Required env (read at runtime so newly-added runtime secrets take effect
+// without a rebuild):
+//   SKILD_SUPABASE_URL
+//   SKILD_SUPABASE_SERVICE_ROLE_KEY
 
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import { SKILD_SUPABASE_URL } from "./skild-supabase";
 
 let cached: SupabaseClient | null = null;
+let cachedKeyFingerprint: string | null = null;
+
+function currentFingerprint() {
+  const url = process.env.SKILD_SUPABASE_URL ?? "";
+  const key = process.env.SKILD_SUPABASE_SERVICE_ROLE_KEY ?? "";
+  return `${url}::${key.length}::${key.slice(-6)}`;
+}
 
 export function getSkildAdmin(): SupabaseClient {
-  if (cached) return cached;
-  const key = process.env.SKILD_SUPABASE_SERVICE_ROLE_KEY;
+  const url = process.env.SKILD_SUPABASE_URL?.trim();
+  const key = process.env.SKILD_SUPABASE_SERVICE_ROLE_KEY?.trim();
+  if (!url) {
+    throw new Error("SKILD_SUPABASE_URL is not configured on the server.");
+  }
   if (!key) {
     throw new Error(
       "SKILD_SUPABASE_SERVICE_ROLE_KEY is not configured on the server.",
     );
   }
-  cached = createClient(SKILD_SUPABASE_URL, key, {
+  const fp = currentFingerprint();
+  if (cached && cachedKeyFingerprint === fp) return cached;
+  cached = createClient(url, key, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
+  cachedKeyFingerprint = fp;
   return cached;
 }
 
 export function hasSkildAdmin(): boolean {
-  return !!process.env.SKILD_SUPABASE_SERVICE_ROLE_KEY;
+  return (
+    !!process.env.SKILD_SUPABASE_URL &&
+    !!process.env.SKILD_SUPABASE_SERVICE_ROLE_KEY
+  );
 }

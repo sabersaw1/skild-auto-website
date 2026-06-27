@@ -41,26 +41,32 @@ export const Route = createFileRoute("/api/public/google/diagnose")({
         let businessSettingsCheck:
           | { reachable: true; tableExists: true }
           | { reachable: false; tableExists: false; error: string; code?: string; hint?: string | null };
-        let supabaseUrlInUse: string | null = null;
+        let appointmentsCheck:
+          | { reachable: true; tableExists: true }
+          | { reachable: false; tableExists: false; error: string; code?: string };
+        let browserSupabaseUrl: string | null = null;
+        const serverSupabaseUrl = process.env.SKILD_SUPABASE_URL?.trim() ?? null;
+        const serviceRoleKey = process.env.SKILD_SUPABASE_SERVICE_ROLE_KEY ?? null;
         try {
           const mod = await import("@/lib/skild-supabase");
-          supabaseUrlInUse = mod.SKILD_SUPABASE_URL;
+          browserSupabaseUrl = mod.SKILD_SUPABASE_URL;
           const { getSkildAdmin } = await import("@/lib/skild-supabase.server");
-          const { error } = await getSkildAdmin()
-            .from("business_settings")
-            .select("key")
-            .limit(1);
+          const sb = getSkildAdmin();
+          const { error } = await sb.from("business_settings").select("key").limit(1);
           businessSettingsCheck = error
-            ? {
-                reachable: false,
-                tableExists: false,
-                error: error.message,
-                code: error.code,
-                hint: error.hint,
-              }
+            ? { reachable: false, tableExists: false, error: error.message, code: error.code, hint: error.hint }
+            : { reachable: true, tableExists: true };
+          const { error: aptErr } = await sb.from("appointments").select("id").limit(1);
+          appointmentsCheck = aptErr
+            ? { reachable: false, tableExists: false, error: aptErr.message, code: aptErr.code }
             : { reachable: true, tableExists: true };
         } catch (err) {
           businessSettingsCheck = {
+            reachable: false,
+            tableExists: false,
+            error: err instanceof Error ? err.message : String(err),
+          };
+          appointmentsCheck = {
             reachable: false,
             tableExists: false,
             error: err instanceof Error ? err.message : String(err),
@@ -132,13 +138,23 @@ export const Route = createFileRoute("/api/public/google/diagnose")({
             business_settings_table_exists: businessSettingsCheck.tableExists,
           },
           supabase: {
-            url_in_use: supabaseUrlInUse,
-            project_ref: supabaseUrlInUse
-              ? supabaseUrlInUse.replace("https://", "").split(".")[0]
+            server_runtime_url: serverSupabaseUrl,
+            server_runtime_project_ref: serverSupabaseUrl
+              ? serverSupabaseUrl.replace("https://", "").split(".")[0]
               : null,
+            browser_build_url: browserSupabaseUrl,
+            browser_build_project_ref: browserSupabaseUrl
+              ? browserSupabaseUrl.replace("https://", "").split(".")[0]
+              : null,
+            service_role_key_present: !!serviceRoleKey,
+            service_role_key_length: serviceRoleKey?.length ?? 0,
+            service_role_key_format_ok:
+              !!serviceRoleKey &&
+              (serviceRoleKey.startsWith("eyJ") || serviceRoleKey.startsWith("sb_secret_")),
           },
           storage: {
             business_settings: businessSettingsCheck,
+            appointments: appointmentsCheck,
           },
           notes: [
             "If Google shows 403 'access_denied' on the consent screen: the signed-in Google account is NOT on the OAuth consent screen → Test users list (while the app is in Testing).",
