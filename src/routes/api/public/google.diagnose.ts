@@ -41,7 +41,10 @@ export const Route = createFileRoute("/api/public/google/diagnose")({
         let businessSettingsCheck:
           | { reachable: true; tableExists: true }
           | { reachable: false; tableExists: false; error: string; code?: string; hint?: string | null };
+        let supabaseUrlInUse: string | null = null;
         try {
+          const mod = await import("@/lib/skild-supabase");
+          supabaseUrlInUse = mod.SKILD_SUPABASE_URL;
           const { getSkildAdmin } = await import("@/lib/skild-supabase.server");
           const { error } = await getSkildAdmin()
             .from("business_settings")
@@ -127,6 +130,12 @@ export const Route = createFileRoute("/api/public/google/diagnose")({
             redirect_uri_is_https: redirectIsHttps,
             redirect_uri_path_matches_app: redirectPath?.pathname === expectedPath,
             business_settings_table_exists: businessSettingsCheck.tableExists,
+          },
+          supabase: {
+            url_in_use: supabaseUrlInUse,
+            project_ref: supabaseUrlInUse
+              ? supabaseUrlInUse.replace("https://", "").split(".")[0]
+              : null,
           },
           storage: {
             business_settings: businessSettingsCheck,
