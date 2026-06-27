@@ -1,15 +1,25 @@
-// @lovable.dev/vite-tanstack-config already includes the following — do NOT add them manually
-// or the app will break with duplicate plugins:
-//   - tanstackStart, viteReact, tailwindcss, tsConfigPaths, nitro (build-only using cloudflare as a default target),
-//     componentTagger (dev-only), VITE_* env injection, @ path alias, React/TanStack dedupe,
-//     error logger plugins, and sandbox detection (port/host/strictPort).
-// You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
+// ============= Full file contents =============
+// @lovable.dev/vite-tanstack-config already includes tanstackStart, viteReact,
+// tailwindcss, tsConfigPaths, nitro, componentTagger, VITE_* env injection,
+// @ path alias, React/TanStack dedupe, error logger plugins, sandbox detection.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
+
+const SKILD_SUPABASE_URL =
+  process.env.SKILD_SUPABASE_URL ?? "https://xukkcixylfasoerjnkra.supabase.co";
+const SKILD_SUPABASE_PUBLISHABLE_KEY =
+  process.env.SKILD_SUPABASE_PUBLISHABLE_KEY ??
+  "sb_publishable_1j_fdwCdPM-y1d2T7WJDjA_ciiqaEne";
 
 export default defineConfig({
   tanstackStart: {
-    // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
-    // nitro/vite builds from this
     server: { entry: "server" },
+  },
+  vite: {
+    define: {
+      __SKILD_SUPABASE_URL__: JSON.stringify(SKILD_SUPABASE_URL),
+      __SKILD_SUPABASE_PUBLISHABLE_KEY__: JSON.stringify(
+        SKILD_SUPABASE_PUBLISHABLE_KEY,
+      ),
+    },
   },
 });
