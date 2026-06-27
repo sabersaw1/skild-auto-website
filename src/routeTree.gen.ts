@@ -34,6 +34,7 @@ import { Route as ApiPublicSkildConfigRouteImport } from './routes/api/public/sk
 import { Route as ApiPublicSendQuoteRouteImport } from './routes/api/public/send-quote'
 import { Route as ApiPublicCloudinarySignRouteImport } from './routes/api/public/cloudinary-sign'
 import { Route as ApiPublicCalendlyWebhookRouteImport } from './routes/api/public/calendly-webhook'
+import { Route as ApiPublicGoogleStatusRouteImport } from './routes/api/public/google.status'
 import { Route as ApiPublicGoogleOauthCallbackRouteImport } from './routes/api/public/google.oauth-callback'
 import { Route as ApiPublicGoogleDiagnoseRouteImport } from './routes/api/public/google.diagnose'
 
@@ -163,6 +164,11 @@ const ApiPublicCalendlyWebhookRoute =
     path: '/api/public/calendly-webhook',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicGoogleStatusRoute = ApiPublicGoogleStatusRouteImport.update({
+  id: '/api/public/google/status',
+  path: '/api/public/google/status',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicGoogleOauthCallbackRoute =
   ApiPublicGoogleOauthCallbackRouteImport.update({
     id: '/api/public/google/oauth-callback',
@@ -203,6 +209,7 @@ export interface FileRoutesByFullPath {
   '/api/public/skild-config': typeof ApiPublicSkildConfigRoute
   '/api/public/google/diagnose': typeof ApiPublicGoogleDiagnoseRoute
   '/api/public/google/oauth-callback': typeof ApiPublicGoogleOauthCallbackRoute
+  '/api/public/google/status': typeof ApiPublicGoogleStatusRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -231,6 +238,7 @@ export interface FileRoutesByTo {
   '/api/public/skild-config': typeof ApiPublicSkildConfigRoute
   '/api/public/google/diagnose': typeof ApiPublicGoogleDiagnoseRoute
   '/api/public/google/oauth-callback': typeof ApiPublicGoogleOauthCallbackRoute
+  '/api/public/google/status': typeof ApiPublicGoogleStatusRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -261,6 +269,7 @@ export interface FileRoutesById {
   '/api/public/skild-config': typeof ApiPublicSkildConfigRoute
   '/api/public/google/diagnose': typeof ApiPublicGoogleDiagnoseRoute
   '/api/public/google/oauth-callback': typeof ApiPublicGoogleOauthCallbackRoute
+  '/api/public/google/status': typeof ApiPublicGoogleStatusRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -292,6 +301,7 @@ export interface FileRouteTypes {
     | '/api/public/skild-config'
     | '/api/public/google/diagnose'
     | '/api/public/google/oauth-callback'
+    | '/api/public/google/status'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -320,6 +330,7 @@ export interface FileRouteTypes {
     | '/api/public/skild-config'
     | '/api/public/google/diagnose'
     | '/api/public/google/oauth-callback'
+    | '/api/public/google/status'
   id:
     | '__root__'
     | '/'
@@ -349,6 +360,7 @@ export interface FileRouteTypes {
     | '/api/public/skild-config'
     | '/api/public/google/diagnose'
     | '/api/public/google/oauth-callback'
+    | '/api/public/google/status'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -373,6 +385,7 @@ export interface RootRouteChildren {
   ApiPublicSkildConfigRoute: typeof ApiPublicSkildConfigRoute
   ApiPublicGoogleDiagnoseRoute: typeof ApiPublicGoogleDiagnoseRoute
   ApiPublicGoogleOauthCallbackRoute: typeof ApiPublicGoogleOauthCallbackRoute
+  ApiPublicGoogleStatusRoute: typeof ApiPublicGoogleStatusRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -552,6 +565,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicCalendlyWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/google/status': {
+      id: '/api/public/google/status'
+      path: '/api/public/google/status'
+      fullPath: '/api/public/google/status'
+      preLoaderRoute: typeof ApiPublicGoogleStatusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/google/oauth-callback': {
       id: '/api/public/google/oauth-callback'
       path: '/api/public/google/oauth-callback'
@@ -611,7 +631,18 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicSkildConfigRoute: ApiPublicSkildConfigRoute,
   ApiPublicGoogleDiagnoseRoute: ApiPublicGoogleDiagnoseRoute,
   ApiPublicGoogleOauthCallbackRoute: ApiPublicGoogleOauthCallbackRoute,
+  ApiPublicGoogleStatusRoute: ApiPublicGoogleStatusRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
