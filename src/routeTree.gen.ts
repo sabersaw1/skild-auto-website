@@ -34,7 +34,6 @@ import { Route as ApiPublicSkildConfigRouteImport } from './routes/api/public/sk
 import { Route as ApiPublicSendQuoteRouteImport } from './routes/api/public/send-quote'
 import { Route as ApiPublicCloudinarySignRouteImport } from './routes/api/public/cloudinary-sign'
 import { Route as ApiPublicCalendlyWebhookRouteImport } from './routes/api/public/calendly-webhook'
-import { Route as ApiPublicAppointmentsRecentRouteImport } from './routes/api/public/appointments-recent'
 import { Route as ApiPublicGoogleStatusRouteImport } from './routes/api/public/google.status'
 import { Route as ApiPublicGoogleOauthCallbackRouteImport } from './routes/api/public/google.oauth-callback'
 import { Route as ApiPublicGoogleDiagnoseRouteImport } from './routes/api/public/google.diagnose'
@@ -165,12 +164,6 @@ const ApiPublicCalendlyWebhookRoute =
     path: '/api/public/calendly-webhook',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiPublicAppointmentsRecentRoute =
-  ApiPublicAppointmentsRecentRouteImport.update({
-    id: '/api/public/appointments-recent',
-    path: '/api/public/appointments-recent',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 const ApiPublicGoogleStatusRoute = ApiPublicGoogleStatusRouteImport.update({
   id: '/api/public/google/status',
   path: '/api/public/google/status',
@@ -210,7 +203,6 @@ export interface FileRoutesByFullPath {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/tasks': typeof AdminTasksRoute
   '/admin/': typeof AdminIndexRoute
-  '/api/public/appointments-recent': typeof ApiPublicAppointmentsRecentRoute
   '/api/public/calendly-webhook': typeof ApiPublicCalendlyWebhookRoute
   '/api/public/cloudinary-sign': typeof ApiPublicCloudinarySignRoute
   '/api/public/send-quote': typeof ApiPublicSendQuoteRoute
@@ -240,7 +232,6 @@ export interface FileRoutesByTo {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/tasks': typeof AdminTasksRoute
   '/admin': typeof AdminIndexRoute
-  '/api/public/appointments-recent': typeof ApiPublicAppointmentsRecentRoute
   '/api/public/calendly-webhook': typeof ApiPublicCalendlyWebhookRoute
   '/api/public/cloudinary-sign': typeof ApiPublicCloudinarySignRoute
   '/api/public/send-quote': typeof ApiPublicSendQuoteRoute
@@ -272,7 +263,6 @@ export interface FileRoutesById {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/tasks': typeof AdminTasksRoute
   '/admin/': typeof AdminIndexRoute
-  '/api/public/appointments-recent': typeof ApiPublicAppointmentsRecentRoute
   '/api/public/calendly-webhook': typeof ApiPublicCalendlyWebhookRoute
   '/api/public/cloudinary-sign': typeof ApiPublicCloudinarySignRoute
   '/api/public/send-quote': typeof ApiPublicSendQuoteRoute
@@ -305,7 +295,6 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/tasks'
     | '/admin/'
-    | '/api/public/appointments-recent'
     | '/api/public/calendly-webhook'
     | '/api/public/cloudinary-sign'
     | '/api/public/send-quote'
@@ -335,7 +324,6 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/tasks'
     | '/admin'
-    | '/api/public/appointments-recent'
     | '/api/public/calendly-webhook'
     | '/api/public/cloudinary-sign'
     | '/api/public/send-quote'
@@ -366,7 +354,6 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/tasks'
     | '/admin/'
-    | '/api/public/appointments-recent'
     | '/api/public/calendly-webhook'
     | '/api/public/cloudinary-sign'
     | '/api/public/send-quote'
@@ -392,7 +379,6 @@ export interface RootRouteChildren {
   ServiceAreaRoute: typeof ServiceAreaRoute
   ServicesRoute: typeof ServicesRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
-  ApiPublicAppointmentsRecentRoute: typeof ApiPublicAppointmentsRecentRoute
   ApiPublicCalendlyWebhookRoute: typeof ApiPublicCalendlyWebhookRoute
   ApiPublicCloudinarySignRoute: typeof ApiPublicCloudinarySignRoute
   ApiPublicSendQuoteRoute: typeof ApiPublicSendQuoteRoute
@@ -579,13 +565,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicCalendlyWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/appointments-recent': {
-      id: '/api/public/appointments-recent'
-      path: '/api/public/appointments-recent'
-      fullPath: '/api/public/appointments-recent'
-      preLoaderRoute: typeof ApiPublicAppointmentsRecentRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/public/google/status': {
       id: '/api/public/google/status'
       path: '/api/public/google/status'
@@ -646,7 +625,6 @@ const rootRouteChildren: RootRouteChildren = {
   ServiceAreaRoute: ServiceAreaRoute,
   ServicesRoute: ServicesRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
-  ApiPublicAppointmentsRecentRoute: ApiPublicAppointmentsRecentRoute,
   ApiPublicCalendlyWebhookRoute: ApiPublicCalendlyWebhookRoute,
   ApiPublicCloudinarySignRoute: ApiPublicCloudinarySignRoute,
   ApiPublicSendQuoteRoute: ApiPublicSendQuoteRoute,
