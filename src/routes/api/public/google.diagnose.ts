@@ -138,13 +138,23 @@ export const Route = createFileRoute("/api/public/google/diagnose")({
             business_settings_table_exists: businessSettingsCheck.tableExists,
           },
           supabase: {
-            url_in_use: supabaseUrlInUse,
-            project_ref: supabaseUrlInUse
-              ? supabaseUrlInUse.replace("https://", "").split(".")[0]
+            server_runtime_url: serverSupabaseUrl,
+            server_runtime_project_ref: serverSupabaseUrl
+              ? serverSupabaseUrl.replace("https://", "").split(".")[0]
               : null,
+            browser_build_url: browserSupabaseUrl,
+            browser_build_project_ref: browserSupabaseUrl
+              ? browserSupabaseUrl.replace("https://", "").split(".")[0]
+              : null,
+            service_role_key_present: !!serviceRoleKey,
+            service_role_key_length: serviceRoleKey?.length ?? 0,
+            service_role_key_format_ok:
+              !!serviceRoleKey &&
+              (serviceRoleKey.startsWith("eyJ") || serviceRoleKey.startsWith("sb_secret_")),
           },
           storage: {
             business_settings: businessSettingsCheck,
+            appointments: appointmentsCheck,
           },
           notes: [
             "If Google shows 403 'access_denied' on the consent screen: the signed-in Google account is NOT on the OAuth consent screen → Test users list (while the app is in Testing).",
