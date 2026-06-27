@@ -13,8 +13,23 @@ function redact(v: string | null | undefined, keep = 6) {
 export const Route = createFileRoute("/api/public/google/status")({
   server: {
     handlers: {
-      GET: async () => {
+      GET: async ({ request }) => {
+        // Admin-only: requires Bearer access token from a signed-in admin.
+        try {
+          const auth = request.headers.get("authorization") ?? "";
+          const token = auth.toLowerCase().startsWith("bearer ")
+            ? auth.slice(7).trim()
+            : "";
+          const { requireSkildAdmin } = await import("@/lib/admin-guard.server");
+          await requireSkildAdmin(token);
+        } catch {
+          return new Response(
+            JSON.stringify({ ok: false, error: "Forbidden" }),
+            { status: 403, headers: { "Content-Type": "application/json" } },
+          );
+        }
         const out: Record<string, unknown> = { ok: true };
+
         try {
           const { getSkildAdmin } = await import("@/lib/skild-supabase.server");
           const sb = getSkildAdmin();
