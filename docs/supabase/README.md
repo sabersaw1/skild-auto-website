@@ -1,11 +1,11 @@
 # Skild Auto OS — Supabase Setup
 
-This project uses **your own Supabase project** (`xukkcixylfasoerjnkra`) as the
+This project uses **your own Supabase project** (`srtpaqwlrtxtflcjbqie`) as the
 backend. Lovable Cloud is **not** used.
 
 ## One-time setup
 
-1. Open the [Supabase SQL Editor](https://supabase.com/dashboard/project/xukkcixylfasoerjnkra/sql/new).
+1. Open the [Supabase SQL Editor](https://supabase.com/dashboard/project/srtpaqwlrtxtflcjbqie/sql/new).
 2. Paste the contents of [`schema.sql`](./schema.sql) and run it.
    - Idempotent. Safe to re-run after edits.
    - Creates: `customers`, `vehicles`, `quotes`, `quote_photos`,

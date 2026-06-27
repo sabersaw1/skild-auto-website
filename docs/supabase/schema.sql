@@ -1,5 +1,5 @@
 -- Skild Auto OS — foundation schema
--- Run this once in the Supabase SQL editor for project xukkcixylfasoerjnkra.
+-- Run this once in the Supabase SQL editor for project srtpaqwlrtxtflcjbqie.
 -- Idempotent: safe to re-run.
 
 -- =========================================================================
