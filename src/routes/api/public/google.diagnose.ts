@@ -142,6 +142,7 @@ export const Route = createFileRoute("/api/public/google/diagnose")({
             server_runtime_project_ref: serverSupabaseUrl
               ? serverSupabaseUrl.replace("https://", "").split(".")[0]
               : null,
+            server_runtime_publishable_key: process.env.SKILD_SUPABASE_PUBLISHABLE_KEY ?? null,
             browser_build_url: browserSupabaseUrl,
             browser_build_project_ref: browserSupabaseUrl
               ? browserSupabaseUrl.replace("https://", "").split(".")[0]

@@ -30,6 +30,7 @@ import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminQuotesRouteImport } from './routes/admin.quotes'
 import { Route as AdminCustomersRouteImport } from './routes/admin.customers'
 import { Route as AdminAppointmentsRouteImport } from './routes/admin.appointments'
+import { Route as ApiPublicSkildConfigRouteImport } from './routes/api/public/skild-config'
 import { Route as ApiPublicSendQuoteRouteImport } from './routes/api/public/send-quote'
 import { Route as ApiPublicCloudinarySignRouteImport } from './routes/api/public/cloudinary-sign'
 import { Route as ApiPublicCalendlyWebhookRouteImport } from './routes/api/public/calendly-webhook'
@@ -141,6 +142,11 @@ const AdminAppointmentsRoute = AdminAppointmentsRouteImport.update({
   path: '/appointments',
   getParentRoute: () => AdminRoute,
 } as any)
+const ApiPublicSkildConfigRoute = ApiPublicSkildConfigRouteImport.update({
+  id: '/api/public/skild-config',
+  path: '/api/public/skild-config',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicSendQuoteRoute = ApiPublicSendQuoteRouteImport.update({
   id: '/api/public/send-quote',
   path: '/api/public/send-quote',
@@ -194,6 +200,7 @@ export interface FileRoutesByFullPath {
   '/api/public/calendly-webhook': typeof ApiPublicCalendlyWebhookRoute
   '/api/public/cloudinary-sign': typeof ApiPublicCloudinarySignRoute
   '/api/public/send-quote': typeof ApiPublicSendQuoteRoute
+  '/api/public/skild-config': typeof ApiPublicSkildConfigRoute
   '/api/public/google/diagnose': typeof ApiPublicGoogleDiagnoseRoute
   '/api/public/google/oauth-callback': typeof ApiPublicGoogleOauthCallbackRoute
 }
@@ -221,6 +228,7 @@ export interface FileRoutesByTo {
   '/api/public/calendly-webhook': typeof ApiPublicCalendlyWebhookRoute
   '/api/public/cloudinary-sign': typeof ApiPublicCloudinarySignRoute
   '/api/public/send-quote': typeof ApiPublicSendQuoteRoute
+  '/api/public/skild-config': typeof ApiPublicSkildConfigRoute
   '/api/public/google/diagnose': typeof ApiPublicGoogleDiagnoseRoute
   '/api/public/google/oauth-callback': typeof ApiPublicGoogleOauthCallbackRoute
 }
@@ -250,6 +258,7 @@ export interface FileRoutesById {
   '/api/public/calendly-webhook': typeof ApiPublicCalendlyWebhookRoute
   '/api/public/cloudinary-sign': typeof ApiPublicCloudinarySignRoute
   '/api/public/send-quote': typeof ApiPublicSendQuoteRoute
+  '/api/public/skild-config': typeof ApiPublicSkildConfigRoute
   '/api/public/google/diagnose': typeof ApiPublicGoogleDiagnoseRoute
   '/api/public/google/oauth-callback': typeof ApiPublicGoogleOauthCallbackRoute
 }
@@ -280,6 +289,7 @@ export interface FileRouteTypes {
     | '/api/public/calendly-webhook'
     | '/api/public/cloudinary-sign'
     | '/api/public/send-quote'
+    | '/api/public/skild-config'
     | '/api/public/google/diagnose'
     | '/api/public/google/oauth-callback'
   fileRoutesByTo: FileRoutesByTo
@@ -307,6 +317,7 @@ export interface FileRouteTypes {
     | '/api/public/calendly-webhook'
     | '/api/public/cloudinary-sign'
     | '/api/public/send-quote'
+    | '/api/public/skild-config'
     | '/api/public/google/diagnose'
     | '/api/public/google/oauth-callback'
   id:
@@ -335,6 +346,7 @@ export interface FileRouteTypes {
     | '/api/public/calendly-webhook'
     | '/api/public/cloudinary-sign'
     | '/api/public/send-quote'
+    | '/api/public/skild-config'
     | '/api/public/google/diagnose'
     | '/api/public/google/oauth-callback'
   fileRoutesById: FileRoutesById
@@ -358,6 +370,7 @@ export interface RootRouteChildren {
   ApiPublicCalendlyWebhookRoute: typeof ApiPublicCalendlyWebhookRoute
   ApiPublicCloudinarySignRoute: typeof ApiPublicCloudinarySignRoute
   ApiPublicSendQuoteRoute: typeof ApiPublicSendQuoteRoute
+  ApiPublicSkildConfigRoute: typeof ApiPublicSkildConfigRoute
   ApiPublicGoogleDiagnoseRoute: typeof ApiPublicGoogleDiagnoseRoute
   ApiPublicGoogleOauthCallbackRoute: typeof ApiPublicGoogleOauthCallbackRoute
 }
@@ -511,6 +524,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAppointmentsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/api/public/skild-config': {
+      id: '/api/public/skild-config'
+      path: '/api/public/skild-config'
+      fullPath: '/api/public/skild-config'
+      preLoaderRoute: typeof ApiPublicSkildConfigRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/send-quote': {
       id: '/api/public/send-quote'
       path: '/api/public/send-quote'
@@ -588,19 +608,10 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicCalendlyWebhookRoute: ApiPublicCalendlyWebhookRoute,
   ApiPublicCloudinarySignRoute: ApiPublicCloudinarySignRoute,
   ApiPublicSendQuoteRoute: ApiPublicSendQuoteRoute,
+  ApiPublicSkildConfigRoute: ApiPublicSkildConfigRoute,
   ApiPublicGoogleDiagnoseRoute: ApiPublicGoogleDiagnoseRoute,
   ApiPublicGoogleOauthCallbackRoute: ApiPublicGoogleOauthCallbackRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
