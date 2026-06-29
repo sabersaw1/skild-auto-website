@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageLayout } from "@/components/PageLayout";
 import { FeatureStrip } from "@/components/FeatureStrip";
 import { Reveal } from "@/components/Reveal";
-import mainBg from "@/assets/main-bg.png.asset.json";
+import mainBg from "@/assets/main-bg.png";
 import { ArrowRight, Bike, Wrench, Gauge, Sparkles, Settings, Stethoscope } from "lucide-react";
 
 export const Route = createFileRoute("/moto")({
@@ -33,7 +33,7 @@ function MotoHome() {
     <PageLayout mode="moto">
       <section className="relative overflow-hidden">
         <div className="absolute inset-0">
-          <img src={mainBg.url} alt="" className="h-full w-full object-cover opacity-70" />
+          <img src={mainBg} alt="" className="h-full w-full object-cover opacity-70" />
           <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-background/20" />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
         </div>

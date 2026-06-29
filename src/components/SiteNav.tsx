@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { Menu, X, Phone } from "lucide-react";
-import skildLogo from "@/assets/skild-logo.png.asset.json";
+import skildLogo from "@/assets/skild-logo.png";
 import { BUSINESS, telHref } from "@/lib/business";
 
 
@@ -27,7 +27,7 @@ export function SiteNav({ mode = "neutral" }: SiteNavProps) {
       <div className="mx-auto flex h-24 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
         <Link to="/" aria-label="Skild Auto — Home" className="group flex min-w-0 items-center">
           <img
-            src={skildLogo.url}
+            src={skildLogo}
             alt="Skild Auto"
             className="h-16 w-auto transition-transform duration-300 group-hover:scale-[1.04] sm:h-20"
           />
