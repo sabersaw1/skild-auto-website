@@ -9,6 +9,24 @@ export const Route = createFileRoute("/admin/appointments")({
   component: Appointments,
 });
 
+// Build the canonical Google Calendar event URL. Format documented by Google:
+// base64(`${eventId} ${calendarId}`) — url-safe, padding stripped.
+// This URL works on mobile (opens the Google Calendar app when installed)
+// and desktop, and never relies on a popup.
+function googleEventUrl(eventId: string, calendarId: string | null): string {
+  if (!calendarId) {
+    // Fallback: open the user's primary calendar; better than a broken link.
+    return "https://calendar.google.com/calendar/r";
+  }
+  const raw = `${eventId} ${calendarId}`;
+  const b64 =
+    typeof btoa === "function"
+      ? btoa(raw)
+      : Buffer.from(raw, "utf-8").toString("base64");
+  const eid = b64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+  return `https://calendar.google.com/calendar/event?eid=${eid}`;
+}
+
 type Appt = {
   id: string;
   start_at: string;
@@ -26,6 +44,20 @@ const STATUSES = ["pending", "confirmed", "completed", "cancelled", "no_show"] a
 function Appointments() {
   const [items, setItems] = useState<Appt[]>([]);
   const [filter, setFilter] = useState<string>("upcoming");
+  const [calendarId, setCalendarId] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/public/skild-config")
+      .then((r) => r.json())
+      .then((cfg: { googleCalendarId?: string }) => {
+        if (!cancelled) setCalendarId(cfg.googleCalendarId || null);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   async function load() {
     let q = skildSupabase
@@ -99,9 +131,9 @@ function Appointments() {
               )}
               {a.google_event_id && (
                 <a
-                  href={`https://calendar.google.com/calendar/u/0/r/eventedit/${a.google_event_id}`}
+                  href={googleEventUrl(a.google_event_id, calendarId)}
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                   className="mt-3 inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-widest text-brand-red hover:text-brand-red-glow"
                 >
                   <ExternalLink className="h-3 w-3" /> View in Google Calendar
