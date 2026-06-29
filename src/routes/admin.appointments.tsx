@@ -44,6 +44,20 @@ const STATUSES = ["pending", "confirmed", "completed", "cancelled", "no_show"] a
 function Appointments() {
   const [items, setItems] = useState<Appt[]>([]);
   const [filter, setFilter] = useState<string>("upcoming");
+  const [calendarId, setCalendarId] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/public/skild-config")
+      .then((r) => r.json())
+      .then((cfg: { googleCalendarId?: string }) => {
+        if (!cancelled) setCalendarId(cfg.googleCalendarId || null);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   async function load() {
     let q = skildSupabase
