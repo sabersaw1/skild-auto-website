@@ -9,6 +9,24 @@ export const Route = createFileRoute("/admin/appointments")({
   component: Appointments,
 });
 
+// Build the canonical Google Calendar event URL. Format documented by Google:
+// base64(`${eventId} ${calendarId}`) — url-safe, padding stripped.
+// This URL works on mobile (opens the Google Calendar app when installed)
+// and desktop, and never relies on a popup.
+function googleEventUrl(eventId: string, calendarId: string | null): string {
+  if (!calendarId) {
+    // Fallback: open the user's primary calendar; better than a broken link.
+    return "https://calendar.google.com/calendar/r";
+  }
+  const raw = `${eventId} ${calendarId}`;
+  const b64 =
+    typeof btoa === "function"
+      ? btoa(raw)
+      : Buffer.from(raw, "utf-8").toString("base64");
+  const eid = b64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+  return `https://calendar.google.com/calendar/event?eid=${eid}`;
+}
+
 type Appt = {
   id: string;
   start_at: string;
