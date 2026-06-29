@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Instagram, Phone, Mail, MapPin, Clock } from "lucide-react";
-import skildLogo from "@/assets/skild-logo.png.asset.json";
+import skildLogo from "@/assets/skild-logo.png";
 import { BUSINESS, mailHref, telHref } from "@/lib/business";
 
 export function SiteFooter() {
@@ -10,7 +10,7 @@ export function SiteFooter() {
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 md:grid-cols-4">
         <div>
           <Link to="/" aria-label="Skild Auto — Home" className="inline-flex items-center">
-            <img src={skildLogo.url} alt="Skild Auto" className="h-16 w-auto" />
+            <img src={skildLogo} alt="Skild Auto" className="h-16 w-auto" />
           </Link>
           <p className="mt-4 text-sm text-muted-foreground">
             Built for the road. Ready for anything. Mobile auto & moto repair across Salt Lake City.

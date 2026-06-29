@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageLayout } from "@/components/PageLayout";
 import { FeatureStrip } from "@/components/FeatureStrip";
 import { Reveal } from "@/components/Reveal";
-import mobileBg from "@/assets/mobile-bg.png.asset.json";
+import mobileBg from "@/assets/mobile-bg.png";
 import { ArrowRight, Wrench, Gauge, Battery, Zap, ShieldCheck, Stethoscope } from "lucide-react";
 
 export const Route = createFileRoute("/auto")({
@@ -34,7 +34,7 @@ function AutoHome() {
       {/* HERO */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0">
-          <img src={mobileBg.url} alt="" className="h-full w-full object-cover" />
+          <img src={mobileBg} alt="" className="h-full w-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-r from-background via-background/85 to-background/30" />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
         </div>

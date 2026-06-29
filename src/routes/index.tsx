@@ -1,8 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Bike, Car, ArrowRight } from "lucide-react";
-import mainBg from "@/assets/main-bg.png.asset.json";
-import skildLogo from "@/assets/skild-logo.png.asset.json";
+import mainBg from "@/assets/main-bg.png";
+import skildLogo from "@/assets/skild-logo.png";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -31,7 +31,7 @@ function Splash() {
     <div className="relative overflow-hidden bg-background" style={{ height: "100svh" }}>
       {/* Background image */}
       <div className="absolute inset-0">
-        <img src={mainBg.url} alt="" className="h-full w-full object-cover opacity-50" />
+        <img src={mainBg} alt="" className="h-full w-full object-cover opacity-50" />
         <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/40 to-background" />
         <div className="absolute inset-0" style={{ background: "var(--gradient-vignette)" }} />
         <div className="absolute inset-0 scanlines opacity-40" />
@@ -67,7 +67,7 @@ function Splash() {
         >
           <p className="text-[10px] font-semibold uppercase tracking-[0.4em] text-brand-red sm:text-xs">Skild Auto Repair</p>
           <img
-            src={skildLogo.url}
+            src={skildLogo}
             alt="Skild Auto"
             className="mx-auto mt-2 w-auto sm:mt-4"
             style={{ height: "clamp(5.5rem, 26vh, 22rem)" }}
