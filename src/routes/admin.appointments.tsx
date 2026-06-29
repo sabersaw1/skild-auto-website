@@ -131,9 +131,9 @@ function Appointments() {
               )}
               {a.google_event_id && (
                 <a
-                  href={`https://calendar.google.com/calendar/u/0/r/eventedit/${a.google_event_id}`}
+                  href={googleEventUrl(a.google_event_id, calendarId)}
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                   className="mt-3 inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-widest text-brand-red hover:text-brand-red-glow"
                 >
                   <ExternalLink className="h-3 w-3" /> View in Google Calendar
