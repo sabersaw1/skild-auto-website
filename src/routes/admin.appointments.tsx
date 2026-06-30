@@ -108,6 +108,7 @@ function Appointments() {
       <ul className="mt-6 space-y-3">
         {items.map((a) => {
           const when = new Date(a.start_at).toLocaleString("en-US", {
+            timeZone: "America/Denver",
             weekday: "short", month: "short", day: "numeric",
             hour: "numeric", minute: "2-digit",
           });
