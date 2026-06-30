@@ -10,6 +10,7 @@ function esc(s: unknown) {
 
 function fmtDateTime(iso: string) {
   return new Date(iso).toLocaleString("en-US", {
+    timeZone: "America/Denver",
     weekday: "short", month: "short", day: "numeric",
     hour: "numeric", minute: "2-digit", timeZoneName: "short",
   });

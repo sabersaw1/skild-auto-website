@@ -3,24 +3,30 @@
 // (privately) check appointment conflicts. We never return appointment
 // PII — only free/busy slot booleans.
 //
-// Provider-agnostic: getAvailableSlots merges Supabase appointments +
-// blocked_times. To layer Google Calendar later, add a second provider
-// and union its busy ranges before slot filtering.
+// All business-hour math is anchored to BUSINESS_TIMEZONE (America/Denver)
+// so the server (UTC on Vercel) and the customer browser produce the same
+// wall-clock slots.
 
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { APPOINTMENT_MINUTES } from "./skild-booking";
+import {
+  BUSINESS_TIMEZONE,
+  addDaysYmd,
+  parseYmd,
+  weekdayForYmd,
+  ymdInBusinessZone,
+  zonedWallTimeToUtc,
+} from "./skild-timezone";
 
 const SLOT_MINUTES = 30; // grid resolution
 const DEFAULT_APPT_MIN = APPOINTMENT_MINUTES;
 
+type HoursRow = { weekday: number; open_time: string; close_time: string; is_open: boolean };
+
 function parseHMS(s: string): { h: number; m: number } {
   const [h, m] = s.split(":").map((n) => parseInt(n, 10));
   return { h: h || 0, m: m || 0 };
-}
-
-function ymd(d: Date): string {
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
 async function loadAvailability(fromISO: string, toISO: string) {
@@ -46,7 +52,7 @@ async function loadAvailability(fromISO: string, toISO: string) {
   if (blockedRes.error) throw blockedRes.error;
   if (apptsRes.error) throw apptsRes.error;
   return {
-    hours: hoursRes.data ?? [],
+    hours: (hoursRes.data ?? []) as HoursRow[],
     busy: [
       ...(blockedRes.data ?? []).map((b) => ({ start: new Date(b.start_at), end: new Date(b.end_at) })),
       ...(apptsRes.data ?? []).map((a) => ({ start: new Date(a.start_at), end: new Date(a.end_at) })),
@@ -55,19 +61,19 @@ async function loadAvailability(fromISO: string, toISO: string) {
   };
 }
 
-function dayWindowFromHours(date: Date, hours: { weekday: number; open_time: string; close_time: string; is_open: boolean }[]) {
-  const row = hours.find((h) => h.weekday === date.getDay());
+function dayWindowFromHours(ymd: string, hours: HoursRow[]): { open: Date; close: Date } | null {
+  const wd = weekdayForYmd(ymd);
+  const row = hours.find((h) => h.weekday === wd);
   if (!row || !row.is_open) return null;
   const o = parseHMS(row.open_time);
   const c = parseHMS(row.close_time);
-  const open = new Date(date);
-  open.setHours(o.h, o.m, 0, 0);
-  const close = new Date(date);
-  close.setHours(c.h, c.m, 0, 0);
+  const { y, m, d } = parseYmd(ymd);
+  const open = zonedWallTimeToUtc(y, m, d, o.h, o.m, BUSINESS_TIMEZONE);
+  const close = zonedWallTimeToUtc(y, m, d, c.h, c.m, BUSINESS_TIMEZONE);
   return { open, close };
 }
 
-function slotsForDay(date: Date, win: { open: Date; close: Date }, busy: { start: Date; end: Date }[]) {
+function slotsForDay(win: { open: Date; close: Date }, busy: { start: Date; end: Date }[]) {
   const slots: string[] = [];
   const now = Date.now();
   const apptMs = DEFAULT_APPT_MIN * 60_000;
@@ -88,24 +94,24 @@ export const getAvailableDays = createServerFn({ method: "POST" })
     z.object({ from: z.string().optional(), days: z.number().min(1).max(60).optional() }).parse(d),
   )
   .handler(async ({ data }) => {
-    const start = data.from ? new Date(data.from) : new Date();
-    start.setHours(0, 0, 0, 0);
+    const startYmd = ymdInBusinessZone(data.from ? new Date(data.from) : new Date());
     const span = data.days ?? 21;
-    const end = new Date(start);
-    end.setDate(end.getDate() + span);
-    const { hours, busy } = await loadAvailability(start.toISOString(), end.toISOString());
+    const endYmd = addDaysYmd(startYmd, span);
+    const { y: sy, m: sm, d: sd } = parseYmd(startYmd);
+    const { y: ey, m: em, d: ed } = parseYmd(endYmd);
+    const fromISO = zonedWallTimeToUtc(sy, sm, sd, 0, 0).toISOString();
+    const toISO = zonedWallTimeToUtc(ey, em, ed, 0, 0).toISOString();
+    const { hours, busy } = await loadAvailability(fromISO, toISO);
 
     const days: { date: string; hasSlots: boolean }[] = [];
     for (let i = 0; i < span; i++) {
-      const d = new Date(start);
-      d.setDate(d.getDate() + i);
-      const win = dayWindowFromHours(d, hours);
+      const ymd = addDaysYmd(startYmd, i);
+      const win = dayWindowFromHours(ymd, hours);
       if (!win) {
-        days.push({ date: ymd(d), hasSlots: false });
+        days.push({ date: ymd, hasSlots: false });
         continue;
       }
-      const s = slotsForDay(d, win, busy);
-      days.push({ date: ymd(d), hasSlots: s.length > 0 });
+      days.push({ date: ymd, hasSlots: slotsForDay(win, busy).length > 0 });
     }
     return { days };
   });
@@ -113,13 +119,16 @@ export const getAvailableDays = createServerFn({ method: "POST" })
 export const getAvailableSlots = createServerFn({ method: "POST" })
   .inputValidator((d: { date: string }) => z.object({ date: z.string() }).parse(d))
   .handler(async ({ data }) => {
-    const day = new Date(`${data.date}T00:00:00`);
-    const next = new Date(day);
-    next.setDate(next.getDate() + 1);
-    const { hours, busy } = await loadAvailability(day.toISOString(), next.toISOString());
-    const win = dayWindowFromHours(day, hours);
+    const ymd = data.date;
+    const nextYmd = addDaysYmd(ymd, 1);
+    const { y, m, d } = parseYmd(ymd);
+    const { y: ny, m: nm, d: nd } = parseYmd(nextYmd);
+    const fromISO = zonedWallTimeToUtc(y, m, d, 0, 0).toISOString();
+    const toISO = zonedWallTimeToUtc(ny, nm, nd, 0, 0).toISOString();
+    const { hours, busy } = await loadAvailability(fromISO, toISO);
+    const win = dayWindowFromHours(ymd, hours);
     if (!win) return { slots: [] };
-    return { slots: slotsForDay(day, win, busy) };
+    return { slots: slotsForDay(win, busy) };
   });
 
 // ─────────────────────────────────────────────────────────────────────────

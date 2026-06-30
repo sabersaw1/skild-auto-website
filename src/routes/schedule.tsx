@@ -6,6 +6,7 @@ import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock } from "luci
 import { getAvailableDays, getAvailableSlots } from "@/lib/booking.functions";
 import { getQuoteId, setSlot } from "@/lib/skild-booking";
 import { loadQuote } from "@/lib/quote-storage";
+import { BUSINESS_TIMEZONE, parseYmd } from "@/lib/skild-timezone";
 
 export const Route = createFileRoute("/schedule")({
   head: () => ({
@@ -23,15 +24,28 @@ function startOfWeek(d: Date) {
   return x;
 }
 
-function fmtMonthDay(d: Date) {
-  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+// Day-card labels are derived from a YYYY-MM-DD string the server already
+// computed in the business zone, so we render that calendar date directly
+// (no UTC drift across midnight).
+function dateFromYmd(ymd: string): Date {
+  const { y, m, d } = parseYmd(ymd);
+  return new Date(y, m - 1, d);
 }
-function fmtWeekday(d: Date) {
-  return d.toLocaleDateString("en-US", { weekday: "short" });
+
+function fmtMonthDay(ymd: string) {
+  return dateFromYmd(ymd).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+function fmtWeekday(ymd: string) {
+  return dateFromYmd(ymd).toLocaleDateString("en-US", { weekday: "short" });
 }
 function fmtTime(iso: string) {
-  return new Date(iso).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+  return new Date(iso).toLocaleTimeString("en-US", {
+    timeZone: BUSINESS_TIMEZONE,
+    hour: "numeric",
+    minute: "2-digit",
+  });
 }
+
 
 function SchedulePage() {
   const navigate = useNavigate();
@@ -129,7 +143,6 @@ function SchedulePage() {
             </div>
             <div className="mt-5 grid grid-cols-7 gap-2">
               {visibleDays.map((d) => {
-                const date = new Date(`${d.date}T00:00:00`);
                 const active = selectedDate === d.date;
                 return (
                   <button
@@ -142,8 +155,8 @@ function SchedulePage() {
                         : "border-border/40 bg-background/40 text-muted-foreground/50"
                     }`}
                   >
-                    <span className="font-bold uppercase tracking-widest">{fmtWeekday(date)}</span>
-                    <span className="mt-1 font-display text-base">{fmtMonthDay(date)}</span>
+                    <span className="font-bold uppercase tracking-widest">{fmtWeekday(d.date)}</span>
+                    <span className="mt-1 font-display text-base">{fmtMonthDay(d.date)}</span>
                     {!d.hasSlots && <span className="mt-0.5 text-[9px] uppercase tracking-widest">—</span>}
                   </button>
                 );

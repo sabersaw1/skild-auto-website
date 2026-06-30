@@ -20,6 +20,9 @@ type Block = { id: string; start_at: string; end_at: string; reason: string | nu
 
 function ScheduleSettings() {
   const [hours, setHours] = useState<Hours[]>([]);
+  const [hoursDirty, setHoursDirty] = useState(false);
+  const [savingHours, setSavingHours] = useState(false);
+  const [hoursMsg, setHoursMsg] = useState<string | null>(null);
   const [blocks, setBlocks] = useState<Block[]>([]);
   const [bStart, setBStart] = useState("");
   const [bEnd, setBEnd] = useState("");
@@ -32,12 +35,34 @@ function ScheduleSettings() {
     ]);
     setHours((h.data ?? []) as Hours[]);
     setBlocks((b.data ?? []) as Block[]);
+    setHoursDirty(false);
   }
   useEffect(() => { load(); }, []);
 
-  async function saveHours(row: Hours, patch: Partial<Hours>) {
-    await skildSupabase.from("business_hours").update(patch).eq("id", row.id);
-    load();
+  function updateHourLocal(id: string, patch: Partial<Hours>) {
+    setHours((prev) => prev.map((h) => (h.id === id ? { ...h, ...patch } : h)));
+    setHoursDirty(true);
+    setHoursMsg(null);
+  }
+
+  async function saveAllHours() {
+    setSavingHours(true);
+    setHoursMsg(null);
+    try {
+      for (const h of hours) {
+        const { error } = await skildSupabase
+          .from("business_hours")
+          .update({ open_time: h.open_time, close_time: h.close_time, is_open: h.is_open })
+          .eq("id", h.id);
+        if (error) throw error;
+      }
+      setHoursDirty(false);
+      setHoursMsg("Saved. Customer availability updated.");
+    } catch (e) {
+      setHoursMsg(e instanceof Error ? e.message : "Could not save hours.");
+    } finally {
+      setSavingHours(false);
+    }
   }
 
   async function addBlock(e: FormEvent) {
@@ -66,26 +91,41 @@ function ScheduleSettings() {
 
       <section className="mt-8">
         <h2 className="font-display text-lg">Business hours</h2>
+        <p className="mt-1 text-xs text-muted-foreground">Times shown in Salt Lake City local time (America/Denver).</p>
         <div className="mt-4 overflow-hidden rounded-xl border border-border bg-card">
           {hours.map((h) => (
             <div key={h.id} className="flex flex-wrap items-center gap-3 border-b border-border px-4 py-3 last:border-b-0">
               <span className="w-12 font-display tracking-wider">{DAYS[h.weekday]}</span>
               <label className="flex items-center gap-2 text-xs">
                 <input type="checkbox" checked={h.is_open}
-                  onChange={(e) => saveHours(h, { is_open: e.target.checked })} />
+                  onChange={(e) => updateHourLocal(h.id, { is_open: e.target.checked })} />
                 Open
               </label>
               <input type="time" value={h.open_time.slice(0, 5)}
-                onChange={(e) => saveHours(h, { open_time: `${e.target.value}:00` })}
+                onChange={(e) => updateHourLocal(h.id, { open_time: `${e.target.value}:00` })}
                 disabled={!h.is_open}
                 className="rounded-md border border-border bg-background px-2 py-1 text-sm disabled:opacity-40" />
               <span className="text-muted-foreground">→</span>
               <input type="time" value={h.close_time.slice(0, 5)}
-                onChange={(e) => saveHours(h, { close_time: `${e.target.value}:00` })}
+                onChange={(e) => updateHourLocal(h.id, { close_time: `${e.target.value}:00` })}
                 disabled={!h.is_open}
                 className="rounded-md border border-border bg-background px-2 py-1 text-sm disabled:opacity-40" />
             </div>
           ))}
+        </div>
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            onClick={saveAllHours}
+            disabled={!hoursDirty || savingHours}
+            className="rounded-md bg-brand-red px-4 py-2 text-xs font-bold uppercase tracking-widest text-white hover:bg-brand-red-glow disabled:opacity-50"
+          >
+            {savingHours ? "Saving…" : "Save Changes"}
+          </button>
+          {hoursDirty && !savingHours && (
+            <span className="text-xs text-muted-foreground">Unsaved changes</span>
+          )}
+          {hoursMsg && <span className="text-xs text-muted-foreground">{hoursMsg}</span>}
         </div>
       </section>
 

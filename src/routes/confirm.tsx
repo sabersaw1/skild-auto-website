@@ -57,6 +57,7 @@ function ConfirmPage() {
   const fullName = [form.firstName, form.lastName].filter(Boolean).join(" ");
   const when = slot
     ? new Date(slot).toLocaleString("en-US", {
+        timeZone: "America/Denver",
         weekday: "long", month: "long", day: "numeric",
         hour: "numeric", minute: "2-digit",
       })

@@ -245,16 +245,16 @@ create policy "user can read own roles" on public.user_roles
   for select to authenticated using (user_id = auth.uid());
 
 -- =========================================================================
--- DEFAULT BUSINESS HOURS (Mon–Sat 8–6, closed Sunday)
+-- DEFAULT BUSINESS HOURS (Mon–Sat 8 AM – 8 PM local, closed Sunday)
 -- =========================================================================
 insert into public.business_hours (weekday, open_time, close_time, is_open) values
   (0, '00:00', '00:00', false),
-  (1, '08:00', '18:00', true),
-  (2, '08:00', '18:00', true),
-  (3, '08:00', '18:00', true),
-  (4, '08:00', '18:00', true),
-  (5, '08:00', '18:00', true),
-  (6, '09:00', '15:00', true)
+  (1, '08:00', '20:00', true),
+  (2, '08:00', '20:00', true),
+  (3, '08:00', '20:00', true),
+  (4, '08:00', '20:00', true),
+  (5, '08:00', '20:00', true),
+  (6, '08:00', '20:00', true)
 on conflict (weekday) do nothing;
 
 -- =========================================================================
