@@ -39,7 +39,9 @@ export const bootstrapSkildAdmin = createServerFn({ method: "POST" }).handler(as
   }
 
   // Ensure customers row exists (optional, for cross-linking).
-  await sb.from("customers").upsert({ email: ADMIN_EMAIL, full_name: "Skild Admin" }, { onConflict: "email" });
+  await sb
+    .from("customers")
+    .upsert({ email: ADMIN_EMAIL, full_name: "Skild Admin" }, { onConflict: "email" });
 
   // Grant admin role.
   const { error: roleErr } = await sb

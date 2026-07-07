@@ -71,7 +71,7 @@
 
   --gradient-hero: linear-gradient(135deg, oklch(0.08 0.01 20) 0%, oklch(0.18 0.05 25) 100%);
   --gradient-red: linear-gradient(135deg, oklch(0.58 0.24 25) 0%, oklch(0.45 0.22 25) 100%);
-  --gradient-vignette: radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.75) 100%);
+  --gradient-vignette: radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.75) 100%);
 }
 
 .dark {
@@ -79,8 +79,12 @@
 }
 
 @layer base {
-  * { border-color: var(--color-border); }
-  html { scroll-behavior: smooth; }
+  * {
+    border-color: var(--color-border);
+  }
+  html {
+    scroll-behavior: smooth;
+  }
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
@@ -90,7 +94,11 @@
       radial-gradient(circle at 20% 10%, rgba(220, 30, 40, 0.08), transparent 40%),
       radial-gradient(circle at 80% 90%, rgba(220, 30, 40, 0.06), transparent 40%);
   }
-  h1, h2, h3, h4, .font-display {
+  h1,
+  h2,
+  h3,
+  h4,
+  .font-display {
     font-family: var(--font-display);
     letter-spacing: 0.01em;
     text-transform: uppercase;
@@ -106,7 +114,9 @@
   &::before {
     content: "";
     position: absolute;
-    left: 0; top: 0; bottom: 0;
+    left: 0;
+    top: 0;
+    bottom: 0;
     width: 3px;
     background: var(--color-brand-red);
     box-shadow: 0 0 12px var(--color-brand-red-glow);
@@ -121,10 +131,17 @@
     inset: 0;
     border-radius: inherit;
     padding: 1px;
-    background: linear-gradient(135deg, rgba(220,30,40,0.6), transparent 50%, rgba(220,30,40,0.3));
-    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    background: linear-gradient(
+      135deg,
+      rgba(220, 30, 40, 0.6),
+      transparent 50%,
+      rgba(220, 30, 40, 0.3)
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
     -webkit-mask-composite: xor;
-            mask-composite: exclude;
+    mask-composite: exclude;
     pointer-events: none;
   }
 }
@@ -132,44 +149,82 @@
 @utility scanlines {
   background-image: repeating-linear-gradient(
     0deg,
-    rgba(255,255,255,0.02) 0px,
-    rgba(255,255,255,0.02) 1px,
+    rgba(255, 255, 255, 0.02) 0px,
+    rgba(255, 255, 255, 0.02) 1px,
     transparent 1px,
     transparent 3px
   );
 }
 
 @keyframes ember-rise {
-  0% { transform: translateY(20px) scale(0.8); opacity: 0; }
-  20% { opacity: 1; }
-  100% { transform: translateY(-120vh) scale(0.4); opacity: 0; }
+  0% {
+    transform: translateY(20px) scale(0.8);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-120vh) scale(0.4);
+    opacity: 0;
+  }
 }
 @keyframes pulse-red {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(220,30,40,0.6); }
-  50% { box-shadow: 0 0 0 18px rgba(220,30,40,0); }
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(220, 30, 40, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 0 18px rgba(220, 30, 40, 0);
+  }
 }
 @keyframes slide-up-fade {
-  from { opacity: 0; transform: translateY(24px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 @keyframes scan-sweep {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(200%); }
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(200%);
+  }
 }
 @keyframes flicker {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.85; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.85;
+  }
 }
 
-.animate-ember { animation: ember-rise 6s linear infinite; }
-.animate-pulse-red { animation: pulse-red 2.2s ease-out infinite; }
-.animate-slide-up { animation: slide-up-fade 0.8s ease-out both; }
-.animate-flicker { animation: flicker 3s ease-in-out infinite; }
+.animate-ember {
+  animation: ember-rise 6s linear infinite;
+}
+.animate-pulse-red {
+  animation: pulse-red 2.2s ease-out infinite;
+}
+.animate-slide-up {
+  animation: slide-up-fade 0.8s ease-out both;
+}
+.animate-flicker {
+  animation: flicker 3s ease-in-out infinite;
+}
 
 .reveal {
   opacity: 0;
   transform: translateY(28px);
-  transition: opacity 0.8s ease, transform 0.8s ease;
+  transition:
+    opacity 0.8s ease,
+    transform 0.8s ease;
 }
 .reveal.in-view {
   opacity: 1;

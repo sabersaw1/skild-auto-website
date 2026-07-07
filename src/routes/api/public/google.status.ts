@@ -17,16 +17,14 @@ export const Route = createFileRoute("/api/public/google/status")({
         // Admin-only: requires Bearer access token from a signed-in admin.
         try {
           const auth = request.headers.get("authorization") ?? "";
-          const token = auth.toLowerCase().startsWith("bearer ")
-            ? auth.slice(7).trim()
-            : "";
+          const token = auth.toLowerCase().startsWith("bearer ") ? auth.slice(7).trim() : "";
           const { requireSkildAdmin } = await import("@/lib/admin-guard.server");
           await requireSkildAdmin(token);
         } catch {
-          return new Response(
-            JSON.stringify({ ok: false, error: "Forbidden" }),
-            { status: 403, headers: { "Content-Type": "application/json" } },
-          );
+          return new Response(JSON.stringify({ ok: false, error: "Forbidden" }), {
+            status: 403,
+            headers: { "Content-Type": "application/json" },
+          });
         }
         const out: Record<string, unknown> = { ok: true };
 
@@ -62,7 +60,8 @@ export const Route = createFileRoute("/api/public/google/status")({
 
           // Try a live refresh + freeBusy ping (this surfaces the real Google error).
           try {
-            const { getGoogleBusy, isGoogleConnected } = await import("@/lib/google-calendar.server");
+            const { getGoogleBusy, isGoogleConnected } =
+              await import("@/lib/google-calendar.server");
             out.is_google_connected = await isGoogleConnected();
             const from = new Date();
             const to = new Date(from.getTime() + 24 * 60 * 60 * 1000);
@@ -77,7 +76,8 @@ export const Route = createFileRoute("/api/public/google/status")({
           // Try creating + deleting a probe event so we know createGoogleEvent works end-to-end.
           if (out.row_present) {
             try {
-              const { createGoogleEvent, deleteGoogleEvent } = await import("@/lib/google-calendar.server");
+              const { createGoogleEvent, deleteGoogleEvent } =
+                await import("@/lib/google-calendar.server");
               const start = new Date(Date.now() + 24 * 60 * 60 * 1000);
               const end = new Date(start.getTime() + 15 * 60 * 1000);
               const ev = await createGoogleEvent({

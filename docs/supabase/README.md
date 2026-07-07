@@ -23,12 +23,12 @@ select id, 'admin' from auth.users where email = 'skildauto@gmail.com';
 
 ## Environment / secrets
 
-| Where         | Name                              | Notes                                 |
-|---------------|-----------------------------------|---------------------------------------|
-| In code       | URL + publishable (anon) key      | Hardcoded in `src/lib/skild-supabase.ts` (safe — public keys). |
-| Secret store  | `SKILD_SUPABASE_SERVICE_ROLE_KEY` | Server-only. Bypasses RLS. Used by `src/lib/skild-supabase.server.ts`. |
-| Secret store  | `RESEND_API_KEY`                  | Email transport for quote notifications. |
-| Secret store  | `CLOUDINARY_API_SECRET`           | Signs photo uploads. |
+| Where        | Name                              | Notes                                                                  |
+| ------------ | --------------------------------- | ---------------------------------------------------------------------- |
+| In code      | URL + publishable (anon) key      | Hardcoded in `src/lib/skild-supabase.ts` (safe — public keys).         |
+| Secret store | `SKILD_SUPABASE_SERVICE_ROLE_KEY` | Server-only. Bypasses RLS. Used by `src/lib/skild-supabase.server.ts`. |
+| Secret store | `RESEND_API_KEY`                  | Email transport for quote notifications.                               |
+| Secret store | `CLOUDINARY_API_SECRET`           | Signs photo uploads.                                                   |
 
 ## Pipeline
 

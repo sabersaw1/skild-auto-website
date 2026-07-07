@@ -1,15 +1,35 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageLayout } from "@/components/PageLayout";
 import { Reveal } from "@/components/Reveal";
-import { Car, Bike, Wrench, Stethoscope, Battery, Droplet, Zap, ShieldCheck, Gauge, Settings, Sparkles, ArrowRight } from "lucide-react";
+import {
+  Car,
+  Bike,
+  Wrench,
+  Stethoscope,
+  Battery,
+  Droplet,
+  Zap,
+  ShieldCheck,
+  Gauge,
+  Settings,
+  Sparkles,
+  ArrowRight,
+} from "lucide-react";
 
 export const Route = createFileRoute("/services")({
   head: () => ({
     meta: [
       { title: "Services — Auto & Moto Repair | Skild Auto" },
-      { name: "description", content: "Full list of automotive and motorcycle services from Skild Auto in Salt Lake City, Utah." },
+      {
+        name: "description",
+        content:
+          "Full list of automotive and motorcycle services from Skild Auto in Salt Lake City, Utah.",
+      },
       { property: "og:title", content: "Skild Auto Services" },
-      { property: "og:description", content: "Diagnostics, repair, maintenance and performance — auto and moto." },
+      {
+        property: "og:description",
+        content: "Diagnostics, repair, maintenance and performance — auto and moto.",
+      },
       { property: "og:url", content: "/services" },
     ],
     links: [{ rel: "canonical", href: "/services" }],
@@ -44,9 +64,12 @@ function ServicesPage() {
       <section className="border-b border-border bg-gradient-to-b from-card to-background">
         <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6">
           <Reveal>
-            <p className="text-xs font-semibold uppercase tracking-[0.4em] text-brand-red">Our Services</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.4em] text-brand-red">
+              Our Services
+            </p>
             <h1 className="mt-3 font-display text-5xl sm:text-6xl">
-              Expert <span className="text-brand-red">repairs</span> & maintenance,<br className="hidden sm:block" /> wherever you are.
+              Expert <span className="text-brand-red">repairs</span> & maintenance,
+              <br className="hidden sm:block" /> wherever you are.
             </h1>
           </Reveal>
         </div>
@@ -58,8 +81,13 @@ function ServicesPage() {
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
         <div className="rounded-2xl border border-border bg-card p-8 text-center shadow-elevated">
           <h3 className="font-display text-3xl">Don't see what you need?</h3>
-          <p className="mt-2 text-sm text-muted-foreground">We handle custom requests, performance projects and one-off jobs.</p>
-          <Link to="/quote" className="mt-6 inline-flex items-center gap-2 rounded-md bg-brand-red px-6 py-3 text-sm font-bold uppercase tracking-[0.16em] text-white shadow-glow hover:bg-brand-red-glow">
+          <p className="mt-2 text-sm text-muted-foreground">
+            We handle custom requests, performance projects and one-off jobs.
+          </p>
+          <Link
+            to="/quote"
+            className="mt-6 inline-flex items-center gap-2 rounded-md bg-brand-red px-6 py-3 text-sm font-bold uppercase tracking-[0.16em] text-white shadow-glow hover:bg-brand-red-glow"
+          >
             Request Custom Quote <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
@@ -69,15 +97,28 @@ function ServicesPage() {
 }
 
 function ServiceBlock({
-  title, icon, items, ctaTo,
-}: { title: string; icon: React.ReactNode; items: { icon: any; name: string }[]; ctaTo: string }) {
+  title,
+  icon,
+  items,
+  ctaTo,
+}: {
+  title: string;
+  icon: React.ReactNode;
+  items: { icon: any; name: string }[];
+  ctaTo: string;
+}) {
   return (
     <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
       <Reveal>
         <div className="flex items-center gap-3">
-          <span className="grid h-10 w-10 place-items-center rounded-md bg-brand-red text-white shadow-glow">{icon}</span>
+          <span className="grid h-10 w-10 place-items-center rounded-md bg-brand-red text-white shadow-glow">
+            {icon}
+          </span>
           <h2 className="font-display text-3xl sm:text-4xl">{title} services</h2>
-          <Link to={ctaTo} className="ml-auto hidden text-xs font-bold uppercase tracking-[0.16em] text-muted-foreground hover:text-brand-red sm:block">
+          <Link
+            to={ctaTo}
+            className="ml-auto hidden text-xs font-bold uppercase tracking-[0.16em] text-muted-foreground hover:text-brand-red sm:block"
+          >
             {title} home →
           </Link>
         </div>

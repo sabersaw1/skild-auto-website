@@ -55,10 +55,7 @@ export async function persistQuoteToSupabase(
   const v = input.vehicle ?? {};
   const s = input.service ?? {};
 
-  const fullName =
-    c.fullName ||
-    [c.firstName, c.lastName].filter(Boolean).join(" ").trim() ||
-    null;
+  const fullName = c.fullName || [c.firstName, c.lastName].filter(Boolean).join(" ").trim() || null;
   const email = (c.email || "").trim().toLowerCase() || null;
   const phone = (c.phone || "").trim() || null;
 
@@ -132,9 +129,7 @@ export async function persistQuoteToSupabase(
   const quoteId = quote.id as string;
 
   // Photos.
-  const photos = (input.photos ?? []).filter(
-    (p) => p && (p.secureUrl || p.url),
-  );
+  const photos = (input.photos ?? []).filter((p) => p && (p.secureUrl || p.url));
   if (photos.length) {
     const rows = photos.map((p) => ({
       quote_id: quoteId,

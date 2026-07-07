@@ -3,7 +3,13 @@ import { PageLayout } from "@/components/PageLayout";
 import { Reveal } from "@/components/Reveal";
 import { useEffect, useState } from "react";
 import { Calendar, Wrench, MapPin, User, Phone, Mail, Pencil, ChevronRight } from "lucide-react";
-import { loadQuote, resolvedMake, resolvedModel, type QuoteData, EMPTY_QUOTE } from "@/lib/quote-storage";
+import {
+  loadQuote,
+  resolvedMake,
+  resolvedModel,
+  type QuoteData,
+  EMPTY_QUOTE,
+} from "@/lib/quote-storage";
 import { getQuoteId, getSlot, clearBooking } from "@/lib/skild-booking";
 import { createAppointment } from "@/lib/booking.functions";
 
@@ -36,7 +42,8 @@ function ConfirmPage() {
       setErr("Missing quote or time. Please start over.");
       return;
     }
-    setBusy(true); setErr(null);
+    setBusy(true);
+    setErr(null);
     try {
       const r = await createAppointment({ data: { quoteId, startISO: slot } });
       if (!r.ok) {
@@ -58,8 +65,11 @@ function ConfirmPage() {
   const when = slot
     ? new Date(slot).toLocaleString("en-US", {
         timeZone: "America/Denver",
-        weekday: "long", month: "long", day: "numeric",
-        hour: "numeric", minute: "2-digit",
+        weekday: "long",
+        month: "long",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
       })
     : "—";
 
@@ -75,33 +85,69 @@ function ConfirmPage() {
         </Reveal>
 
         <div className="mt-10 space-y-4">
-          <Card title="Appointment" right={
-            <Link to="/schedule" className="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-widest text-muted-foreground hover:text-brand-red">
-              <Pencil className="h-3 w-3" /> Change
-            </Link>
-          }>
-            <Row icon={<Calendar className="h-4 w-4 text-brand-red" />} primary={when} secondary="60 minutes" />
+          <Card
+            title="Appointment"
+            right={
+              <Link
+                to="/schedule"
+                className="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-widest text-muted-foreground hover:text-brand-red"
+              >
+                <Pencil className="h-3 w-3" /> Change
+              </Link>
+            }
+          >
+            <Row
+              icon={<Calendar className="h-4 w-4 text-brand-red" />}
+              primary={when}
+              secondary="60 minutes"
+            />
           </Card>
 
-          <Card title="Service" right={
-            <Link to="/quote" className="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-widest text-muted-foreground hover:text-brand-red">
-              <Pencil className="h-3 w-3" /> Edit
-            </Link>
-          }>
-            <Row icon={<Wrench className="h-4 w-4 text-brand-red" />}
+          <Card
+            title="Service"
+            right={
+              <Link
+                to="/quote"
+                className="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-widest text-muted-foreground hover:text-brand-red"
+              >
+                <Pencil className="h-3 w-3" /> Edit
+              </Link>
+            }
+          >
+            <Row
+              icon={<Wrench className="h-4 w-4 text-brand-red" />}
               primary={form.service || "—"}
-              secondary={`${form.type === "moto" ? "Moto" : "Auto"} · ${form.year || "—"} ${make} ${model}`.trim()} />
+              secondary={`${form.type === "moto" ? "Moto" : "Auto"} · ${form.year || "—"} ${make} ${model}`.trim()}
+            />
             {form.description && (
-              <p className="mt-3 whitespace-pre-wrap text-sm text-muted-foreground">{form.description}</p>
+              <p className="mt-3 whitespace-pre-wrap text-sm text-muted-foreground">
+                {form.description}
+              </p>
             )}
           </Card>
 
           <Card title="Contact">
             <div className="space-y-2 text-sm">
-              {fullName && <div className="flex items-center gap-2"><User className="h-4 w-4 text-brand-red" /> {fullName}</div>}
-              {form.phone && <div className="flex items-center gap-2"><Phone className="h-4 w-4 text-brand-red" /> {form.phone}</div>}
-              {form.email && <div className="flex items-center gap-2"><Mail className="h-4 w-4 text-brand-red" /> {form.email}</div>}
-              {form.location && <div className="flex items-center gap-2"><MapPin className="h-4 w-4 text-brand-red" /> {form.location}</div>}
+              {fullName && (
+                <div className="flex items-center gap-2">
+                  <User className="h-4 w-4 text-brand-red" /> {fullName}
+                </div>
+              )}
+              {form.phone && (
+                <div className="flex items-center gap-2">
+                  <Phone className="h-4 w-4 text-brand-red" /> {form.phone}
+                </div>
+              )}
+              {form.email && (
+                <div className="flex items-center gap-2">
+                  <Mail className="h-4 w-4 text-brand-red" /> {form.email}
+                </div>
+              )}
+              {form.location && (
+                <div className="flex items-center gap-2">
+                  <MapPin className="h-4 w-4 text-brand-red" /> {form.location}
+                </div>
+              )}
             </div>
           </Card>
 
@@ -109,7 +155,12 @@ function ConfirmPage() {
             <Card title="Photos">
               <div className="flex flex-wrap gap-2">
                 {form.photos.map((p) => (
-                  <img key={p} src={p} alt="Vehicle" className="h-20 w-20 rounded-md border border-border object-cover" />
+                  <img
+                    key={p}
+                    src={p}
+                    alt="Vehicle"
+                    className="h-20 w-20 rounded-md border border-border object-cover"
+                  />
                 ))}
               </div>
             </Card>
@@ -122,7 +173,13 @@ function ConfirmPage() {
             disabled={busy || !quoteId || !slot}
             className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-brand-red px-6 py-4 text-sm font-bold uppercase tracking-[0.16em] text-white shadow-glow hover:bg-brand-red-glow disabled:opacity-50"
           >
-            {busy ? "Booking…" : (<>Submit booking <ChevronRight className="h-4 w-4" /></>)}
+            {busy ? (
+              "Booking…"
+            ) : (
+              <>
+                Submit booking <ChevronRight className="h-4 w-4" />
+              </>
+            )}
           </button>
         </div>
       </section>
@@ -130,7 +187,15 @@ function ConfirmPage() {
   );
 }
 
-function Card({ title, right, children }: { title: string; right?: React.ReactNode; children: React.ReactNode }) {
+function Card({
+  title,
+  right,
+  children,
+}: {
+  title: string;
+  right?: React.ReactNode;
+  children: React.ReactNode;
+}) {
   return (
     <div className="rounded-2xl border border-border bg-card p-6">
       <div className="flex items-center justify-between">
@@ -142,7 +207,15 @@ function Card({ title, right, children }: { title: string; right?: React.ReactNo
   );
 }
 
-function Row({ icon, primary, secondary }: { icon: React.ReactNode; primary: string; secondary: string }) {
+function Row({
+  icon,
+  primary,
+  secondary,
+}: {
+  icon: React.ReactNode;
+  primary: string;
+  secondary: string;
+}) {
   return (
     <div className="flex gap-3">
       <span className="mt-0.5">{icon}</span>

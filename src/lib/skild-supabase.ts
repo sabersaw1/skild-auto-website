@@ -11,14 +11,10 @@ declare const __SKILD_SUPABASE_PUBLISHABLE_KEY__: string;
 export const SKILD_SUPABASE_URL: string = __SKILD_SUPABASE_URL__;
 export const SKILD_SUPABASE_PUBLISHABLE_KEY: string = __SKILD_SUPABASE_PUBLISHABLE_KEY__;
 
-export const skildSupabase = createClient(
-  SKILD_SUPABASE_URL,
-  SKILD_SUPABASE_PUBLISHABLE_KEY,
-  {
-    auth: {
-      persistSession: true,
-      autoRefreshToken: true,
-      storageKey: "skild-auto-auth",
-    },
+export const skildSupabase = createClient(SKILD_SUPABASE_URL, SKILD_SUPABASE_PUBLISHABLE_KEY, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    storageKey: "skild-auto-auth",
   },
-);
+});

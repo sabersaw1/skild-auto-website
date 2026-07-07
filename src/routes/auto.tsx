@@ -9,9 +9,16 @@ export const Route = createFileRoute("/auto")({
   head: () => ({
     meta: [
       { title: "Auto — Mobile Automotive Repair | Skild Auto" },
-      { name: "description", content: "Mobile auto repair without the shop visit. Diagnostics, brakes, electrical and maintenance across Salt Lake City, UT." },
+      {
+        name: "description",
+        content:
+          "Mobile auto repair without the shop visit. Diagnostics, brakes, electrical and maintenance across Salt Lake City, UT.",
+      },
       { property: "og:title", content: "Skild Auto — Mobile Automotive Repair" },
-      { property: "og:description", content: "Diagnostics, repairs, maintenance and emergency service brought directly to you." },
+      {
+        property: "og:description",
+        content: "Diagnostics, repairs, maintenance and emergency service brought directly to you.",
+      },
       { property: "og:url", content: "/auto" },
     ],
     links: [{ rel: "canonical", href: "/auto" }],
@@ -20,9 +27,21 @@ export const Route = createFileRoute("/auto")({
 });
 
 const services = [
-  { icon: Stethoscope, name: "Diagnostics", desc: "Computerized scanning, error code analysis & root cause." },
-  { icon: Wrench, name: "Brake Service", desc: "Pads, rotors, fluid flushes — done at your driveway." },
-  { icon: Battery, name: "Battery & Starter", desc: "Testing, replacement & charging system repair." },
+  {
+    icon: Stethoscope,
+    name: "Diagnostics",
+    desc: "Computerized scanning, error code analysis & root cause.",
+  },
+  {
+    icon: Wrench,
+    name: "Brake Service",
+    desc: "Pads, rotors, fluid flushes — done at your driveway.",
+  },
+  {
+    icon: Battery,
+    name: "Battery & Starter",
+    desc: "Testing, replacement & charging system repair.",
+  },
   { icon: Zap, name: "Electrical", desc: "Wiring, sensors, lights and component diagnostics." },
   { icon: Gauge, name: "Maintenance", desc: "Oil, filters, fluids and scheduled inspections." },
   { icon: ShieldCheck, name: "Pre-Purchase", desc: "Independent inspections before you buy." },
@@ -42,13 +61,17 @@ function AutoHome() {
 
         <div className="relative z-10 mx-auto max-w-7xl px-4 py-24 sm:px-6 sm:py-32 lg:py-40">
           <div className="max-w-2xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.4em] text-brand-red">Auto · Salt Lake City</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.4em] text-brand-red">
+              Auto · Salt Lake City
+            </p>
             <h1 className="mt-5 font-display text-5xl leading-[0.95] text-glow sm:text-6xl md:text-7xl">
-              Mobile auto repair<br />
+              Mobile auto repair
+              <br />
               <span className="text-brand-red">without</span> the shop visit
             </h1>
             <p className="mt-6 max-w-xl text-base text-muted-foreground">
-              Diagnostics, repairs, maintenance and emergency service brought directly to your driveway, office, or roadside.
+              Diagnostics, repairs, maintenance and emergency service brought directly to your
+              driveway, office, or roadside.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
@@ -77,10 +100,15 @@ function AutoHome() {
         <Reveal>
           <div className="flex items-end justify-between gap-6">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.4em] text-brand-red">What we do</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.4em] text-brand-red">
+                What we do
+              </p>
               <h2 className="mt-3 font-display text-4xl sm:text-5xl">Auto Services</h2>
             </div>
-            <Link to="/services" className="hidden text-xs font-bold uppercase tracking-[0.16em] text-muted-foreground hover:text-brand-red sm:block">
+            <Link
+              to="/services"
+              className="hidden text-xs font-bold uppercase tracking-[0.16em] text-muted-foreground hover:text-brand-red sm:block"
+            >
               All services →
             </Link>
           </div>
@@ -117,7 +145,9 @@ function CtaBand() {
       <div className="absolute inset-0 opacity-30 scanlines" />
       <div className="relative mx-auto flex max-w-7xl flex-col items-start justify-between gap-6 px-4 py-14 sm:px-6 md:flex-row md:items-center">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.4em] text-brand-red">Ready to roll</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.4em] text-brand-red">
+            Ready to roll
+          </p>
           <h3 className="mt-2 font-display text-3xl sm:text-4xl">Get your fast, honest quote.</h3>
         </div>
         <Link

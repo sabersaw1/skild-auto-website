@@ -27,7 +27,12 @@ async function loadAppointmentForSync(id: string) {
     notes: string | null;
     google_event_id: string | null;
     location: string | null;
-    customer: { full_name: string | null; email: string | null; phone: string | null; location: string | null } | null;
+    customer: {
+      full_name: string | null;
+      email: string | null;
+      phone: string | null;
+      location: string | null;
+    } | null;
     vehicle: { year: number | null; make: string | null; model: string | null } | null;
     quote: { requested_service: string | null; description: string | null } | null;
   };
@@ -121,15 +126,16 @@ export const setAppointmentStatus = createServerFn({ method: "POST" })
   });
 
 export const rescheduleAppointment = createServerFn({ method: "POST" })
-  .inputValidator((d: { appointmentId: string; startISO: string; minutes?: number; accessToken: string }) =>
-    z
-      .object({
-        appointmentId: z.string().uuid(),
-        accessToken: z.string().min(20),
-        startISO: z.string(),
-        minutes: z.number().min(15).max(480).optional(),
-      })
-      .parse(d),
+  .inputValidator(
+    (d: { appointmentId: string; startISO: string; minutes?: number; accessToken: string }) =>
+      z
+        .object({
+          appointmentId: z.string().uuid(),
+          accessToken: z.string().min(20),
+          startISO: z.string(),
+          minutes: z.number().min(15).max(480).optional(),
+        })
+        .parse(d),
   )
   .handler(async ({ data }) => {
     const { requireSkildAdmin } = await import("./admin-guard.server");
@@ -146,9 +152,8 @@ export const rescheduleAppointment = createServerFn({ method: "POST" })
       .update({ start_at: start.toISOString(), end_at: end.toISOString() })
       .eq("id", a.id);
 
-    const { updateGoogleEvent, createGoogleEvent, isGoogleConnected } = await import(
-      "./google-calendar.server"
-    );
+    const { updateGoogleEvent, createGoogleEvent, isGoogleConnected } =
+      await import("./google-calendar.server");
     if (!(await isGoogleConnected())) return { ok: true as const, synced: false };
     const input = eventInputFor({
       ...a,

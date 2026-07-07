@@ -7,9 +7,16 @@ export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
       { title: "About — Johnny Green & Skild Auto" },
-      { name: "description", content: "Skild Auto was founded by Johnny Green with 8+ years of automotive and motorcycle experience to bring honest, fair, mobile service to Salt Lake City." },
+      {
+        name: "description",
+        content:
+          "Skild Auto was founded by Johnny Green with 8+ years of automotive and motorcycle experience to bring honest, fair, mobile service to Salt Lake City.",
+      },
       { property: "og:title", content: "About Skild Auto" },
-      { property: "og:description", content: "Honest service. Fair pricing. Built around the community." },
+      {
+        property: "og:description",
+        content: "Honest service. Fair pricing. Built around the community.",
+      },
       { property: "og:url", content: "/about" },
     ],
     links: [{ rel: "canonical", href: "/about" }],
@@ -36,8 +43,9 @@ function AboutPage() {
               Why choose <span className="text-brand-red">Skild Auto?</span>
             </h1>
             <p className="mt-6 text-base text-muted-foreground">
-              Skild Auto was created by Johnny Green to bring honest automotive service to the Salt Lake City community —
-              fair pricing, better communication, and a better experience than the traditional shop visit.
+              Skild Auto was created by Johnny Green to bring honest automotive service to the Salt
+              Lake City community — fair pricing, better communication, and a better experience than
+              the traditional shop visit.
             </p>
             <ul className="mt-8 space-y-3">
               {reasons.map((r) => (
@@ -68,21 +76,27 @@ function AboutPage() {
 
       <section className="mx-auto max-w-4xl px-4 py-20 sm:px-6">
         <Reveal>
-          <p className="text-xs font-semibold uppercase tracking-[0.4em] text-brand-red">The Story</p>
-          <h2 className="mt-3 font-display text-4xl sm:text-5xl">Built by a wrench, for the road.</h2>
+          <p className="text-xs font-semibold uppercase tracking-[0.4em] text-brand-red">
+            The Story
+          </p>
+          <h2 className="mt-3 font-display text-4xl sm:text-5xl">
+            Built by a wrench, for the road.
+          </h2>
           <div className="mt-8 space-y-5 text-base text-muted-foreground">
             <p>
-              Johnny Green has spent the last 8 years working on cars and motorcycles — from everyday maintenance to
-              performance projects and custom builds. He's worked on over 100 vehicles, learning what owners really
-              want from a mechanic: trust, clear communication and fair pricing.
+              Johnny Green has spent the last 8 years working on cars and motorcycles — from
+              everyday maintenance to performance projects and custom builds. He's worked on over
+              100 vehicles, learning what owners really want from a mechanic: trust, clear
+              communication and fair pricing.
             </p>
             <p>
-              Skild Auto exists to deliver exactly that. No upsell pressure. No shop visit. No surprises. Just a
-              technician who shows up, explains everything, and gets the job done right.
+              Skild Auto exists to deliver exactly that. No upsell pressure. No shop visit. No
+              surprises. Just a technician who shows up, explains everything, and gets the job done
+              right.
             </p>
             <p>
-              This is just the first layer of the Skild Auto ecosystem — a community-driven brand built around honest
-              service, fair quotes and a positive customer experience.
+              This is just the first layer of the Skild Auto ecosystem — a community-driven brand
+              built around honest service, fair quotes and a positive customer experience.
             </p>
           </div>
         </Reveal>
@@ -94,7 +108,9 @@ function AboutPage() {
 function Stat({ icon, kpi, label }: { icon: React.ReactNode; kpi: string; label: string }) {
   return (
     <div className="shine-border rounded-xl border border-border bg-card p-6">
-      <span className="inline-grid h-10 w-10 place-items-center rounded-md bg-brand-red/10 text-brand-red">{icon}</span>
+      <span className="inline-grid h-10 w-10 place-items-center rounded-md bg-brand-red/10 text-brand-red">
+        {icon}
+      </span>
       <div className="mt-4 font-display text-4xl text-glow">{kpi}</div>
       <div className="mt-1 text-xs uppercase tracking-widest text-muted-foreground">{label}</div>
     </div>

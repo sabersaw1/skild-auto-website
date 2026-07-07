@@ -3,16 +3,21 @@
 import { getSkildAdmin } from "./skild-supabase.server";
 
 function esc(s: unknown) {
-  return String(s ?? "").replace(/[&<>"']/g, (c) =>
-    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!,
+  return String(s ?? "").replace(
+    /[&<>"']/g,
+    (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!,
   );
 }
 
 function fmtDateTime(iso: string) {
   return new Date(iso).toLocaleString("en-US", {
     timeZone: "America/Denver",
-    weekday: "short", month: "short", day: "numeric",
-    hour: "numeric", minute: "2-digit", timeZoneName: "short",
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    timeZoneName: "short",
   });
 }
 
@@ -48,19 +53,37 @@ export async function sendBookingEmails(appointmentId: string) {
   const sb = getSkildAdmin();
   const { data: appt, error } = await sb
     .from("appointments")
-    .select(`
+    .select(
+      `
       id, start_at, end_at, status, notes,
       customer:customer_id ( id, full_name, email, phone, location ),
       vehicle:vehicle_id ( kind, year, make, model, mileage ),
       quote:quote_id ( id, requested_service, description, notes, summary )
-    `)
+    `,
+    )
     .eq("id", appointmentId)
     .single();
   if (error || !appt) throw error ?? new Error("Appointment not found");
 
-  const c = (appt.customer ?? {}) as { full_name?: string; email?: string; phone?: string; location?: string };
-  const v = (appt.vehicle ?? {}) as { kind?: string; year?: number; make?: string; model?: string; mileage?: string };
-  const q = (appt.quote ?? {}) as { id?: string; requested_service?: string; description?: string; notes?: string };
+  const c = (appt.customer ?? {}) as {
+    full_name?: string;
+    email?: string;
+    phone?: string;
+    location?: string;
+  };
+  const v = (appt.vehicle ?? {}) as {
+    kind?: string;
+    year?: number;
+    make?: string;
+    model?: string;
+    mileage?: string;
+  };
+  const q = (appt.quote ?? {}) as {
+    id?: string;
+    requested_service?: string;
+    description?: string;
+    notes?: string;
+  };
 
   const { data: photos } = q.id
     ? await sb.from("quote_photos").select("url, original_filename").eq("quote_id", q.id)
@@ -70,19 +93,29 @@ export async function sendBookingEmails(appointmentId: string) {
   const vehicleLine = [v.year, v.make, v.model].filter(Boolean).join(" ") || "—";
   const photoList = (photos ?? []).length
     ? `<ul style="margin:6px 0 0;padding-left:18px;font-size:13px">${(photos ?? [])
-        .map((p) => `<li><a href="${esc(p.url)}" style="color:#dc1e28">${esc(p.original_filename || "photo")}</a></li>`)
+        .map(
+          (p) =>
+            `<li><a href="${esc(p.url)}" style="color:#dc1e28">${esc(p.original_filename || "photo")}</a></li>`,
+        )
         .join("")}</ul>`
     : `<p style="margin:0;font-size:13px;color:#9b8e94">No photos uploaded.</p>`;
 
   const detailsTable = (rows: [string, string][]) =>
     `<table style="font-size:14px;border-collapse:collapse">${rows
-      .map(([k, val]) => `<tr><td style="padding:2px 12px 2px 0;color:#9b8e94">${esc(k)}</td><td>${esc(val)}</td></tr>`)
+      .map(
+        ([k, val]) =>
+          `<tr><td style="padding:2px 12px 2px 0;color:#9b8e94">${esc(k)}</td><td>${esc(val)}</td></tr>`,
+      )
       .join("")}</table>`;
 
   // ---- Admin email ----
   const adminInner = `
     <h3 style="margin:16px 0 6px;color:#dc1e28;font-size:13px;letter-spacing:.18em;text-transform:uppercase">Appointment</h3>
-    ${detailsTable([["When", when], ["Status", appt.status], ["Service", q.requested_service || "—"]])}
+    ${detailsTable([
+      ["When", when],
+      ["Status", appt.status],
+      ["Service", q.requested_service || "—"],
+    ])}
 
     <h3 style="margin:20px 0 6px;color:#dc1e28;font-size:13px;letter-spacing:.18em;text-transform:uppercase">Customer</h3>
     ${detailsTable([

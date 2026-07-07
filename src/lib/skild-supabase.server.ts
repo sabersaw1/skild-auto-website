@@ -25,9 +25,7 @@ export function getSkildAdmin(): SupabaseClient {
     throw new Error("SKILD_SUPABASE_URL is not configured on the server.");
   }
   if (!key) {
-    throw new Error(
-      "SKILD_SUPABASE_SERVICE_ROLE_KEY is not configured on the server.",
-    );
+    throw new Error("SKILD_SUPABASE_SERVICE_ROLE_KEY is not configured on the server.");
   }
   const fp = currentFingerprint();
   if (cached && cachedKeyFingerprint === fp) return cached;
@@ -39,8 +37,5 @@ export function getSkildAdmin(): SupabaseClient {
 }
 
 export function hasSkildAdmin(): boolean {
-  return (
-    !!process.env.SKILD_SUPABASE_URL &&
-    !!process.env.SKILD_SUPABASE_SERVICE_ROLE_KEY
-  );
+  return !!process.env.SKILD_SUPABASE_URL && !!process.env.SKILD_SUPABASE_SERVICE_ROLE_KEY;
 }

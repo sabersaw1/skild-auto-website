@@ -53,10 +53,7 @@ export const Route = createFileRoute("/api/public/cloudinary-sign")({
         const FOLDER_PREFIX = "skild-auto/quotes";
         const folder = body.folder?.trim() || FOLDER_PREFIX;
         if (folder !== FOLDER_PREFIX && !folder.startsWith(`${FOLDER_PREFIX}/`)) {
-          return Response.json(
-            { error: "Invalid folder" },
-            { status: 400, headers: CORS },
-          );
+          return Response.json({ error: "Invalid folder" }, { status: 400, headers: CORS });
         }
         const timestamp = Math.floor(Date.now() / 1000);
 
@@ -79,7 +76,6 @@ export const Route = createFileRoute("/api/public/cloudinary-sign")({
             timestamp,
             folder,
             signature,
-
           },
           { headers: CORS },
         );

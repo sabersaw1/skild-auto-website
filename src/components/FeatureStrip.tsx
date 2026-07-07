@@ -22,7 +22,9 @@ export function FeatureStrip() {
             </span>
             <div className="min-w-0">
               <div className="font-display text-xs tracking-widest">{it.title}</div>
-              <div className="truncate text-[11px] uppercase tracking-wider text-muted-foreground">{it.sub}</div>
+              <div className="truncate text-[11px] uppercase tracking-wider text-muted-foreground">
+                {it.sub}
+              </div>
             </div>
           </div>
         );
