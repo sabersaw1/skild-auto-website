@@ -7,8 +7,8 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
-import { inject } from "@vercel/analytics";
+import { type ReactNode, useEffect } from "react";
+import { Analytics } from "@vercel/analytics/react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -118,13 +118,10 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
-  useEffect(() => {
-    inject();
-  }, []);
-
   return (
     <QueryClientProvider client={queryClient}>
       <Outlet />
+      <Analytics />
     </QueryClientProvider>
   );
 }
