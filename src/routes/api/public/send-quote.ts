@@ -72,7 +72,9 @@ function isAllowedPhotoUrl(url: string): boolean {
   }
 }
 
-async function fetchAsBase64(url: string): Promise<{ base64: string; contentType: string; bytes: number }> {
+async function fetchAsBase64(
+  url: string,
+): Promise<{ base64: string; contentType: string; bytes: number }> {
   if (!isAllowedPhotoUrl(url)) {
     throw new Error("Disallowed photo URL");
   }
@@ -137,9 +139,8 @@ export const Route = createFileRoute("/api/public/send-quote")({
         // path. Supabase is the source of truth once the row lands.
         let quoteId: string | null = null;
         try {
-          const { hasSupabase, persistQuoteToSupabase } = await import(
-            "@/lib/skild-quote-store.server"
-          );
+          const { hasSupabase, persistQuoteToSupabase } =
+            await import("@/lib/skild-quote-store.server");
           if (hasSupabase()) {
             const res = await persistQuoteToSupabase({
               customer: c as never,
@@ -156,10 +157,7 @@ export const Route = createFileRoute("/api/public/send-quote")({
             );
           }
         } catch (err) {
-          console.error(
-            "[send-quote] Supabase persistence failed (continuing)",
-            err,
-          );
+          console.error("[send-quote] Supabase persistence failed (continuing)", err);
         }
 
         // Fetch every Cloudinary URL server-side and convert to a Resend
@@ -208,14 +206,15 @@ export const Route = createFileRoute("/api/public/send-quote")({
              ${photoListHtml}`
           : `<p style="font-family:Arial,sans-serif;font-size:13px;color:#888">No photos uploaded.</p>`;
 
-        const bookingBlock = b && (b.startTime || b.eventUri || b.notes)
-          ? `<h3 style="margin:24px 0 8px;font-family:Arial,sans-serif;font-size:14px;color:#dc1e28;text-transform:uppercase;letter-spacing:.18em">Booking</h3>
+        const bookingBlock =
+          b && (b.startTime || b.eventUri || b.notes)
+            ? `<h3 style="margin:24px 0 8px;font-family:Arial,sans-serif;font-size:14px;color:#dc1e28;text-transform:uppercase;letter-spacing:.18em">Booking</h3>
              <table style="font-family:Arial,sans-serif;font-size:14px;color:#fff;border-collapse:collapse">
                ${b.startTime ? `<tr><td style="padding:2px 12px 2px 0;color:#9b8e94">When</td><td>${esc(b.startTime)}</td></tr>` : ""}
                ${b.eventUri ? `<tr><td style="padding:2px 12px 2px 0;color:#9b8e94">Event</td><td><a style="color:#fff" href="${esc(b.eventUri)}">${esc(b.eventUri)}</a></td></tr>` : ""}
                ${b.notes ? `<tr><td style="padding:2px 12px 2px 0;color:#9b8e94">Notes</td><td>${esc(b.notes)}</td></tr>` : ""}
              </table>`
-          : "";
+            : "";
 
         const html = `
           <div style="background:#0a0608;padding:24px;font-family:Arial,sans-serif;color:#fff">

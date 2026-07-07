@@ -3,23 +3,34 @@ import { PageLayout } from "@/components/PageLayout";
 import { Reveal } from "@/components/Reveal";
 import { useEffect, useMemo, useState } from "react";
 import {
-  Car, Bike, ChevronLeft, ChevronRight, Wrench, Zap, Gauge, Stethoscope,
-  Sparkles, Settings, Camera, X, Calendar,
+  Car,
+  Bike,
+  ChevronLeft,
+  ChevronRight,
+  Wrench,
+  Zap,
+  Gauge,
+  Stethoscope,
+  Sparkles,
+  Settings,
+  Camera,
+  X,
+  Calendar,
 } from "lucide-react";
-import {
-  EMPTY_QUOTE, loadQuote, saveQuote, type QuoteData,
-} from "@/lib/quote-storage";
+import { EMPTY_QUOTE, loadQuote, saveQuote, type QuoteData } from "@/lib/quote-storage";
 import { getMakes, getModels, getYears, OTHER } from "@/lib/vehicles";
 import { uploadQuotePhoto, type CloudinaryPhoto } from "@/lib/cloudinary-upload";
-import {
-  submitQuote, markQuoteSubmitted, wasQuoteSubmitted,
-} from "@/lib/quote-submit";
+import { submitQuote, markQuoteSubmitted, wasQuoteSubmitted } from "@/lib/quote-submit";
 
 export const Route = createFileRoute("/quote")({
   head: () => ({
     meta: [
       { title: "Get a Quote — Skild Auto" },
-      { name: "description", content: "Tell us about your vehicle and we'll get back to you fast with an honest mobile service quote." },
+      {
+        name: "description",
+        content:
+          "Tell us about your vehicle and we'll get back to you fast with an honest mobile service quote.",
+      },
       { property: "og:title", content: "Get a Skild Auto Quote" },
       { property: "og:description", content: "Interactive quote in under 2 minutes." },
       { property: "og:url", content: "/quote" },
@@ -84,17 +95,29 @@ function QuotePage() {
 
   const canNext = () => {
     switch (step) {
-      case 0: return form.type !== null;
-      case 1: return !!form.service;
+      case 0:
+        return form.type !== null;
+      case 1:
+        return !!form.service;
       case 2:
-        return !!form.year && !!form.make && !!form.model
-          && (form.make !== OTHER || !!form.makeOther.trim())
-          && (form.model !== OTHER || !!form.modelOther.trim());
-      case 3: return true; // description optional
+        return (
+          !!form.year &&
+          !!form.make &&
+          !!form.model &&
+          (form.make !== OTHER || !!form.makeOther.trim()) &&
+          (form.model !== OTHER || !!form.modelOther.trim())
+        );
+      case 3:
+        return true; // description optional
       case 4:
-        return !!form.firstName.trim() && !!form.lastName.trim()
-          && !!form.phone.trim() && !!form.email.trim();
-      default: return true;
+        return (
+          !!form.firstName.trim() &&
+          !!form.lastName.trim() &&
+          !!form.phone.trim() &&
+          !!form.email.trim()
+        );
+      default:
+        return true;
     }
   };
 
@@ -107,15 +130,10 @@ function QuotePage() {
       const picked = Array.from(files).slice(0, remaining);
       const uploads = await Promise.all(picked.map((f) => uploadQuotePhoto(f)));
       setPhotoRefs((prev) => [...prev, ...uploads].slice(0, 4));
-      update(
-        "photos",
-        [...form.photos, ...uploads.map((u) => u.secureUrl)].slice(0, 4),
-      );
+      update("photos", [...form.photos, ...uploads.map((u) => u.secureUrl)].slice(0, 4));
     } catch (err) {
       console.error("photo upload failed", err);
-      setPhotoError(
-        err instanceof Error ? err.message : "Photo upload failed. Please try again.",
-      );
+      setPhotoError(err instanceof Error ? err.message : "Photo upload failed. Please try again.");
     } finally {
       setPhotoBusy(false);
     }
@@ -125,7 +143,10 @@ function QuotePage() {
     // Persist the quote in Supabase, then forward to the custom scheduler
     // with the quoteId so the customer doesn't re-enter anything.
     const fingerprint = JSON.stringify({
-      e: form.email, p: form.phone, s: form.service, d: form.description,
+      e: form.email,
+      p: form.phone,
+      s: form.service,
+      d: form.description,
     });
     let quoteId: string | null = null;
     if (submitState !== "sent" && !wasQuoteSubmitted(fingerprint)) {
@@ -139,9 +160,7 @@ function QuotePage() {
       } catch (err) {
         console.error("quote submission failed", err);
         setSubmitState("error");
-        setSubmitError(
-          err instanceof Error ? err.message : "Could not save your quote.",
-        );
+        setSubmitError(err instanceof Error ? err.message : "Could not save your quote.");
         return;
       }
     }
@@ -154,7 +173,9 @@ function QuotePage() {
     <PageLayout>
       <section className="mx-auto max-w-4xl px-4 py-16 sm:px-6">
         <Reveal>
-          <p className="text-xs font-semibold uppercase tracking-[0.4em] text-brand-red">Interactive Quote</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.4em] text-brand-red">
+            Interactive Quote
+          </p>
           <h1 className="mt-3 font-display text-4xl sm:text-5xl">Let's get you a number.</h1>
           <p className="mt-3 text-sm text-muted-foreground">
             Answer once — your info follows you all the way to scheduling.
@@ -169,13 +190,23 @@ function QuotePage() {
                 type="button"
                 onClick={() => i < step && setStep(i)}
                 className={`grid h-8 w-8 shrink-0 place-items-center rounded-full border text-xs font-bold transition ${
-                  i <= step ? "border-brand-red bg-brand-red text-white shadow-glow" : "border-border bg-card text-muted-foreground"
+                  i <= step
+                    ? "border-brand-red bg-brand-red text-white shadow-glow"
+                    : "border-border bg-card text-muted-foreground"
                 }`}
-              >{i + 1}</button>
-              <span className={`hidden truncate text-[10px] font-bold uppercase tracking-widest sm:inline ${
-                i === step ? "text-brand-red" : "text-muted-foreground"
-              }`}>{label}</span>
-              {i < steps.length - 1 && <div className={`h-px flex-1 ${i < step ? "bg-brand-red" : "bg-border"}`} />}
+              >
+                {i + 1}
+              </button>
+              <span
+                className={`hidden truncate text-[10px] font-bold uppercase tracking-widest sm:inline ${
+                  i === step ? "text-brand-red" : "text-muted-foreground"
+                }`}
+              >
+                {label}
+              </span>
+              {i < steps.length - 1 && (
+                <div className={`h-px flex-1 ${i < step ? "bg-brand-red" : "bg-border"}`} />
+              )}
             </div>
           ))}
         </div>
@@ -184,10 +215,30 @@ function QuotePage() {
           {step === 0 && (
             <StepShell title="What needs service?">
               <div className="grid gap-4 sm:grid-cols-2">
-                <ChoiceBig active={form.type === "auto"} onClick={() => { update("type", "auto"); update("make", ""); update("model", ""); next(); }}
-                  icon={<Car className="h-7 w-7" />} label="Auto" sub="Cars, trucks, SUVs" />
-                <ChoiceBig active={form.type === "moto"} onClick={() => { update("type", "moto"); update("make", ""); update("model", ""); next(); }}
-                  icon={<Bike className="h-7 w-7" />} label="Moto" sub="Motorcycles" />
+                <ChoiceBig
+                  active={form.type === "auto"}
+                  onClick={() => {
+                    update("type", "auto");
+                    update("make", "");
+                    update("model", "");
+                    next();
+                  }}
+                  icon={<Car className="h-7 w-7" />}
+                  label="Auto"
+                  sub="Cars, trucks, SUVs"
+                />
+                <ChoiceBig
+                  active={form.type === "moto"}
+                  onClick={() => {
+                    update("type", "moto");
+                    update("make", "");
+                    update("model", "");
+                    next();
+                  }}
+                  icon={<Bike className="h-7 w-7" />}
+                  label="Moto"
+                  sub="Motorcycles"
+                />
               </div>
             </StepShell>
           )}
@@ -199,11 +250,19 @@ function QuotePage() {
                   const Icon = s.icon;
                   const active = form.service === s.name;
                   return (
-                    <button key={s.name} type="button" onClick={() => update("service", s.name)}
+                    <button
+                      key={s.name}
+                      type="button"
+                      onClick={() => update("service", s.name)}
                       className={`flex flex-col items-center gap-2 rounded-lg border p-5 transition-all ${
-                        active ? "border-brand-red bg-brand-red/10 shadow-glow" : "border-border bg-background hover:border-brand-red/60"
-                      }`}>
-                      <Icon className={`h-6 w-6 ${active ? "text-brand-red" : "text-muted-foreground"}`} />
+                        active
+                          ? "border-brand-red bg-brand-red/10 shadow-glow"
+                          : "border-border bg-background hover:border-brand-red/60"
+                      }`}
+                    >
+                      <Icon
+                        className={`h-6 w-6 ${active ? "text-brand-red" : "text-muted-foreground"}`}
+                      />
                       <span className="font-display text-xs tracking-widest">{s.name}</span>
                     </button>
                   );
@@ -215,24 +274,58 @@ function QuotePage() {
           {step === 2 && (
             <StepShell title="Vehicle info">
               <div className="grid gap-4 sm:grid-cols-3">
-                <Select label="Year" value={form.year} onChange={(v) => update("year", v)} options={years} placeholder="Select year" />
-                <Select label="Make" value={form.make}
-                  onChange={(v) => { update("make", v); update("model", ""); update("modelOther", ""); }}
-                  options={makes} placeholder="Select make" />
-                <Select label="Model" value={form.model}
-                  onChange={(v) => update("model", v)} options={models}
+                <Select
+                  label="Year"
+                  value={form.year}
+                  onChange={(v) => update("year", v)}
+                  options={years}
+                  placeholder="Select year"
+                />
+                <Select
+                  label="Make"
+                  value={form.make}
+                  onChange={(v) => {
+                    update("make", v);
+                    update("model", "");
+                    update("modelOther", "");
+                  }}
+                  options={makes}
+                  placeholder="Select make"
+                />
+                <Select
+                  label="Model"
+                  value={form.model}
+                  onChange={(v) => update("model", v)}
+                  options={models}
                   placeholder={form.make ? "Select model" : "Pick a make first"}
-                  disabled={!form.make} />
+                  disabled={!form.make}
+                />
                 {form.make === OTHER && (
-                  <Field label="Make (please specify)" value={form.makeOther} onChange={(v) => update("makeOther", v)} placeholder="Enter make" />
+                  <Field
+                    label="Make (please specify)"
+                    value={form.makeOther}
+                    onChange={(v) => update("makeOther", v)}
+                    placeholder="Enter make"
+                  />
                 )}
                 {form.model === OTHER && (
-                  <Field label="Model (please specify)" value={form.modelOther} onChange={(v) => update("modelOther", v)} placeholder="Enter model" />
+                  <Field
+                    label="Model (please specify)"
+                    value={form.modelOther}
+                    onChange={(v) => update("modelOther", v)}
+                    placeholder="Enter model"
+                  />
                 )}
-                <Field label="Mileage (optional)" value={form.mileage} onChange={(v) => update("mileage", v)} placeholder="62,000" />
+                <Field
+                  label="Mileage (optional)"
+                  value={form.mileage}
+                  onChange={(v) => update("mileage", v)}
+                  placeholder="62,000"
+                />
               </div>
               <p className="mt-4 text-[11px] text-muted-foreground">
-                Don't see your vehicle? Choose <span className="text-brand-red">Other</span> and type it in.
+                Don't see your vehicle? Choose <span className="text-brand-red">Other</span> and
+                type it in.
               </p>
             </StepShell>
           )}
@@ -240,7 +333,9 @@ function QuotePage() {
           {step === 3 && (
             <StepShell title="Describe the issue">
               <label className="block">
-                <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">Problem description</span>
+                <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+                  Problem description
+                </span>
                 <textarea
                   value={form.description}
                   onChange={(e) => update("description", e.target.value)}
@@ -250,7 +345,9 @@ function QuotePage() {
                 />
               </label>
               <label className="mt-4 block">
-                <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">Additional notes (optional)</span>
+                <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+                  Additional notes (optional)
+                </span>
                 <textarea
                   value={form.notes}
                   onChange={(e) => update("notes", e.target.value)}
@@ -261,20 +358,30 @@ function QuotePage() {
               </label>
 
               <div className="mt-6">
-                <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">Photos (optional)</span>
+                <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+                  Photos (optional)
+                </span>
                 <div className="mt-2 flex flex-wrap items-center gap-3">
                   {form.photos.map((p, idx) => (
-                    <div key={p} className="relative h-20 w-20 overflow-hidden rounded-md border border-border">
+                    <div
+                      key={p}
+                      className="relative h-20 w-20 overflow-hidden rounded-md border border-border"
+                    >
                       <img src={p} alt="Uploaded" className="h-full w-full object-cover" />
                       <button
                         type="button"
                         onClick={() => {
-                          update("photos", form.photos.filter((_, i) => i !== idx));
+                          update(
+                            "photos",
+                            form.photos.filter((_, i) => i !== idx),
+                          );
                           setPhotoRefs((prev) => prev.filter((_, i) => i !== idx));
                         }}
                         className="absolute right-1 top-1 grid h-5 w-5 place-items-center rounded-full bg-background/80 text-foreground"
                         aria-label="Remove photo"
-                      ><X className="h-3 w-3" /></button>
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
                     </div>
                   ))}
                   {form.photos.length < 4 && (
@@ -298,9 +405,7 @@ function QuotePage() {
                 <p className="mt-2 text-[11px] text-muted-foreground">
                   {photoBusy ? "Uploading…" : "Photos help us quote faster. Up to 4."}
                 </p>
-                {photoError && (
-                  <p className="mt-1 text-[11px] text-brand-red">{photoError}</p>
-                )}
+                {photoError && <p className="mt-1 text-[11px] text-brand-red">{photoError}</p>}
               </div>
             </StepShell>
           )}
@@ -308,12 +413,39 @@ function QuotePage() {
           {step === 4 && (
             <StepShell title="Contact & location">
               <div className="grid gap-4 sm:grid-cols-2">
-                <Field label="First name" value={form.firstName} onChange={(v) => update("firstName", v)} placeholder="Johnny" />
-                <Field label="Last name" value={form.lastName} onChange={(v) => update("lastName", v)} placeholder="Green" />
-                <Field label="Phone" value={form.phone} onChange={(v) => update("phone", v)} placeholder="(801) 555-0100" type="tel" />
-                <Field label="Email" value={form.email} onChange={(v) => update("email", v)} placeholder="you@email.com" type="email" />
+                <Field
+                  label="First name"
+                  value={form.firstName}
+                  onChange={(v) => update("firstName", v)}
+                  placeholder="Johnny"
+                />
+                <Field
+                  label="Last name"
+                  value={form.lastName}
+                  onChange={(v) => update("lastName", v)}
+                  placeholder="Green"
+                />
+                <Field
+                  label="Phone"
+                  value={form.phone}
+                  onChange={(v) => update("phone", v)}
+                  placeholder="(801) 555-0100"
+                  type="tel"
+                />
+                <Field
+                  label="Email"
+                  value={form.email}
+                  onChange={(v) => update("email", v)}
+                  placeholder="you@email.com"
+                  type="email"
+                />
                 <div className="sm:col-span-2">
-                  <Field label="Service location / address" value={form.location} onChange={(v) => update("location", v)} placeholder="Street, city, ZIP — where we should meet you" />
+                  <Field
+                    label="Service location / address"
+                    value={form.location}
+                    onChange={(v) => update("location", v)}
+                    placeholder="Street, city, ZIP — where we should meet you"
+                  />
                 </div>
               </div>
             </StepShell>
@@ -327,7 +459,9 @@ function QuotePage() {
                     <Calendar className="h-5 w-5" />
                   </span>
                   <div>
-                    <h3 className="font-display text-lg">You're all set, {form.firstName || "rider"}.</h3>
+                    <h3 className="font-display text-lg">
+                      You're all set, {form.firstName || "rider"}.
+                    </h3>
                     <p className="mt-1 text-sm text-muted-foreground">
                       Pick a date and time on the next screen. Everything you entered will be passed
                       straight into the booking — you won't need to repeat anything.
@@ -341,14 +475,18 @@ function QuotePage() {
                 disabled={submitState === "sending"}
                 className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-md bg-brand-red px-6 py-4 text-sm font-bold uppercase tracking-[0.16em] text-white shadow-glow hover:bg-brand-red-glow animate-pulse-red disabled:opacity-60"
               >
-                {submitState === "sending"
-                  ? "Sending your quote…"
-                  : (<>Continue to scheduling <ChevronRight className="h-4 w-4" /></>)}
+                {submitState === "sending" ? (
+                  "Sending your quote…"
+                ) : (
+                  <>
+                    Continue to scheduling <ChevronRight className="h-4 w-4" />
+                  </>
+                )}
               </button>
               {submitState === "error" && (
                 <p className="mt-3 text-xs text-brand-red">
-                  Quote saved locally, but the notification email failed: {submitError}.
-                  You can still continue to scheduling — we'll see your details on the calendar.
+                  Quote saved locally, but the notification email failed: {submitError}. You can
+                  still continue to scheduling — we'll see your details on the calendar.
                 </p>
               )}
             </StepShell>
@@ -356,12 +494,18 @@ function QuotePage() {
 
           {step < steps.length - 1 && (
             <div className="mt-10 flex items-center justify-between gap-4">
-              <button onClick={prev} disabled={step === 0}
-                className="inline-flex items-center gap-2 rounded-md border border-border bg-background px-5 py-2.5 text-xs font-bold uppercase tracking-[0.16em] disabled:opacity-30">
+              <button
+                onClick={prev}
+                disabled={step === 0}
+                className="inline-flex items-center gap-2 rounded-md border border-border bg-background px-5 py-2.5 text-xs font-bold uppercase tracking-[0.16em] disabled:opacity-30"
+              >
                 <ChevronLeft className="h-4 w-4" /> Back
               </button>
-              <button onClick={next} disabled={!canNext()}
-                className="inline-flex items-center gap-2 rounded-md bg-brand-red px-6 py-3 text-xs font-bold uppercase tracking-[0.16em] text-white shadow-glow hover:bg-brand-red-glow disabled:opacity-40">
+              <button
+                onClick={next}
+                disabled={!canNext()}
+                className="inline-flex items-center gap-2 rounded-md bg-brand-red px-6 py-3 text-xs font-bold uppercase tracking-[0.16em] text-white shadow-glow hover:bg-brand-red-glow disabled:opacity-40"
+              >
                 Next Step <ChevronRight className="h-4 w-4" />
               </button>
             </div>
@@ -381,13 +525,32 @@ function StepShell({ title, children }: { title: string; children: React.ReactNo
   );
 }
 
-function ChoiceBig({ icon, label, sub, active, onClick }: { icon: React.ReactNode; label: string; sub: string; active: boolean; onClick: () => void }) {
+function ChoiceBig({
+  icon,
+  label,
+  sub,
+  active,
+  onClick,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  sub: string;
+  active: boolean;
+  onClick: () => void;
+}) {
   return (
-    <button onClick={onClick} type="button"
+    <button
+      onClick={onClick}
+      type="button"
       className={`group flex items-center gap-4 rounded-xl border p-6 text-left transition-all ${
-        active ? "border-brand-red bg-brand-red/10 shadow-glow" : "border-border bg-background hover:border-brand-red/60 hover:-translate-y-0.5"
-      }`}>
-      <span className="grid h-14 w-14 place-items-center rounded-lg bg-brand-red/10 text-brand-red">{icon}</span>
+        active
+          ? "border-brand-red bg-brand-red/10 shadow-glow"
+          : "border-border bg-background hover:border-brand-red/60 hover:-translate-y-0.5"
+      }`}
+    >
+      <span className="grid h-14 w-14 place-items-center rounded-lg bg-brand-red/10 text-brand-red">
+        {icon}
+      </span>
       <div>
         <div className="font-display text-3xl">{label}</div>
         <div className="text-xs uppercase tracking-widest text-muted-foreground">{sub}</div>
@@ -396,12 +559,29 @@ function ChoiceBig({ icon, label, sub, active, onClick }: { icon: React.ReactNod
   );
 }
 
-function Field({ label, value, onChange, placeholder, type = "text" }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string; type?: string }) {
+function Field({
+  label,
+  value,
+  onChange,
+  placeholder,
+  type = "text",
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+  type?: string;
+}) {
   return (
     <label className="block">
-      <span className="block text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">{label}</span>
+      <span className="block text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+        {label}
+      </span>
       <input
-        type={type} value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder}
+        type={type}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
         className="mt-2 w-full rounded-md border border-border bg-background px-4 py-2.5 text-sm placeholder:text-muted-foreground/50 focus:border-brand-red focus:outline-none"
       />
     </label>
@@ -409,11 +589,25 @@ function Field({ label, value, onChange, placeholder, type = "text" }: { label: 
 }
 
 function Select({
-  label, value, onChange, options, placeholder, disabled,
-}: { label: string; value: string; onChange: (v: string) => void; options: string[]; placeholder?: string; disabled?: boolean }) {
+  label,
+  value,
+  onChange,
+  options,
+  placeholder,
+  disabled,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  options: string[];
+  placeholder?: string;
+  disabled?: boolean;
+}) {
   return (
     <label className="block">
-      <span className="block text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">{label}</span>
+      <span className="block text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+        {label}
+      </span>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
@@ -422,7 +616,9 @@ function Select({
       >
         <option value="">{placeholder ?? "Select"}</option>
         {options.map((o) => (
-          <option key={o} value={o}>{o}</option>
+          <option key={o} value={o}>
+            {o}
+          </option>
         ))}
       </select>
     </label>

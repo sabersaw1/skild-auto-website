@@ -20,11 +20,31 @@ export function SiteFooter() {
         <div>
           <h4 className="font-display text-sm tracking-widest text-brand-red">Explore</h4>
           <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
-            <li><Link to="/auto" className="hover:text-foreground">Auto</Link></li>
-            <li><Link to="/moto" className="hover:text-foreground">Moto</Link></li>
-            <li><Link to="/services" className="hover:text-foreground">Services</Link></li>
-            <li><Link to="/about" className="hover:text-foreground">About</Link></li>
-            <li><Link to="/reviews" className="hover:text-foreground">Reviews</Link></li>
+            <li>
+              <Link to="/auto" className="hover:text-foreground">
+                Auto
+              </Link>
+            </li>
+            <li>
+              <Link to="/moto" className="hover:text-foreground">
+                Moto
+              </Link>
+            </li>
+            <li>
+              <Link to="/services" className="hover:text-foreground">
+                Services
+              </Link>
+            </li>
+            <li>
+              <Link to="/about" className="hover:text-foreground">
+                About
+              </Link>
+            </li>
+            <li>
+              <Link to="/reviews" className="hover:text-foreground">
+                Reviews
+              </Link>
+            </li>
           </ul>
         </div>
 
@@ -33,14 +53,22 @@ export function SiteFooter() {
           <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
             <li className="flex items-start gap-2">
               <Phone className="mt-0.5 h-4 w-4 text-brand-red" />
-              <a href={telHref} className="hover:text-foreground">{BUSINESS.phone}</a>
+              <a href={telHref} className="hover:text-foreground">
+                {BUSINESS.phone}
+              </a>
             </li>
             <li className="flex items-start gap-2">
               <Mail className="mt-0.5 h-4 w-4 text-brand-red" />
-              <a href={mailHref} className="hover:text-foreground">{BUSINESS.email}</a>
+              <a href={mailHref} className="hover:text-foreground">
+                {BUSINESS.email}
+              </a>
             </li>
-            <li className="flex items-start gap-2"><MapPin className="mt-0.5 h-4 w-4 text-brand-red" /> {BUSINESS.location}</li>
-            <li className="flex items-start gap-2"><Clock className="mt-0.5 h-4 w-4 text-brand-red" /> {BUSINESS.hours}</li>
+            <li className="flex items-start gap-2">
+              <MapPin className="mt-0.5 h-4 w-4 text-brand-red" /> {BUSINESS.location}
+            </li>
+            <li className="flex items-start gap-2">
+              <Clock className="mt-0.5 h-4 w-4 text-brand-red" /> {BUSINESS.hours}
+            </li>
           </ul>
         </div>
 
@@ -48,7 +76,8 @@ export function SiteFooter() {
           <h4 className="font-display text-sm tracking-widest text-brand-red">Follow</h4>
           <a
             href={BUSINESS.instagramUrl}
-            target="_blank" rel="noreferrer"
+            target="_blank"
+            rel="noreferrer"
             className="mt-4 inline-flex items-center gap-2 rounded-md border border-border bg-background px-4 py-2 text-sm hover:border-brand-red hover:text-brand-red"
           >
             <Instagram className="h-4 w-4" /> {BUSINESS.instagramHandle}
@@ -63,8 +92,12 @@ export function SiteFooter() {
       </div>
       <div className="border-t border-border">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 py-6 text-xs text-muted-foreground sm:flex-row sm:px-6">
-          <p>© {new Date().getFullYear()} {BUSINESS.name}. All rights reserved.</p>
-          <p>{BUSINESS.location} — Owned by {BUSINESS.owner}</p>
+          <p>
+            © {new Date().getFullYear()} {BUSINESS.name}. All rights reserved.
+          </p>
+          <p>
+            {BUSINESS.location} — Owned by {BUSINESS.owner}
+          </p>
         </div>
       </div>
     </footer>

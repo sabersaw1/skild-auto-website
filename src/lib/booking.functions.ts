@@ -35,11 +35,7 @@ async function loadAvailability(fromISO: string, toISO: string) {
   const sb = getSkildAdmin();
   const [hoursRes, blockedRes, apptsRes, googleBusy] = await Promise.all([
     sb.from("business_hours").select("weekday, open_time, close_time, is_open"),
-    sb
-      .from("blocked_times")
-      .select("start_at, end_at")
-      .lt("start_at", toISO)
-      .gt("end_at", fromISO),
+    sb.from("blocked_times").select("start_at, end_at").lt("start_at", toISO).gt("end_at", fromISO),
     sb
       .from("appointments")
       .select("start_at, end_at, status")
@@ -54,8 +50,14 @@ async function loadAvailability(fromISO: string, toISO: string) {
   return {
     hours: (hoursRes.data ?? []) as HoursRow[],
     busy: [
-      ...(blockedRes.data ?? []).map((b) => ({ start: new Date(b.start_at), end: new Date(b.end_at) })),
-      ...(apptsRes.data ?? []).map((a) => ({ start: new Date(a.start_at), end: new Date(a.end_at) })),
+      ...(blockedRes.data ?? []).map((b) => ({
+        start: new Date(b.start_at),
+        end: new Date(b.end_at),
+      })),
+      ...(apptsRes.data ?? []).map((a) => ({
+        start: new Date(a.start_at),
+        end: new Date(a.end_at),
+      })),
       ...googleBusy,
     ],
   };

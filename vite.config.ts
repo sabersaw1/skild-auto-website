@@ -6,10 +6,10 @@ import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 const SKILD_SUPABASE_URL = (
   process.env.SKILD_SUPABASE_URL ?? "https://srtpaqwlrtxtflcjbqie.supabase.co"
-).trim().replace(/\/$/, "");
-const SKILD_SUPABASE_PUBLISHABLE_KEY = (
-  process.env.SKILD_SUPABASE_PUBLISHABLE_KEY ?? ""
-).trim();
+)
+  .trim()
+  .replace(/\/$/, "");
+const SKILD_SUPABASE_PUBLISHABLE_KEY = (process.env.SKILD_SUPABASE_PUBLISHABLE_KEY ?? "").trim();
 
 if (!SKILD_SUPABASE_PUBLISHABLE_KEY) {
   // Surface the missing build-time secret loudly rather than silently
@@ -27,9 +27,7 @@ export default defineConfig({
   vite: {
     define: {
       __SKILD_SUPABASE_URL__: JSON.stringify(SKILD_SUPABASE_URL),
-      __SKILD_SUPABASE_PUBLISHABLE_KEY__: JSON.stringify(
-        SKILD_SUPABASE_PUBLISHABLE_KEY,
-      ),
+      __SKILD_SUPABASE_PUBLISHABLE_KEY__: JSON.stringify(SKILD_SUPABASE_PUBLISHABLE_KEY),
     },
   },
 });

@@ -11,8 +11,16 @@ export const Route = createFileRoute("/api/public/skild-config")({
         const key = process.env.SKILD_SUPABASE_PUBLISHABLE_KEY?.trim() ?? "";
         const calendarId = process.env.GOOGLE_CALENDAR_ID?.trim() ?? "";
         return new Response(
-          JSON.stringify({ url, publishableKey: key, projectRef: url.replace("https://", "").split(".")[0], googleCalendarId: calendarId }),
-          { status: 200, headers: { "content-type": "application/json", "cache-control": "public, max-age=60" } },
+          JSON.stringify({
+            url,
+            publishableKey: key,
+            projectRef: url.replace("https://", "").split(".")[0],
+            googleCalendarId: calendarId,
+          }),
+          {
+            status: 200,
+            headers: { "content-type": "application/json", "cache-control": "public, max-age=60" },
+          },
         );
       },
     },

@@ -86,7 +86,9 @@ export const Route = createFileRoute("/api/public/calendly-webhook")({
         const signingKey = process.env.CALENDLY_WEBHOOK_SIGNING_KEY;
 
         if (!signingKey) {
-          console.error("[calendly-webhook] CALENDLY_WEBHOOK_SIGNING_KEY not configured — rejecting");
+          console.error(
+            "[calendly-webhook] CALENDLY_WEBHOOK_SIGNING_KEY not configured — rejecting",
+          );
           return new Response("Webhook not configured", { status: 503, headers: CORS });
         }
         const ok = await verifySignature(
@@ -116,14 +118,13 @@ export const Route = createFileRoute("/api/public/calendly-webhook")({
         const startTime: string | undefined = scheduled?.start_time;
         const endTime: string | undefined = scheduled?.end_time;
         const status: string =
-          event === "invitee.canceled" ? "canceled" : scheduled?.status ?? "active";
+          event === "invitee.canceled" ? "canceled" : (scheduled?.status ?? "active");
 
         // Persist (best-effort) and find matching quote
         let quoteId: string | null = null;
         try {
-          const { hasNeon, findRecentQuoteIdByEmail, recordAppointment } = await import(
-            "@/lib/neon.server"
-          );
+          const { hasNeon, findRecentQuoteIdByEmail, recordAppointment } =
+            await import("@/lib/neon.server");
           if (hasNeon()) {
             if (inviteeEmail) quoteId = await findRecentQuoteIdByEmail(inviteeEmail);
             await recordAppointment({

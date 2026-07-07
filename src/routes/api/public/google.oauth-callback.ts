@@ -26,7 +26,10 @@ function failureResponse(
 ) {
   console.error("[google-oauth-callback] failure", { title, status, ...details });
   const rows = Object.entries(details)
-    .map(([key, value]) => `<li><b>${escapeHtml(key)}:</b> ${escapeHtml(String(value ?? "(none)"))}</li>`)
+    .map(
+      ([key, value]) =>
+        `<li><b>${escapeHtml(key)}:</b> ${escapeHtml(String(value ?? "(none)"))}</li>`,
+    )
     .join("");
   return new Response(
     `<h1>${escapeHtml(title)}</h1><p>Google Calendar connection did not complete.</p><ul>${rows}</ul><p>Return to <a href="/admin/settings">Schedule settings</a> and try connecting again.</p>`,
@@ -209,23 +212,23 @@ export const Route = createFileRoute("/api/public/google/oauth-callback")({
           // The frontend never sees these values.
           const { getSkildAdmin } = await import("@/lib/skild-supabase.server");
           const sb = getSkildAdmin();
-          const expiresAt = new Date(Date.now() + (tokenData.expires_in ?? 3600) * 1000).toISOString();
-          const { error: saveError } = await sb
-            .from("business_settings")
-            .upsert(
-              {
-                key: "google_calendar",
-                value: {
-                  refresh_token: tokenData.refresh_token,
-                  access_token: tokenData.access_token,
-                  access_token_expires_at: expiresAt,
-                  calendar_id: calendarId || null,
-                  scope: tokenData.scope,
-                  connected_at: new Date().toISOString(),
-                },
+          const expiresAt = new Date(
+            Date.now() + (tokenData.expires_in ?? 3600) * 1000,
+          ).toISOString();
+          const { error: saveError } = await sb.from("business_settings").upsert(
+            {
+              key: "google_calendar",
+              value: {
+                refresh_token: tokenData.refresh_token,
+                access_token: tokenData.access_token,
+                access_token_expires_at: expiresAt,
+                calendar_id: calendarId || null,
+                scope: tokenData.scope,
+                connected_at: new Date().toISOString(),
               },
-              { onConflict: "key" },
-            );
+            },
+            { onConflict: "key" },
+          );
           if (saveError) {
             return failureResponse("Google token storage failed", 500, {
               step: "supabase_business_settings_save",
@@ -245,7 +248,8 @@ export const Route = createFileRoute("/api/public/google/oauth-callback")({
             .select("value")
             .eq("key", "google_calendar")
             .maybeSingle();
-          const savedValue = saved?.value as { refresh_token?: string; calendar_id?: string | null } | undefined;
+          const savedValue = saved?.value as
+            { refresh_token?: string; calendar_id?: string | null } | undefined;
           if (verifyError || !savedValue?.refresh_token) {
             return failureResponse("Google token storage verification failed", 500, {
               step: "supabase_business_settings_verify",

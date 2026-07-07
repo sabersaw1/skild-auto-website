@@ -20,8 +20,7 @@ export const Route = createFileRoute("/api/public/google/diagnose")({
         const calendarId = process.env.GOOGLE_CALENDAR_ID;
 
         const cidLooksValid =
-          !!clientId &&
-          /^[0-9]+-[a-z0-9]+\.apps\.googleusercontent\.com$/i.test(clientId.trim());
+          !!clientId && /^[0-9]+-[a-z0-9]+\.apps\.googleusercontent\.com$/i.test(clientId.trim());
 
         const redirectTrimmed = redirectUri?.trim();
         const redirectHasWhitespace = !!redirectUri && redirectUri !== redirectTrimmed;
@@ -40,7 +39,13 @@ export const Route = createFileRoute("/api/public/google/diagnose")({
         const expectedPath = "/api/public/google/oauth-callback";
         let businessSettingsCheck:
           | { reachable: true; tableExists: true }
-          | { reachable: false; tableExists: false; error: string; code?: string; hint?: string | null };
+          | {
+              reachable: false;
+              tableExists: false;
+              error: string;
+              code?: string;
+              hint?: string | null;
+            };
         let appointmentsCheck:
           | { reachable: true; tableExists: true }
           | { reachable: false; tableExists: false; error: string; code?: string };
@@ -54,7 +59,13 @@ export const Route = createFileRoute("/api/public/google/diagnose")({
           const sb = getSkildAdmin();
           const { error } = await sb.from("business_settings").select("key").limit(1);
           businessSettingsCheck = error
-            ? { reachable: false, tableExists: false, error: error.message, code: error.code, hint: error.hint }
+            ? {
+                reachable: false,
+                tableExists: false,
+                error: error.message,
+                code: error.code,
+                hint: error.hint,
+              }
             : { reachable: true, tableExists: true };
           const { error: aptErr } = await sb.from("appointments").select("id").limit(1);
           appointmentsCheck = aptErr

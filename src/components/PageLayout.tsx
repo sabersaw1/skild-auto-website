@@ -2,7 +2,13 @@ import type { ReactNode } from "react";
 import { SiteNav } from "./SiteNav";
 import { SiteFooter } from "./SiteFooter";
 
-export function PageLayout({ children, mode = "neutral" }: { children: ReactNode; mode?: "auto" | "moto" | "neutral" }) {
+export function PageLayout({
+  children,
+  mode = "neutral",
+}: {
+  children: ReactNode;
+  mode?: "auto" | "moto" | "neutral";
+}) {
   return (
     <div className="flex min-h-screen flex-col">
       <SiteNav mode={mode} />

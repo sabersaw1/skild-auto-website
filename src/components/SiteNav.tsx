@@ -4,7 +4,6 @@ import { Menu, X, Phone } from "lucide-react";
 import skildLogo from "@/assets/skild-logo.png";
 import { BUSINESS, telHref } from "@/lib/business";
 
-
 interface SiteNavProps {
   mode?: "auto" | "moto" | "neutral";
 }
@@ -61,7 +60,6 @@ export function SiteNav({ mode = "neutral" }: SiteNavProps) {
           </Link>
         </div>
 
-
         <button
           onClick={() => setOpen(!open)}
           aria-label="Toggle menu"
@@ -98,7 +96,6 @@ export function SiteNav({ mode = "neutral" }: SiteNavProps) {
             >
               Get Quote
             </Link>
-
           </nav>
         </div>
       )}

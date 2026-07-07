@@ -9,9 +9,16 @@ export const Route = createFileRoute("/moto")({
   head: () => ({
     meta: [
       { title: "Moto — Motorcycle Service That Comes To You | Skild Auto" },
-      { name: "description", content: "Professional motorcycle maintenance, repair and performance upgrades wherever you are. Salt Lake City." },
+      {
+        name: "description",
+        content:
+          "Professional motorcycle maintenance, repair and performance upgrades wherever you are. Salt Lake City.",
+      },
       { property: "og:title", content: "Skild Auto — Motorcycle Service" },
-      { property: "og:description", content: "Repair, maintenance, diagnostics and performance for riders." },
+      {
+        property: "og:description",
+        content: "Repair, maintenance, diagnostics and performance for riders.",
+      },
       { property: "og:url", content: "/moto" },
     ],
     links: [{ rel: "canonical", href: "/moto" }],
@@ -21,11 +28,19 @@ export const Route = createFileRoute("/moto")({
 
 const services = [
   { icon: Wrench, name: "Repair", desc: "Mechanical fixes, top-end work, drivetrain & more." },
-  { icon: Stethoscope, name: "Diagnostics", desc: "ECU scans, fault tracing, electrical analysis." },
+  {
+    icon: Stethoscope,
+    name: "Diagnostics",
+    desc: "ECU scans, fault tracing, electrical analysis.",
+  },
   { icon: Gauge, name: "Maintenance", desc: "Oil, chain, brakes, tires and seasonal prep." },
   { icon: Sparkles, name: "Performance", desc: "Exhausts, intakes, tuning & power upgrades." },
   { icon: Settings, name: "Custom Work", desc: "One-off builds, mods and personal projects." },
-  { icon: Bike, name: "Ride-Ready Check", desc: "Pre-ride inspection so you ride with confidence." },
+  {
+    icon: Bike,
+    name: "Ride-Ready Check",
+    desc: "Pre-ride inspection so you ride with confidence.",
+  },
 ];
 
 function MotoHome() {
@@ -40,13 +55,17 @@ function MotoHome() {
 
         <div className="relative z-10 mx-auto max-w-7xl px-4 py-24 sm:px-6 sm:py-32 lg:py-40">
           <div className="max-w-2xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.4em] text-brand-red">Moto · Salt Lake City</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.4em] text-brand-red">
+              Moto · Salt Lake City
+            </p>
             <h1 className="mt-5 font-display text-5xl leading-[0.95] text-glow sm:text-6xl md:text-7xl">
-              Motorcycle service<br />
+              Motorcycle service
+              <br />
               that <span className="text-brand-red">comes</span> to you
             </h1>
             <p className="mt-6 max-w-xl text-base text-muted-foreground">
-              Professional maintenance, repair, performance and custom work — wherever you ride or park.
+              Professional maintenance, repair, performance and custom work — wherever you ride or
+              park.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
@@ -72,7 +91,9 @@ function MotoHome() {
 
       <section className="mx-auto max-w-7xl px-4 py-24 sm:px-6">
         <Reveal>
-          <p className="text-xs font-semibold uppercase tracking-[0.4em] text-brand-red">For riders</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.4em] text-brand-red">
+            For riders
+          </p>
           <h2 className="mt-3 font-display text-4xl sm:text-5xl">Moto Services</h2>
         </Reveal>
 

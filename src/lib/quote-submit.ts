@@ -6,12 +6,7 @@
 // No Supabase, no Lovable Cloud — portable across GitHub, Vercel, Neon,
 // and the future Skild OS layer.
 
-import {
-  quoteSummary,
-  resolvedMake,
-  resolvedModel,
-  type QuoteData,
-} from "./quote-storage";
+import { quoteSummary, resolvedMake, resolvedModel, type QuoteData } from "./quote-storage";
 import type { CloudinaryPhoto } from "./cloudinary-upload";
 
 const SUBMITTED_FLAG = "skild.quote.submitted";
@@ -98,7 +93,9 @@ export async function submitQuote(
     throw new Error(`Quote notification failed (${res.status}): ${text.slice(0, 300)}`);
   }
   const data = (await res.json().catch(() => ({}))) as {
-    ok?: boolean; error?: string; quoteId?: string | null;
+    ok?: boolean;
+    error?: string;
+    quoteId?: string | null;
   };
   if (data.ok === false) {
     throw new Error(data.error || "Quote notification failed");

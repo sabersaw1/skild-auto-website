@@ -7,7 +7,11 @@ export const Route = createFileRoute("/reviews")({
   head: () => ({
     meta: [
       { title: "Reviews — What Customers Say | Skild Auto" },
-      { name: "description", content: "Read what Salt Lake City drivers and riders say about Skild Auto's mobile service." },
+      {
+        name: "description",
+        content:
+          "Read what Salt Lake City drivers and riders say about Skild Auto's mobile service.",
+      },
       { property: "og:title", content: "Skild Auto Reviews" },
       { property: "og:description", content: "Honest customers, honest reviews." },
       { property: "og:url", content: "/reviews" },
@@ -18,12 +22,42 @@ export const Route = createFileRoute("/reviews")({
 });
 
 const reviews = [
-  { name: "Jason M.", city: "Salt Lake City, UT", stars: 5, quote: "Incredible service! They came to my house and had me back on the road in no time." },
-  { name: "Tyler D.", city: "Draper, UT", stars: 5, quote: "Professional, honest and convenient. Highly recommend Skild Auto." },
-  { name: "Brandon R.", city: "Lehi, UT", stars: 5, quote: "Best mobile mechanic I've ever used. Top notch from start to finish." },
-  { name: "Maria S.", city: "Sandy, UT", stars: 5, quote: "Fair pricing, clear communication and quality work. Will use again." },
-  { name: "Devin K.", city: "Bountiful, UT", stars: 5, quote: "Diagnosed an issue three shops missed. Saved me hundreds." },
-  { name: "Alex P.", city: "Provo, UT", stars: 5, quote: "Came out fast and got my bike running perfect." },
+  {
+    name: "Jason M.",
+    city: "Salt Lake City, UT",
+    stars: 5,
+    quote: "Incredible service! They came to my house and had me back on the road in no time.",
+  },
+  {
+    name: "Tyler D.",
+    city: "Draper, UT",
+    stars: 5,
+    quote: "Professional, honest and convenient. Highly recommend Skild Auto.",
+  },
+  {
+    name: "Brandon R.",
+    city: "Lehi, UT",
+    stars: 5,
+    quote: "Best mobile mechanic I've ever used. Top notch from start to finish.",
+  },
+  {
+    name: "Maria S.",
+    city: "Sandy, UT",
+    stars: 5,
+    quote: "Fair pricing, clear communication and quality work. Will use again.",
+  },
+  {
+    name: "Devin K.",
+    city: "Bountiful, UT",
+    stars: 5,
+    quote: "Diagnosed an issue three shops missed. Saved me hundreds.",
+  },
+  {
+    name: "Alex P.",
+    city: "Provo, UT",
+    stars: 5,
+    quote: "Came out fast and got my bike running perfect.",
+  },
 ];
 
 function ReviewsPage() {
@@ -32,7 +66,9 @@ function ReviewsPage() {
       <section className="border-b border-border bg-gradient-to-b from-card to-background">
         <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6">
           <Reveal>
-            <p className="text-xs font-semibold uppercase tracking-[0.4em] text-brand-red">Reviews</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.4em] text-brand-red">
+              Reviews
+            </p>
             <h1 className="mt-3 font-display text-5xl sm:text-6xl">
               What our <span className="text-brand-red">customers</span> say
             </h1>
@@ -66,7 +102,9 @@ function ReviewsPage() {
                 <p className="mt-4 text-sm leading-relaxed text-foreground">"{r.quote}"</p>
                 <div className="mt-6 border-t border-border pt-4">
                   <div className="font-display text-sm">{r.name}</div>
-                  <div className="text-xs uppercase tracking-wider text-muted-foreground">{r.city}</div>
+                  <div className="text-xs uppercase tracking-wider text-muted-foreground">
+                    {r.city}
+                  </div>
                 </div>
               </article>
             </Reveal>
@@ -81,7 +119,10 @@ function ReviewsPage() {
         </div>
 
         <div className="mt-12 text-center">
-          <Link to="/quote" className="inline-flex rounded-md bg-brand-red px-6 py-3 text-sm font-bold uppercase tracking-[0.16em] text-white shadow-glow hover:bg-brand-red-glow">
+          <Link
+            to="/quote"
+            className="inline-flex rounded-md bg-brand-red px-6 py-3 text-sm font-bold uppercase tracking-[0.16em] text-white shadow-glow hover:bg-brand-red-glow"
+          >
             Become our next 5-star
           </Link>
         </div>

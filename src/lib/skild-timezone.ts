@@ -6,10 +6,7 @@
 export const BUSINESS_TIMEZONE = "America/Denver";
 
 /** Format an ISO timestamp in the business's local time zone. */
-export function formatInBusinessZone(
-  iso: string | Date,
-  opts: Intl.DateTimeFormatOptions,
-): string {
+export function formatInBusinessZone(iso: string | Date, opts: Intl.DateTimeFormatOptions): string {
   const d = typeof iso === "string" ? new Date(iso) : iso;
   return d.toLocaleString("en-US", { timeZone: BUSINESS_TIMEZONE, ...opts });
 }

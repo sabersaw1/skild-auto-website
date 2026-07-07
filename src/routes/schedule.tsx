@@ -46,7 +46,6 @@ function fmtTime(iso: string) {
   });
 }
 
-
 function SchedulePage() {
   const navigate = useNavigate();
   const [quoteId, setQid] = useState<string | null>(null);
@@ -67,20 +66,37 @@ function SchedulePage() {
     let alive = true;
     setErr(null);
     getAvailableDays({ data: { from: weekStart.toISOString(), days: 21 } })
-      .then((r) => { if (alive) setDays(r.days); })
-      .catch((e) => { if (alive) setErr(e.message || "Could not load availability"); });
-    return () => { alive = false; };
+      .then((r) => {
+        if (alive) setDays(r.days);
+      })
+      .catch((e) => {
+        if (alive) setErr(e.message || "Could not load availability");
+      });
+    return () => {
+      alive = false;
+    };
   }, [weekStart]);
 
   useEffect(() => {
-    if (!selectedDate) { setSlots([]); return; }
+    if (!selectedDate) {
+      setSlots([]);
+      return;
+    }
     let alive = true;
     setLoadingSlots(true);
     getAvailableSlots({ data: { date: selectedDate } })
-      .then((r) => { if (alive) setSlots(r.slots); })
-      .catch((e) => { if (alive) setErr(e.message || "Could not load times"); })
-      .finally(() => { if (alive) setLoadingSlots(false); });
-    return () => { alive = false; };
+      .then((r) => {
+        if (alive) setSlots(r.slots);
+      })
+      .catch((e) => {
+        if (alive) setErr(e.message || "Could not load times");
+      })
+      .finally(() => {
+        if (alive) setLoadingSlots(false);
+      });
+    return () => {
+      alive = false;
+    };
   }, [selectedDate]);
 
   const visibleDays = useMemo(() => days.slice(0, 14), [days]);
@@ -97,7 +113,9 @@ function SchedulePage() {
     <PageLayout>
       <section className="mx-auto max-w-5xl px-4 py-16 sm:px-6">
         <Reveal>
-          <p className="text-xs font-semibold uppercase tracking-[0.4em] text-brand-red">Schedule</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.4em] text-brand-red">
+            Schedule
+          </p>
           <h1 className="mt-3 font-display text-4xl sm:text-5xl">Pick your time{hello}.</h1>
           <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
             Available 60-minute slots. We'll confirm shortly after you submit.
@@ -107,7 +125,10 @@ function SchedulePage() {
         {!quoteId && (
           <div className="mt-8 rounded-xl border border-border bg-card p-5 text-sm">
             <span className="text-muted-foreground">Haven't told us about your vehicle yet? </span>
-            <Link to="/quote" className="font-bold uppercase tracking-widest text-brand-red hover:underline">
+            <Link
+              to="/quote"
+              className="font-bold uppercase tracking-widest text-brand-red hover:underline"
+            >
               Start the quote →
             </Link>
           </div>
@@ -125,20 +146,26 @@ function SchedulePage() {
               <div className="flex gap-2">
                 <button
                   onClick={() => {
-                    const n = new Date(weekStart); n.setDate(n.getDate() - 7);
+                    const n = new Date(weekStart);
+                    n.setDate(n.getDate() - 7);
                     if (n >= startOfWeek(new Date())) setWeekStart(n);
                   }}
                   className="grid h-8 w-8 place-items-center rounded-md border border-border hover:border-brand-red hover:text-brand-red disabled:opacity-30"
                   aria-label="Previous week"
-                ><ChevronLeft className="h-4 w-4" /></button>
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
                 <button
                   onClick={() => {
-                    const n = new Date(weekStart); n.setDate(n.getDate() + 7);
+                    const n = new Date(weekStart);
+                    n.setDate(n.getDate() + 7);
                     setWeekStart(n);
                   }}
                   className="grid h-8 w-8 place-items-center rounded-md border border-border hover:border-brand-red hover:text-brand-red"
                   aria-label="Next week"
-                ><ChevronRight className="h-4 w-4" /></button>
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </button>
               </div>
             </div>
             <div className="mt-5 grid grid-cols-7 gap-2">
@@ -150,14 +177,20 @@ function SchedulePage() {
                     disabled={!d.hasSlots}
                     onClick={() => setSelectedDate(d.date)}
                     className={`flex flex-col items-center rounded-md border p-2 text-xs transition ${
-                      active ? "border-brand-red bg-brand-red/10 text-brand-red shadow-glow"
-                        : d.hasSlots ? "border-border bg-background hover:border-brand-red/60"
-                        : "border-border/40 bg-background/40 text-muted-foreground/50"
+                      active
+                        ? "border-brand-red bg-brand-red/10 text-brand-red shadow-glow"
+                        : d.hasSlots
+                          ? "border-border bg-background hover:border-brand-red/60"
+                          : "border-border/40 bg-background/40 text-muted-foreground/50"
                     }`}
                   >
-                    <span className="font-bold uppercase tracking-widest">{fmtWeekday(d.date)}</span>
+                    <span className="font-bold uppercase tracking-widest">
+                      {fmtWeekday(d.date)}
+                    </span>
                     <span className="mt-1 font-display text-base">{fmtMonthDay(d.date)}</span>
-                    {!d.hasSlots && <span className="mt-0.5 text-[9px] uppercase tracking-widest">—</span>}
+                    {!d.hasSlots && (
+                      <span className="mt-0.5 text-[9px] uppercase tracking-widest">—</span>
+                    )}
                   </button>
                 );
               })}
@@ -185,7 +218,9 @@ function SchedulePage() {
                     key={s}
                     onClick={() => picked(s)}
                     className="rounded-md border border-border bg-background py-2.5 text-sm font-bold uppercase tracking-wider transition hover:border-brand-red hover:bg-brand-red/10 hover:text-brand-red"
-                  >{fmtTime(s)}</button>
+                  >
+                    {fmtTime(s)}
+                  </button>
                 ))}
               </div>
             )}
