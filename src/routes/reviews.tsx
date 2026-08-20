@@ -7,10 +7,10 @@ const GOOGLE_REVIEW_URL = "https://g.page/r/CZCH7korVYMuEBI/review";
 export const Route = createFileRoute("/reviews")({
   head: () => ({
     meta: [
-      { title: "Reviews — Leave a Google Review | Skild Auto" },
-      { name: "description", content: "Have a great experience with Skild Auto? Leave an honest Google review and help others discover our mobile auto and moto repair service in Salt Lake City." },
+      { title: "Reviews — What Customers Say | Skild Auto" },
+      { name: "description", content: "Read what Salt Lake City drivers and riders say about Skild Auto's mobile service." },
       { property: "og:title", content: "Skild Auto Reviews" },
-      { property: "og:description", content: "Share your experience with Skild Auto on Google." },
+      { property: "og:description", content: "Honest customers, honest reviews." },
       { property: "og:url", content: "/reviews" },
     ],
     links: [{ rel: "canonical", href: "/reviews" }],
