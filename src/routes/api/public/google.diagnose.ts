@@ -28,8 +28,11 @@ export const Route = createFileRoute("/api/public/google/diagnose")({
         }
         const clientId = process.env.GOOGLE_CLIENT_ID;
         const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-        const redirectUri = process.env.GOOGLE_REDIRECT_URI;
+        const { resolveGoogleRedirectUri } = await import("@/lib/google-calendar.server");
+        // What the app will actually send from THIS host (origin-derived).
+        const redirectUri = resolveGoogleRedirectUri(request.url);
         const calendarId = process.env.GOOGLE_CALENDAR_ID;
+
 
         const cidLooksValid =
           !!clientId &&
