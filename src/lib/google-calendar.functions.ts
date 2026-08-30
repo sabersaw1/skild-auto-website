@@ -14,7 +14,8 @@ export const getGoogleCalendarStatus = createServerFn({ method: "POST" })
     await requireSkildAdmin(data.accessToken);
     const { getGoogleSettings } = await import("./google-calendar.server");
     const s = await getGoogleSettings();
-    if (!s?.refresh_token) return { connected: false as const };
+    // A revoked/expired refresh token is not a working connection.
+    if (!s?.refresh_token || s.invalid_grant_at) return { connected: false as const };
     return {
       connected: true as const,
       calendarId: s.calendar_id ?? null,
