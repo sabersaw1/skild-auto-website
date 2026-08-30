@@ -13,7 +13,19 @@ function redact(v: string | undefined | null, keep = 6) {
 export const Route = createFileRoute("/api/public/google/diagnose")({
   server: {
     handlers: {
-      GET: async () => {
+      GET: async ({ request }) => {
+        // Admin-only: this exposes infrastructure configuration details.
+        try {
+          const auth = request.headers.get("authorization") ?? "";
+          const token = auth.toLowerCase().startsWith("bearer ") ? auth.slice(7).trim() : "";
+          const { requireSkildAdmin } = await import("@/lib/admin-guard.server");
+          await requireSkildAdmin(token);
+        } catch {
+          return new Response(JSON.stringify({ ok: false, error: "Forbidden" }), {
+            status: 403,
+            headers: { "Content-Type": "application/json" },
+          });
+        }
         const clientId = process.env.GOOGLE_CLIENT_ID;
         const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
         const redirectUri = process.env.GOOGLE_REDIRECT_URI;
