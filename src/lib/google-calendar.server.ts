@@ -16,6 +16,9 @@ export type GoogleSettings = {
   connected_at?: string;
   access_token?: string;
   access_token_expires_at?: string;
+  /** Set when Google rejected the stored refresh token (revoked/expired).
+   *  Presence means the shop must re-authorize; we keep the row for history. */
+  invalid_grant_at?: string | null;
 };
 
 export async function getGoogleSettings(): Promise<GoogleSettings | null> {
@@ -202,12 +205,18 @@ async function getAccessToken(): Promise<{ token: string; calendarId: string } |
   };
   if (!res.ok || !data.access_token) {
     console.error("[google-calendar] refresh failed", data);
+    if (data.error === "invalid_grant") {
+      // Refresh token was revoked or expired — flag it so the admin UI shows
+      // "Not connected" instead of falsely reporting a working connection.
+      await saveGoogleSettings({ invalid_grant_at: new Date().toISOString() });
+    }
     throw new Error(`Google token refresh failed: ${data.error || res.status}`);
   }
   const expiresAt = new Date(Date.now() + (data.expires_in ?? 3600) * 1000).toISOString();
   await saveGoogleSettings({
     access_token: data.access_token,
     access_token_expires_at: expiresAt,
+    invalid_grant_at: null,
   });
   return {
     token: data.access_token,
@@ -233,7 +242,7 @@ async function gcalFetch(path: string, init: RequestInit & { calendarId?: string
 
 export async function isGoogleConnected(): Promise<boolean> {
   const s = await getGoogleSettings();
-  return !!s?.refresh_token;
+  return !!s?.refresh_token && !s.invalid_grant_at;
 }
 
 /** Returns busy intervals in [fromISO, toISO) from Google Calendar. Empty if not connected. */
