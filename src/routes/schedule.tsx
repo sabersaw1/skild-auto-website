@@ -68,7 +68,10 @@ function SchedulePage() {
     setErr(null);
     getAvailableDays({ data: { from: weekStart.toISOString(), days: 21 } })
       .then((r) => { if (alive) setDays(r.days); })
-      .catch((e) => { if (alive) setErr(e.message || "Could not load availability"); });
+      .catch((e) => {
+        console.error("[schedule] availability load failed", e);
+        if (alive) setErr("We couldn't load the schedule right now. Please call 801-584-9804 or try again in a moment.");
+      });
     return () => { alive = false; };
   }, [weekStart]);
 
@@ -78,7 +81,10 @@ function SchedulePage() {
     setLoadingSlots(true);
     getAvailableSlots({ data: { date: selectedDate } })
       .then((r) => { if (alive) setSlots(r.slots); })
-      .catch((e) => { if (alive) setErr(e.message || "Could not load times"); })
+      .catch((e) => {
+        console.error("[schedule] slot load failed", e);
+        if (alive) setErr("We couldn't load times for that day. Please call 801-584-9804 or try again in a moment.");
+      })
       .finally(() => { if (alive) setLoadingSlots(false); });
     return () => { alive = false; };
   }, [selectedDate]);
