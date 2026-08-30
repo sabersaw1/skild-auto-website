@@ -46,12 +46,37 @@ export async function disconnectGoogle() {
   await sb.from("business_settings").delete().eq("key", "google_calendar");
 }
 
-export function buildGoogleAuthUrl(state?: string): string {
-  const clientId = process.env.GOOGLE_CLIENT_ID?.trim();
-  const redirectUri = process.env.GOOGLE_REDIRECT_URI?.trim();
-  if (!clientId || !redirectUri) {
-    throw new Error("GOOGLE_CLIENT_ID or GOOGLE_REDIRECT_URI not configured");
+export const GOOGLE_CALLBACK_PATH = "/api/public/google/oauth-callback";
+
+/**
+ * Single source of truth for the OAuth redirect URI.
+ *
+ * The authorize request and the token exchange MUST send byte-identical
+ * values. Deriving both from the origin the admin is actually browsing keeps
+ * them in sync across the production domain (apex or www), the Vercel
+ * deployment URL and the Lovable preview, instead of depending on one
+ * hardcoded GOOGLE_REDIRECT_URI that only matches a single host.
+ */
+export function resolveGoogleRedirectUri(requestUrl?: string | null): string {
+  if (requestUrl) {
+    try {
+      return new URL(GOOGLE_CALLBACK_PATH, new URL(requestUrl).origin).toString();
+    } catch {
+      /* fall through to env */
+    }
   }
+  const fromEnv = process.env.GOOGLE_REDIRECT_URI?.trim();
+  if (!fromEnv) throw new Error("GOOGLE_REDIRECT_URI not configured");
+  return fromEnv;
+}
+
+export function buildGoogleAuthUrl(state?: string, requestUrl?: string | null): string {
+  const clientId = process.env.GOOGLE_CLIENT_ID?.trim();
+  if (!clientId) {
+    throw new Error("GOOGLE_CLIENT_ID not configured");
+  }
+  const redirectUri = resolveGoogleRedirectUri(requestUrl);
+
   const params = new URLSearchParams({
     client_id: clientId,
     redirect_uri: redirectUri,

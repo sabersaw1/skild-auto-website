@@ -29,10 +29,20 @@ export const getGoogleCalendarAuthUrl = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const { requireSkildAdmin } = await import("./admin-guard.server");
     await requireSkildAdmin(data.accessToken);
+    const { getRequest } = await import("@tanstack/react-start/server");
     const { buildGoogleAuthUrl, createOauthState } = await import("./google-calendar.server");
     const state = createOauthState();
-    return { url: buildGoogleAuthUrl(state) };
+    // Derive the callback from the host the admin is actually on so the
+    // authorize request and the token exchange always agree.
+    let requestUrl: string | null = null;
+    try {
+      requestUrl = getRequest()?.url ?? null;
+    } catch {
+      requestUrl = null;
+    }
+    return { url: buildGoogleAuthUrl(state, requestUrl) };
   });
+
 
 export const disconnectGoogleCalendar = createServerFn({ method: "POST" })
   .inputValidator((d: { accessToken: string }) => TokenInput.parse(d))
