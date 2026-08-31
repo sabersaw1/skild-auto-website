@@ -11,9 +11,9 @@ export const Route = createFileRoute("/service-area")({
       { name: "description", content: "Check if Skild Auto services your area across Salt Lake County and surrounding cities in Utah." },
       { property: "og:title", content: "Skild Auto Service Area" },
       { property: "og:description", content: "Mobile service across the Salt Lake City region." },
-      { property: "og:url", content: "/service-area" },
+      { property: "og:url", content: "https://www.skildauto.com/service-area" },
     ],
-    links: [{ rel: "canonical", href: "/service-area" }],
+    links: [{ rel: "canonical", href: "https://www.skildauto.com/service-area" }],
   }),
   component: ServiceAreaPage,
 });

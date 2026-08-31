@@ -12,9 +12,9 @@ export const Route = createFileRoute("/moto")({
       { name: "description", content: "Professional motorcycle maintenance, repair and performance upgrades wherever you are. Salt Lake City." },
       { property: "og:title", content: "Skild Auto — Motorcycle Service" },
       { property: "og:description", content: "Repair, maintenance, diagnostics and performance for riders." },
-      { property: "og:url", content: "/moto" },
+      { property: "og:url", content: "https://www.skildauto.com/moto" },
     ],
-    links: [{ rel: "canonical", href: "/moto" }],
+    links: [{ rel: "canonical", href: "https://www.skildauto.com/moto" }],
   }),
   component: MotoHome,
 });

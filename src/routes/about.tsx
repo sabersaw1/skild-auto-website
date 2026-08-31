@@ -10,9 +10,9 @@ export const Route = createFileRoute("/about")({
       { name: "description", content: "Skild Auto was founded by Johnny Green with 8+ years of automotive and motorcycle experience to bring honest, fair, mobile service to Salt Lake City." },
       { property: "og:title", content: "About Skild Auto" },
       { property: "og:description", content: "Honest service. Fair pricing. Built around the community." },
-      { property: "og:url", content: "/about" },
+      { property: "og:url", content: "https://www.skildauto.com/about" },
     ],
-    links: [{ rel: "canonical", href: "/about" }],
+    links: [{ rel: "canonical", href: "https://www.skildauto.com/about" }],
   }),
   component: AboutPage,
 });

@@ -12,9 +12,9 @@ export const Route = createFileRoute("/contact")({
       { name: "description", content: "Reach Skild Auto by phone, email or Instagram. Salt Lake City, Utah." },
       { property: "og:title", content: "Contact Skild Auto" },
       { property: "og:description", content: "Have a question? We're here to help." },
-      { property: "og:url", content: "/contact" },
+      { property: "og:url", content: "https://www.skildauto.com/contact" },
     ],
-    links: [{ rel: "canonical", href: "/contact" }],
+    links: [{ rel: "canonical", href: "https://www.skildauto.com/contact" }],
   }),
   component: ContactPage,
 });

@@ -12,9 +12,9 @@ export const Route = createFileRoute("/auto")({
       { name: "description", content: "Mobile auto repair without the shop visit. Diagnostics, brakes, electrical and maintenance across Salt Lake City, UT." },
       { property: "og:title", content: "Skild Auto — Mobile Automotive Repair" },
       { property: "og:description", content: "Diagnostics, repairs, maintenance and emergency service brought directly to you." },
-      { property: "og:url", content: "/auto" },
+      { property: "og:url", content: "https://www.skildauto.com/auto" },
     ],
-    links: [{ rel: "canonical", href: "/auto" }],
+    links: [{ rel: "canonical", href: "https://www.skildauto.com/auto" }],
   }),
   component: AutoHome,
 });

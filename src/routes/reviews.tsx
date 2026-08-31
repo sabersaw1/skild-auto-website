@@ -11,9 +11,9 @@ export const Route = createFileRoute("/reviews")({
       { name: "description", content: "Read what Salt Lake City drivers and riders say about Skild Auto's mobile service." },
       { property: "og:title", content: "Skild Auto Reviews" },
       { property: "og:description", content: "Honest customers, honest reviews." },
-      { property: "og:url", content: "/reviews" },
+      { property: "og:url", content: "https://www.skildauto.com/reviews" },
     ],
-    links: [{ rel: "canonical", href: "/reviews" }],
+    links: [{ rel: "canonical", href: "https://www.skildauto.com/reviews" }],
   }),
   component: ReviewsPage,
 });
