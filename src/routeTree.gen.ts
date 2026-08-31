@@ -24,6 +24,7 @@ import { Route as ApparelRouteImport } from './routes/apparel'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as GalleryIndexRouteImport } from './routes/gallery.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminTasksRouteImport } from './routes/admin.tasks'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
@@ -111,6 +112,11 @@ const AboutRoute = AboutRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GalleryIndexRoute = GalleryIndexRouteImport.update({
+  id: '/gallery/',
+  path: '/gallery/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
@@ -203,6 +209,7 @@ export interface FileRoutesByFullPath {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/tasks': typeof AdminTasksRoute
   '/admin/': typeof AdminIndexRoute
+  '/gallery/': typeof GalleryIndexRoute
   '/api/public/calendly-webhook': typeof ApiPublicCalendlyWebhookRoute
   '/api/public/cloudinary-sign': typeof ApiPublicCloudinarySignRoute
   '/api/public/send-quote': typeof ApiPublicSendQuoteRoute
@@ -232,6 +239,7 @@ export interface FileRoutesByTo {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/tasks': typeof AdminTasksRoute
   '/admin': typeof AdminIndexRoute
+  '/gallery': typeof GalleryIndexRoute
   '/api/public/calendly-webhook': typeof ApiPublicCalendlyWebhookRoute
   '/api/public/cloudinary-sign': typeof ApiPublicCloudinarySignRoute
   '/api/public/send-quote': typeof ApiPublicSendQuoteRoute
@@ -263,6 +271,7 @@ export interface FileRoutesById {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/tasks': typeof AdminTasksRoute
   '/admin/': typeof AdminIndexRoute
+  '/gallery/': typeof GalleryIndexRoute
   '/api/public/calendly-webhook': typeof ApiPublicCalendlyWebhookRoute
   '/api/public/cloudinary-sign': typeof ApiPublicCloudinarySignRoute
   '/api/public/send-quote': typeof ApiPublicSendQuoteRoute
@@ -295,6 +304,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/tasks'
     | '/admin/'
+    | '/gallery/'
     | '/api/public/calendly-webhook'
     | '/api/public/cloudinary-sign'
     | '/api/public/send-quote'
@@ -324,6 +334,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/tasks'
     | '/admin'
+    | '/gallery'
     | '/api/public/calendly-webhook'
     | '/api/public/cloudinary-sign'
     | '/api/public/send-quote'
@@ -354,6 +365,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/tasks'
     | '/admin/'
+    | '/gallery/'
     | '/api/public/calendly-webhook'
     | '/api/public/cloudinary-sign'
     | '/api/public/send-quote'
@@ -379,6 +391,7 @@ export interface RootRouteChildren {
   ServiceAreaRoute: typeof ServiceAreaRoute
   ServicesRoute: typeof ServicesRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  GalleryIndexRoute: typeof GalleryIndexRoute
   ApiPublicCalendlyWebhookRoute: typeof ApiPublicCalendlyWebhookRoute
   ApiPublicCloudinarySignRoute: typeof ApiPublicCloudinarySignRoute
   ApiPublicSendQuoteRoute: typeof ApiPublicSendQuoteRoute
@@ -493,6 +506,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gallery/': {
+      id: '/gallery/'
+      path: '/gallery'
+      fullPath: '/gallery/'
+      preLoaderRoute: typeof GalleryIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/': {
@@ -625,6 +645,7 @@ const rootRouteChildren: RootRouteChildren = {
   ServiceAreaRoute: ServiceAreaRoute,
   ServicesRoute: ServicesRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  GalleryIndexRoute: GalleryIndexRoute,
   ApiPublicCalendlyWebhookRoute: ApiPublicCalendlyWebhookRoute,
   ApiPublicCloudinarySignRoute: ApiPublicCloudinarySignRoute,
   ApiPublicSendQuoteRoute: ApiPublicSendQuoteRoute,
