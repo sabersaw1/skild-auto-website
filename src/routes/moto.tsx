@@ -33,7 +33,7 @@ function MotoHome() {
     <PageLayout mode="moto">
       <section className="relative overflow-hidden">
         <div className="absolute inset-0">
-          <img src={mainBg} alt="" className="h-full w-full object-cover opacity-70" />
+          <img src={mainBg} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover opacity-70" />
           <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-background/20" />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
         </div>
