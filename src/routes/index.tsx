@@ -65,6 +65,7 @@ function Splash() {
         <div
           className={`flex flex-col items-center transition-all duration-1000 ${revealed ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
         >
+          <h1 className="sr-only">Skild Auto — Mobile Auto &amp; Motorcycle Repair in Salt Lake City, Utah</h1>
           <p className="text-[10px] font-semibold uppercase tracking-[0.4em] text-brand-red sm:text-xs">Skild Auto Repair</p>
           <img
             src={skildLogo}

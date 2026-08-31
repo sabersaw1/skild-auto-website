@@ -38,7 +38,7 @@ function ServiceAreaPage() {
           <h1 className="mt-3 font-display text-5xl sm:text-6xl">Check your <span className="text-brand-red">area</span></h1>
         </Reveal>
 
-        <div className="mt-12 grid gap-10 lg:grid-cols-2">
+        <div className="mt-12 grid gap-10 lg:grid-cols-2 [&>*]:min-w-0">
           <Reveal>
             <div className="rounded-2xl border border-border bg-card p-8 shadow-elevated">
               <p className="text-sm text-muted-foreground">Enter your ZIP code to see if we service your area.</p>
