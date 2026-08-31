@@ -8,6 +8,7 @@ import {
   getGoogleCalendarAuthUrl,
   disconnectGoogleCalendar,
 } from "@/lib/google-calendar.functions";
+import { getReviewSyncStatus, runGoogleReviewSync } from "@/lib/reviews.functions";
 
 export const Route = createFileRoute("/admin/settings")({
   component: ScheduleSettings,
