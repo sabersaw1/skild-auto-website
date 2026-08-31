@@ -83,6 +83,32 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" },
     ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "AutoRepair",
+          name: BUSINESS.name,
+          url: SITE_URL,
+          telephone: BUSINESS.phoneE164,
+          email: BUSINESS.email,
+          description:
+            "Mobile automotive and motorcycle repair, diagnostics and maintenance brought to customers across the Salt Lake City, Utah area.",
+          areaServed: { "@type": "City", name: "Salt Lake City", addressRegion: "UT", addressCountry: "US" },
+          address: { "@type": "PostalAddress", addressLocality: "Salt Lake City", addressRegion: "UT", addressCountry: "US" },
+          openingHoursSpecification: [
+            {
+              "@type": "OpeningHoursSpecification",
+              dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+              opens: "07:00",
+              closes: "19:00",
+            },
+          ],
+          sameAs: [BUSINESS.instagramUrl],
+        }),
+      },
+    ],
   }),
   shellComponent: RootShell,
   component: RootComponent,
