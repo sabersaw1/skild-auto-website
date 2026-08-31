@@ -26,6 +26,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as GalleryIndexRouteImport } from './routes/gallery.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as GallerySlugRouteImport } from './routes/gallery.$slug'
 import { Route as AdminTasksRouteImport } from './routes/admin.tasks'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminQuotesRouteImport } from './routes/admin.quotes'
@@ -124,6 +125,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
+const GallerySlugRoute = GallerySlugRouteImport.update({
+  id: '/gallery/$slug',
+  path: '/gallery/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminTasksRoute = AdminTasksRouteImport.update({
   id: '/tasks',
   path: '/tasks',
@@ -208,6 +214,7 @@ export interface FileRoutesByFullPath {
   '/admin/quotes': typeof AdminQuotesRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/tasks': typeof AdminTasksRoute
+  '/gallery/$slug': typeof GallerySlugRoute
   '/admin/': typeof AdminIndexRoute
   '/gallery/': typeof GalleryIndexRoute
   '/api/public/calendly-webhook': typeof ApiPublicCalendlyWebhookRoute
@@ -238,6 +245,7 @@ export interface FileRoutesByTo {
   '/admin/quotes': typeof AdminQuotesRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/tasks': typeof AdminTasksRoute
+  '/gallery/$slug': typeof GallerySlugRoute
   '/admin': typeof AdminIndexRoute
   '/gallery': typeof GalleryIndexRoute
   '/api/public/calendly-webhook': typeof ApiPublicCalendlyWebhookRoute
@@ -270,6 +278,7 @@ export interface FileRoutesById {
   '/admin/quotes': typeof AdminQuotesRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/tasks': typeof AdminTasksRoute
+  '/gallery/$slug': typeof GallerySlugRoute
   '/admin/': typeof AdminIndexRoute
   '/gallery/': typeof GalleryIndexRoute
   '/api/public/calendly-webhook': typeof ApiPublicCalendlyWebhookRoute
@@ -303,6 +312,7 @@ export interface FileRouteTypes {
     | '/admin/quotes'
     | '/admin/settings'
     | '/admin/tasks'
+    | '/gallery/$slug'
     | '/admin/'
     | '/gallery/'
     | '/api/public/calendly-webhook'
@@ -333,6 +343,7 @@ export interface FileRouteTypes {
     | '/admin/quotes'
     | '/admin/settings'
     | '/admin/tasks'
+    | '/gallery/$slug'
     | '/admin'
     | '/gallery'
     | '/api/public/calendly-webhook'
@@ -364,6 +375,7 @@ export interface FileRouteTypes {
     | '/admin/quotes'
     | '/admin/settings'
     | '/admin/tasks'
+    | '/gallery/$slug'
     | '/admin/'
     | '/gallery/'
     | '/api/public/calendly-webhook'
@@ -391,6 +403,7 @@ export interface RootRouteChildren {
   ServiceAreaRoute: typeof ServiceAreaRoute
   ServicesRoute: typeof ServicesRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  GallerySlugRoute: typeof GallerySlugRoute
   GalleryIndexRoute: typeof GalleryIndexRoute
   ApiPublicCalendlyWebhookRoute: typeof ApiPublicCalendlyWebhookRoute
   ApiPublicCloudinarySignRoute: typeof ApiPublicCloudinarySignRoute
@@ -522,6 +535,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/gallery/$slug': {
+      id: '/gallery/$slug'
+      path: '/gallery/$slug'
+      fullPath: '/gallery/$slug'
+      preLoaderRoute: typeof GallerySlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/tasks': {
       id: '/admin/tasks'
       path: '/tasks'
@@ -645,6 +665,7 @@ const rootRouteChildren: RootRouteChildren = {
   ServiceAreaRoute: ServiceAreaRoute,
   ServicesRoute: ServicesRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  GallerySlugRoute: GallerySlugRoute,
   GalleryIndexRoute: GalleryIndexRoute,
   ApiPublicCalendlyWebhookRoute: ApiPublicCalendlyWebhookRoute,
   ApiPublicCloudinarySignRoute: ApiPublicCloudinarySignRoute,
