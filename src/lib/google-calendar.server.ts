@@ -107,12 +107,27 @@ function signOauthStatePayload(payload: string) {
   return signature.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
 }
 
-export function createOauthState(): string {
+function b64url(v: string) {
+  return Buffer.from(v, "utf8").toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+}
+function unb64url(v: string) {
+  return Buffer.from(v.replace(/-/g, "+").replace(/_/g, "/"), "base64").toString("utf8");
+}
+
+/**
+ * Signed, stateless CSRF token. When a redirect URI is supplied it is embedded
+ * (v2) so the token exchange reuses the EXACT redirect_uri sent to Google, even
+ * if the callback lands on a different host (e.g. apex -> www redirect).
+ */
+export function createOauthState(redirectUri?: string): string {
   const issuedAt = Date.now().toString(36);
   const nonce = globalThis.crypto.randomUUID().replace(/-/g, "");
-  const payload = `v1.${issuedAt}.${nonce}`;
+  const payload = redirectUri
+    ? `v2.${issuedAt}.${nonce}.${b64url(redirectUri)}`
+    : `v1.${issuedAt}.${nonce}`;
   return `${payload}.${signOauthStatePayload(payload)}`;
 }
+
 
 /** Persist a one-time OAuth state token (CSRF protection). 10-minute window. */
 export async function saveOauthState(state: string) {
