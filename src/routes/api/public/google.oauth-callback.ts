@@ -126,15 +126,16 @@ export const Route = createFileRoute("/api/public/google/oauth-callback")({
         const clientId = process.env.GOOGLE_CLIENT_ID?.trim();
         const clientSecret = process.env.GOOGLE_CLIENT_SECRET?.trim();
         const calendarId = process.env.GOOGLE_CALENDAR_ID?.trim();
-        // Same resolver used to build the authorize URL: derive from this
-        // request's origin so the exchange matches byte-for-byte.
+        // Prefer the redirect_uri that was actually sent to Google (embedded in
+        // the signed state). Falls back to this request's origin.
         const { resolveGoogleRedirectUri } = await import("@/lib/google-calendar.server");
         let redirectUri: string | undefined;
         try {
-          redirectUri = resolveGoogleRedirectUri(request.url);
+          redirectUri = stateResult.redirectUri ?? resolveGoogleRedirectUri(request.url);
         } catch {
           redirectUri = undefined;
         }
+
 
         if (!clientId || !clientSecret || !redirectUri) {
           return failureResponse("Google Calendar is not configured", 500, {
