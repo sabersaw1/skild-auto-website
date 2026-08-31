@@ -96,23 +96,50 @@ export async function persistQuoteToSupabase(
   }
 
   // Vehicle (optional — only insert if there's something useful).
+  // Reuse the customer's existing matching vehicle instead of creating a
+  // duplicate row every time they request service for the same car.
   let vehicleId: string | null = null;
   if (v.year || v.make || v.model) {
-    const { data, error } = await sb
+    const kind = v.type === "moto" ? "moto" : "auto";
+    const year = v.year ? Number(v.year) || null : null;
+    const make = v.make || null;
+    const model = v.model || null;
+
+    let existing = sb
       .from("vehicles")
-      .insert({
-        customer_id: customerId,
-        kind: v.type === "moto" ? "moto" : "auto",
-        year: v.year ? Number(v.year) || null : null,
-        make: v.make || null,
-        model: v.model || null,
-        mileage: v.mileage || null,
-      })
-      .select("id")
-      .single();
-    if (error) throw error;
-    vehicleId = data.id as string;
+      .select("id, mileage")
+      .eq("customer_id", customerId)
+      .eq("kind", kind);
+    existing = year === null ? existing.is("year", null) : existing.eq("year", year);
+    existing = make === null ? existing.is("make", null) : existing.eq("make", make);
+    existing = model === null ? existing.is("model", null) : existing.eq("model", model);
+    const { data: found, error: findErr } = await existing.limit(1).maybeSingle();
+    if (findErr) throw findErr;
+
+    if (found) {
+      vehicleId = found.id as string;
+      // Refresh mileage only when the customer supplied a newer value.
+      if (v.mileage && v.mileage !== found.mileage) {
+        await sb.from("vehicles").update({ mileage: v.mileage }).eq("id", vehicleId);
+      }
+    } else {
+      const { data, error } = await sb
+        .from("vehicles")
+        .insert({
+          customer_id: customerId,
+          kind,
+          year,
+          make,
+          model,
+          mileage: v.mileage || null,
+        })
+        .select("id")
+        .single();
+      if (error) throw error;
+      vehicleId = data.id as string;
+    }
   }
+
 
   // Quote.
   const { data: quote, error: qErr } = await sb
