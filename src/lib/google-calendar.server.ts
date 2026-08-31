@@ -148,7 +148,7 @@ export async function saveOauthState(state: string) {
 }
 
 export type OAuthStateConsumeResult =
-  | { valid: true; ageMs: number | null }
+  | { valid: true; ageMs: number | null; redirectUri?: string | null }
   | { valid: false; reason: "missing_callback_state" | "missing_saved_state" | "state_mismatch" | "state_expired" | "state_lookup_failed" | "state_delete_failed"; ageMs?: number | null; details?: string };
 
 /** Consume and validate a one-time OAuth state token. Returns true if valid. */
@@ -156,20 +156,30 @@ export async function consumeOauthStateDetailed(state: string | null): Promise<O
   if (!state) return { valid: false, reason: "missing_callback_state" };
 
   const parts = state.split(".");
-  if (parts.length === 4 && parts[0] === "v1") {
+  const signedVersion = (parts.length === 4 && parts[0] === "v1") || (parts.length === 5 && parts[0] === "v2");
+  if (signedVersion) {
     const issuedAt = Number.parseInt(parts[1], 36);
     const ageMs = Number.isFinite(issuedAt) ? Date.now() - issuedAt : null;
     if (ageMs === null || ageMs < 0) return { valid: false, reason: "state_mismatch", ageMs };
     if (ageMs > OAUTH_STATE_TTL_MS) return { valid: false, reason: "state_expired", ageMs };
 
-    const payload = parts.slice(0, 3).join(".");
+    const payload = parts.slice(0, parts.length - 1).join(".");
     const expected = Buffer.from(signOauthStatePayload(payload));
-    const received = Buffer.from(parts[3]);
+    const received = Buffer.from(parts[parts.length - 1]);
     if (received.length !== expected.length || !timingSafeEqual(received, expected)) {
       return { valid: false, reason: "state_mismatch", ageMs };
     }
-    return { valid: true, ageMs };
+    let redirectUri: string | null = null;
+    if (parts[0] === "v2") {
+      try {
+        redirectUri = unb64url(parts[3]);
+      } catch {
+        redirectUri = null;
+      }
+    }
+    return { valid: true, ageMs, redirectUri };
   }
+
 
   const sb = getSkildAdmin();
   const { data, error } = await sb
