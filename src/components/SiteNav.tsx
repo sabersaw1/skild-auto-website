@@ -12,6 +12,7 @@ interface SiteNavProps {
 const links = [
   { to: "/services", label: "Services" },
   { to: "/about", label: "About" },
+  { to: "/gallery", label: "Gallery" },
   { to: "/service-area", label: "Service Area" },
   { to: "/reviews", label: "Reviews" },
   { to: "/apparel", label: "Apparel" },

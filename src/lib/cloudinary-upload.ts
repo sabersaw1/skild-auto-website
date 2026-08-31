@@ -59,8 +59,14 @@ async function getSignature(folder: string): Promise<SignatureResponse> {
   return (await res.json()) as SignatureResponse;
 }
 
-export async function uploadQuotePhoto(file: File): Promise<CloudinaryPhoto> {
-  const folder = quoteSessionFolder();
+/** Gallery/project photos live in their own Cloudinary folder. */
+export const PROJECT_FOLDER = "skild-auto/projects";
+
+export async function uploadQuotePhoto(
+  file: File,
+  folderOverride?: string,
+): Promise<CloudinaryPhoto> {
+  const folder = folderOverride ?? quoteSessionFolder();
   const sig = await getSignature(folder);
 
   const fd = new FormData();

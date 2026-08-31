@@ -21,11 +21,31 @@ export const Route = createFileRoute("/sitemap.xml")({
           { path: "/services", changefreq: "weekly", priority: "0.8" },
           { path: "/about", changefreq: "monthly", priority: "0.7" },
           { path: "/reviews", changefreq: "weekly", priority: "0.7" },
+          { path: "/gallery", changefreq: "weekly", priority: "0.8" },
           { path: "/service-area", changefreq: "monthly", priority: "0.7" },
           { path: "/quote", changefreq: "monthly", priority: "0.8" },
           { path: "/contact", changefreq: "monthly", priority: "0.6" },
           { path: "/apparel", changefreq: "monthly", priority: "0.5" },
         ];
+
+        try {
+          const { getSkildPublicDb } = await import("@/lib/skild-public.server");
+          const { data } = await getSkildPublicDb()
+            .from("projects")
+            .select("slug, updated_at")
+            .eq("is_published", true)
+            .limit(500);
+          for (const row of (data ?? []) as { slug: string; updated_at?: string }[]) {
+            entries.push({
+              path: `/gallery/${row.slug}`,
+              lastmod: row.updated_at ? new Date(row.updated_at).toISOString() : undefined,
+              changefreq: "monthly",
+              priority: "0.7",
+            });
+          }
+        } catch {
+          /* gallery entries are optional; never break the sitemap */
+        }
 
         const urls = entries.map((e) =>
           [

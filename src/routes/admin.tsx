@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, Link, useRouter } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
-import { LayoutDashboard, ClipboardList, Calendar, Users, ListChecks, Settings, LogOut } from "lucide-react";
+import { LayoutDashboard, ClipboardList, Calendar, Users, ListChecks, Settings, LogOut, Images } from "lucide-react";
 import { useSkildSession, signInWithPassword, signOut } from "@/lib/skild-auth";
 import { bootstrapSkildAdmin } from "@/lib/admin-bootstrap.functions";
 
@@ -41,6 +41,7 @@ function Shell() {
     { to: "/admin/quotes", label: "Quotes", icon: ClipboardList },
     { to: "/admin/appointments", label: "Appointments", icon: Calendar },
     { to: "/admin/customers", label: "Customers", icon: Users },
+    { to: "/admin/gallery", label: "Gallery", icon: Images },
     { to: "/admin/tasks", label: "Tasks", icon: ListChecks },
     { to: "/admin/settings", label: "Schedule", icon: Settings },
   ] as const;

@@ -1,10 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Star } from "lucide-react";
 import { PageLayout } from "@/components/PageLayout";
 import { Reveal } from "@/components/Reveal";
+import { listPublicReviews, type PublicReview } from "@/lib/reviews.functions";
 
 const GOOGLE_REVIEW_URL = "https://g.page/r/CZCH7korVYMuEBI/review";
 
 export const Route = createFileRoute("/reviews")({
+  loader: async () => await listPublicReviews(),
   head: () => ({
     meta: [
       { title: "Reviews — What Customers Say | Skild Auto" },
@@ -15,10 +18,17 @@ export const Route = createFileRoute("/reviews")({
     ],
     links: [{ rel: "canonical", href: "https://www.skildauto.com/reviews" }],
   }),
+  errorComponent: () => <ReviewsShell reviews={[]} />,
+  notFoundComponent: () => <ReviewsShell reviews={[]} />,
   component: ReviewsPage,
 });
 
 function ReviewsPage() {
+  const { reviews } = Route.useLoaderData();
+  return <ReviewsShell reviews={reviews} />;
+}
+
+function ReviewsShell({ reviews }: { reviews: PublicReview[] }) {
   return (
     <PageLayout>
       <section className="border-b border-border bg-gradient-to-b from-card to-background">
@@ -31,6 +41,33 @@ function ReviewsPage() {
           </Reveal>
         </div>
       </section>
+
+      {reviews.length > 0 && (
+        <section className="mx-auto max-w-7xl px-4 pt-16 sm:px-6">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {reviews.map((r) => (
+              <Reveal key={r.id}>
+                <article className="h-full rounded-xl border border-border bg-card p-6">
+                  <div className="flex items-center gap-1 text-brand-red" aria-label={`${r.rating ?? 0} out of 5 stars`}>
+                    {Array.from({ length: r.rating ?? 0 }).map((_, i) => (
+                      <Star key={i} className="h-4 w-4 fill-current" />
+                    ))}
+                  </div>
+                  {r.comment && <p className="mt-4 text-sm text-muted-foreground">{r.comment}</p>}
+                  <p className="mt-4 text-xs font-bold uppercase tracking-[0.18em]">
+                    {r.reviewer_name || "Google customer"}
+                  </p>
+                  {r.review_created_at && (
+                    <p className="mt-1 text-[11px] uppercase tracking-widest text-muted-foreground">
+                      {new Date(r.review_created_at).toLocaleDateString()}
+                    </p>
+                  )}
+                </article>
+              </Reveal>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
         <div className="mx-auto max-w-xl text-center">

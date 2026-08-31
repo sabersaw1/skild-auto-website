@@ -8,6 +8,7 @@ import {
   getGoogleCalendarAuthUrl,
   disconnectGoogleCalendar,
 } from "@/lib/google-calendar.functions";
+import { getReviewSyncStatus, runGoogleReviewSync } from "@/lib/reviews.functions";
 
 export const Route = createFileRoute("/admin/settings")({
   component: ScheduleSettings,
@@ -163,7 +164,69 @@ function ScheduleSettings() {
           {blocks.length === 0 && <p className="text-sm text-muted-foreground">No blocked time.</p>}
         </ul>
       </section>
+
+      <GoogleReviewsPanel />
     </div>
+  );
+}
+
+function GoogleReviewsPanel() {
+  const [status, setStatus] = useState<Record<string, unknown> | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState<string | null>(null);
+
+  async function refresh() {
+    try {
+      const accessToken = await getAdminAccessToken();
+      setStatus(await getReviewSyncStatus({ data: { accessToken } }));
+    } catch (e) {
+      setMsg(e instanceof Error ? e.message : "Could not load review status");
+    }
+  }
+  useEffect(() => { refresh(); }, []);
+
+  async function sync() {
+    setBusy(true); setMsg(null);
+    try {
+      const accessToken = await getAdminAccessToken();
+      const r = await runGoogleReviewSync({ data: { accessToken } });
+      setMsg(r.ok ? `Synced ${r.fetched ?? 0} review(s) from Google.` : r.message || "Sync failed");
+      await refresh();
+    } catch (e) {
+      setMsg(e instanceof Error ? e.message : "Sync failed");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  const hasKey = status?.hasApiKey === true;
+  return (
+    <section className="rounded-xl border border-border bg-card p-5">
+      <h2 className="font-display text-xl">Google reviews</h2>
+      <p className="mt-1 text-sm text-muted-foreground">
+        Pulls the real reviews from the Skild Auto Google Business Profile into the site cache.
+      </p>
+      <dl className="mt-4 space-y-1 text-sm">
+        <div className="flex justify-between gap-3">
+          <dt className="text-xs uppercase tracking-widest text-muted-foreground">Places API key</dt>
+          <dd>{hasKey ? "configured" : "missing"}</dd>
+        </div>
+        <div className="flex justify-between gap-3">
+          <dt className="text-xs uppercase tracking-widest text-muted-foreground">Place id</dt>
+          <dd>{(status?.place_id as string) || "—"}</dd>
+        </div>
+        <div className="flex justify-between gap-3">
+          <dt className="text-xs uppercase tracking-widest text-muted-foreground">Last sync</dt>
+          <dd>{status?.last_synced_at ? new Date(status.last_synced_at as string).toLocaleString() : "never"}</dd>
+        </div>
+      </dl>
+      {status?.last_error ? <p className="mt-3 text-xs text-brand-red">{String(status.last_error)}</p> : null}
+      {msg && <p className="mt-3 text-sm text-brand-red">{msg}</p>}
+      <button onClick={sync} disabled={busy}
+        className="mt-4 rounded-md bg-brand-red px-4 py-2 text-xs font-bold uppercase tracking-widest text-white disabled:opacity-50">
+        {busy ? "Syncing…" : "Sync now"}
+      </button>
+    </section>
   );
 }
 
