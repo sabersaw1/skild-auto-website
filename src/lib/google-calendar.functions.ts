@@ -30,8 +30,9 @@ export const getGoogleCalendarAuthUrl = createServerFn({ method: "POST" })
     const { requireSkildAdmin } = await import("./admin-guard.server");
     await requireSkildAdmin(data.accessToken);
     const { getRequest } = await import("@tanstack/react-start/server");
-    const { buildGoogleAuthUrl, createOauthState } = await import("./google-calendar.server");
-    const state = createOauthState();
+    const { buildGoogleAuthUrl, createOauthState, resolveGoogleRedirectUri } = await import(
+      "./google-calendar.server"
+    );
     // Derive the callback from the host the admin is actually on so the
     // authorize request and the token exchange always agree.
     let requestUrl: string | null = null;
@@ -40,7 +41,12 @@ export const getGoogleCalendarAuthUrl = createServerFn({ method: "POST" })
     } catch {
       requestUrl = null;
     }
+    const redirectUri = resolveGoogleRedirectUri(requestUrl);
+    // Embed the exact redirect_uri in the signed state: apex -> www redirects
+    // would otherwise change the origin before the token exchange.
+    const state = createOauthState(redirectUri);
     return { url: buildGoogleAuthUrl(state, requestUrl) };
+
   });
 
 
