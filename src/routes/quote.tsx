@@ -22,9 +22,9 @@ export const Route = createFileRoute("/quote")({
       { name: "description", content: "Tell us about your vehicle and we'll get back to you fast with an honest mobile service quote." },
       { property: "og:title", content: "Get a Skild Auto Quote" },
       { property: "og:description", content: "Interactive quote in under 2 minutes." },
-      { property: "og:url", content: "/quote" },
+      { property: "og:url", content: "https://www.skildauto.com/quote" },
     ],
-    links: [{ rel: "canonical", href: "/quote" }],
+    links: [{ rel: "canonical", href: "https://www.skildauto.com/quote" }],
   }),
   component: QuotePage,
 });

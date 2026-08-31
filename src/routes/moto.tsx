@@ -12,9 +12,9 @@ export const Route = createFileRoute("/moto")({
       { name: "description", content: "Professional motorcycle maintenance, repair and performance upgrades wherever you are. Salt Lake City." },
       { property: "og:title", content: "Skild Auto — Motorcycle Service" },
       { property: "og:description", content: "Repair, maintenance, diagnostics and performance for riders." },
-      { property: "og:url", content: "/moto" },
+      { property: "og:url", content: "https://www.skildauto.com/moto" },
     ],
-    links: [{ rel: "canonical", href: "/moto" }],
+    links: [{ rel: "canonical", href: "https://www.skildauto.com/moto" }],
   }),
   component: MotoHome,
 });
@@ -33,7 +33,7 @@ function MotoHome() {
     <PageLayout mode="moto">
       <section className="relative overflow-hidden">
         <div className="absolute inset-0">
-          <img src={mainBg} alt="" className="h-full w-full object-cover opacity-70" />
+          <img src={mainBg} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover opacity-70" />
           <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-background/20" />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
         </div>

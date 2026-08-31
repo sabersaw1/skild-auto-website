@@ -10,9 +10,9 @@ export const Route = createFileRoute("/services")({
       { name: "description", content: "Full list of automotive and motorcycle services from Skild Auto in Salt Lake City, Utah." },
       { property: "og:title", content: "Skild Auto Services" },
       { property: "og:description", content: "Diagnostics, repair, maintenance and performance — auto and moto." },
-      { property: "og:url", content: "/services" },
+      { property: "og:url", content: "https://www.skildauto.com/services" },
     ],
-    links: [{ rel: "canonical", href: "/services" }],
+    links: [{ rel: "canonical", href: "https://www.skildauto.com/services" }],
   }),
   component: ServicesPage,
 });

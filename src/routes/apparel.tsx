@@ -11,9 +11,9 @@ export const Route = createFileRoute("/apparel")({
       { name: "description", content: "Premium Skild Auto apparel and merch. Coming soon." },
       { property: "og:title", content: "Skild Auto Apparel" },
       { property: "og:description", content: "Premium Skild Auto merchandise — coming soon." },
-      { property: "og:url", content: "/apparel" },
+      { property: "og:url", content: "https://www.skildauto.com/apparel" },
     ],
-    links: [{ rel: "canonical", href: "/apparel" }],
+    links: [{ rel: "canonical", href: "https://www.skildauto.com/apparel" }],
   }),
   component: ApparelPage,
 });

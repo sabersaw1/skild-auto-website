@@ -12,6 +12,7 @@ export const Route = createFileRoute("/confirm")({
     meta: [
       { title: "Confirm Booking — Skild Auto" },
       { name: "description", content: "Review your Skild Auto booking and submit." },
+      { name: "robots", content: "noindex, nofollow" },
     ],
   }),
   component: ConfirmPage,

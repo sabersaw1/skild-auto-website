@@ -12,9 +12,9 @@ export const Route = createFileRoute("/auto")({
       { name: "description", content: "Mobile auto repair without the shop visit. Diagnostics, brakes, electrical and maintenance across Salt Lake City, UT." },
       { property: "og:title", content: "Skild Auto — Mobile Automotive Repair" },
       { property: "og:description", content: "Diagnostics, repairs, maintenance and emergency service brought directly to you." },
-      { property: "og:url", content: "/auto" },
+      { property: "og:url", content: "https://www.skildauto.com/auto" },
     ],
-    links: [{ rel: "canonical", href: "/auto" }],
+    links: [{ rel: "canonical", href: "https://www.skildauto.com/auto" }],
   }),
   component: AutoHome,
 });
@@ -34,7 +34,7 @@ function AutoHome() {
       {/* HERO */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0">
-          <img src={mobileBg} alt="" className="h-full w-full object-cover" />
+          <img src={mobileBg} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-r from-background via-background/85 to-background/30" />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
         </div>

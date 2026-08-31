@@ -11,9 +11,9 @@ export const Route = createFileRoute("/")({
       { name: "description", content: "Choose your experience: mobile automotive repair or motorcycle service. Skild Auto, Salt Lake City." },
       { property: "og:title", content: "Skild Auto" },
       { property: "og:description", content: "Mobile auto and moto service brought to you in Salt Lake City." },
-      { property: "og:url", content: "/" },
+      { property: "og:url", content: "https://www.skildauto.com/" },
     ],
-    links: [{ rel: "canonical", href: "/" }],
+    links: [{ rel: "canonical", href: "https://www.skildauto.com/" }],
   }),
   component: Splash,
 });
