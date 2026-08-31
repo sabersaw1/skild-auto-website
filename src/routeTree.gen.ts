@@ -30,6 +30,7 @@ import { Route as GallerySlugRouteImport } from './routes/gallery.$slug'
 import { Route as AdminTasksRouteImport } from './routes/admin.tasks'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminQuotesRouteImport } from './routes/admin.quotes'
+import { Route as AdminGalleryRouteImport } from './routes/admin.gallery'
 import { Route as AdminCustomersRouteImport } from './routes/admin.customers'
 import { Route as AdminAppointmentsRouteImport } from './routes/admin.appointments'
 import { Route as ApiPublicSkildConfigRouteImport } from './routes/api/public/skild-config'
@@ -145,6 +146,11 @@ const AdminQuotesRoute = AdminQuotesRouteImport.update({
   path: '/quotes',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminGalleryRoute = AdminGalleryRouteImport.update({
+  id: '/gallery',
+  path: '/gallery',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminCustomersRoute = AdminCustomersRouteImport.update({
   id: '/customers',
   path: '/customers',
@@ -211,6 +217,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/appointments': typeof AdminAppointmentsRoute
   '/admin/customers': typeof AdminCustomersRoute
+  '/admin/gallery': typeof AdminGalleryRoute
   '/admin/quotes': typeof AdminQuotesRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/tasks': typeof AdminTasksRoute
@@ -242,6 +249,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/appointments': typeof AdminAppointmentsRoute
   '/admin/customers': typeof AdminCustomersRoute
+  '/admin/gallery': typeof AdminGalleryRoute
   '/admin/quotes': typeof AdminQuotesRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/tasks': typeof AdminTasksRoute
@@ -275,6 +283,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/appointments': typeof AdminAppointmentsRoute
   '/admin/customers': typeof AdminCustomersRoute
+  '/admin/gallery': typeof AdminGalleryRoute
   '/admin/quotes': typeof AdminQuotesRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/tasks': typeof AdminTasksRoute
@@ -309,6 +318,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/admin/appointments'
     | '/admin/customers'
+    | '/admin/gallery'
     | '/admin/quotes'
     | '/admin/settings'
     | '/admin/tasks'
@@ -340,6 +350,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/admin/appointments'
     | '/admin/customers'
+    | '/admin/gallery'
     | '/admin/quotes'
     | '/admin/settings'
     | '/admin/tasks'
@@ -372,6 +383,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/admin/appointments'
     | '/admin/customers'
+    | '/admin/gallery'
     | '/admin/quotes'
     | '/admin/settings'
     | '/admin/tasks'
@@ -563,6 +575,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminQuotesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/gallery': {
+      id: '/admin/gallery'
+      path: '/gallery'
+      fullPath: '/admin/gallery'
+      preLoaderRoute: typeof AdminGalleryRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/customers': {
       id: '/admin/customers'
       path: '/customers'
@@ -632,6 +651,7 @@ declare module '@tanstack/react-router' {
 interface AdminRouteChildren {
   AdminAppointmentsRoute: typeof AdminAppointmentsRoute
   AdminCustomersRoute: typeof AdminCustomersRoute
+  AdminGalleryRoute: typeof AdminGalleryRoute
   AdminQuotesRoute: typeof AdminQuotesRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminTasksRoute: typeof AdminTasksRoute
@@ -641,6 +661,7 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAppointmentsRoute: AdminAppointmentsRoute,
   AdminCustomersRoute: AdminCustomersRoute,
+  AdminGalleryRoute: AdminGalleryRoute,
   AdminQuotesRoute: AdminQuotesRoute,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminTasksRoute: AdminTasksRoute,
