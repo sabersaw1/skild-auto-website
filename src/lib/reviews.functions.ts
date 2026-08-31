@@ -11,7 +11,24 @@ export type PublicReview = {
 };
 
 /** Public, cached read of the synchronized Google reviews. Never fabricates data. */
+const STALE_MS = 12 * 60 * 60 * 1000;
+
+/** At most one background refresh per 12h, so page loads stay fast. */
+async function refreshIfStale() {
+  try {
+    const { getReviewSettings, hasPlacesKey, syncGoogleReviews } = await import("./google-reviews.server");
+    if (!hasPlacesKey()) return;
+    const s = await getReviewSettings();
+    const last = s.last_synced_at ? new Date(s.last_synced_at).getTime() : 0;
+    if (Date.now() - last < STALE_MS) return;
+    await syncGoogleReviews();
+  } catch {
+    /* never block the public page on Google */
+  }
+}
+
 export const listPublicReviews = createServerFn({ method: "GET" }).handler(async () => {
+  await refreshIfStale();
   try {
     const { getSkildPublicDb } = await import("./skild-public.server");
     const sb = getSkildPublicDb();
