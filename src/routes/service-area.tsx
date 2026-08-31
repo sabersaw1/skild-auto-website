@@ -38,7 +38,7 @@ function ServiceAreaPage() {
           <h1 className="mt-3 font-display text-5xl sm:text-6xl">Check your <span className="text-brand-red">area</span></h1>
         </Reveal>
 
-        <div className="mt-12 grid gap-10 lg:grid-cols-2">
+        <div className="mt-12 grid gap-10 lg:grid-cols-2 [&>*]:min-w-0">
           <Reveal>
             <div className="rounded-2xl border border-border bg-card p-8 shadow-elevated">
               <p className="text-sm text-muted-foreground">Enter your ZIP code to see if we service your area.</p>
@@ -47,7 +47,8 @@ function ServiceAreaPage() {
                   value={zip}
                   onChange={(e) => setZip(e.target.value)}
                   placeholder="84070"
-                  className="flex-1 rounded-md border border-border bg-background px-4 py-3 text-sm focus:border-brand-red focus:outline-none"
+                  aria-label="ZIP code"
+                  className="min-w-0 flex-1 rounded-md border border-border bg-background px-4 py-3 text-sm focus:border-brand-red focus:outline-none"
                 />
                 <button onClick={check} className="inline-flex items-center gap-2 rounded-md bg-brand-red px-5 text-xs font-bold uppercase tracking-[0.16em] text-white shadow-glow hover:bg-brand-red-glow">
                   <Search className="h-4 w-4" /> Check
