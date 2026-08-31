@@ -1,2 +1,9 @@
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /schedule
+Disallow: /confirm
+Disallow: /booking
+
+Sitemap: https://www.skildauto.com/sitemap.xml

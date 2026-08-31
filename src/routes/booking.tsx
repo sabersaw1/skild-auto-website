@@ -9,6 +9,7 @@ export const Route = createFileRoute("/booking")({
     meta: [
       { title: "Booking Received — Skild Auto" },
       { name: "description", content: "Your Skild Auto booking has been received." },
+      { name: "robots", content: "noindex, nofollow" },
     ],
   }),
   component: ThanksPage,

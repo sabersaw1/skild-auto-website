@@ -6,6 +6,7 @@ import { bootstrapSkildAdmin } from "@/lib/admin-bootstrap.functions";
 
 export const Route = createFileRoute("/admin")({
   ssr: false,
+  head: () => ({ meta: [{ title: "Admin — Skild Auto" }, { name: "robots", content: "noindex, nofollow" }] }),
   component: AdminLayout,
 });
 

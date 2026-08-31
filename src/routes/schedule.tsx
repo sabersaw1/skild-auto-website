@@ -13,6 +13,7 @@ export const Route = createFileRoute("/schedule")({
     meta: [
       { title: "Schedule — Skild Auto" },
       { name: "description", content: "Pick a date and time for your Skild Auto service." },
+      { name: "robots", content: "noindex, nofollow" },
     ],
   }),
   component: SchedulePage,
