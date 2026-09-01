@@ -241,12 +241,19 @@ function AdminGallery() {
                     .sort((a, b) => a.sort_order - b.sort_order)
                     .map((p) => (
                       <div key={p.id} className="relative">
-                        <img src={p.url} alt={p.alt_text ?? ""} className="h-24 w-24 rounded-md border border-border object-cover" />
+                        <img src={p.url} alt={p.alt_text ?? ""} loading="lazy" className="h-24 w-24 rounded-md border border-border object-cover" />
                         <button onClick={() => deletePhoto(p.id)} aria-label="Delete photo"
                           className="absolute -right-2 -top-2 grid h-6 w-6 place-items-center rounded-full border border-border bg-background text-brand-red">
                           <Trash2 className="h-3 w-3" />
                         </button>
+                        <div className="mt-1 flex justify-center gap-1">
+                          <button onClick={() => movePhoto(p, -1)} disabled={busy} aria-label="Move photo earlier"
+                            className="rounded border border-border px-2 text-xs hover:border-brand-red hover:text-brand-red disabled:opacity-40">←</button>
+                          <button onClick={() => movePhoto(p, 1)} disabled={busy} aria-label="Move photo later"
+                            className="rounded border border-border px-2 text-xs hover:border-brand-red hover:text-brand-red disabled:opacity-40">→</button>
+                        </div>
                       </div>
+
                     ))}
                 </div>
               </div>
