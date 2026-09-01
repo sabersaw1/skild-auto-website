@@ -63,6 +63,8 @@ export const runGoogleReviewSync = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const { requireSkildAdmin } = await import("./admin-guard.server");
     await requireSkildAdmin(data.accessToken);
+    const { hasGbpCredentials, syncGbpReviews } = await import("./gbp-reviews.server");
+    if (hasGbpCredentials()) return await syncGbpReviews();
     const { syncGoogleReviews } = await import("./google-reviews.server");
     return await syncGoogleReviews();
   });
@@ -76,6 +78,15 @@ export const getReviewSyncStatus = createServerFn({ method: "POST" })
     const { requireSkildAdmin } = await import("./admin-guard.server");
     await requireSkildAdmin(data.accessToken);
     const { getReviewSettings, hasPlacesKey } = await import("./google-reviews.server");
+    const { hasGbpCredentials, getGbpSettings } = await import("./gbp-reviews.server");
     const settings = await getReviewSettings();
-    return { hasApiKey: hasPlacesKey(), ...settings };
+    const gbp = await getGbpSettings().catch(() => ({}));
+    return {
+      hasApiKey: hasPlacesKey(),
+      hasBusinessProfile: hasGbpCredentials(),
+      source: hasGbpCredentials() ? "business_profile" : hasPlacesKey() ? "places" : "none",
+      businessProfile: gbp,
+      ...settings,
+    };
   });
+
