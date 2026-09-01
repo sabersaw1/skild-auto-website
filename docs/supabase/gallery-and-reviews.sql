@@ -122,3 +122,15 @@ create policy "admin/staff manage project photos" on public.project_photos
   for all to authenticated
   using (public.has_role(auth.uid(), 'admin') or public.has_role(auth.uid(), 'staff'))
   with check (public.has_role(auth.uid(), 'admin') or public.has_role(auth.uid(), 'staff'));
+
+-- ----------------------------------------------------------------------------
+-- Hardening (2026-09-01 audit): internal project notes must never be readable
+-- by anonymous visitors, even though row-level access is limited to published
+-- projects. Column-level grants close that gap. Run once; safe to re-run.
+-- ----------------------------------------------------------------------------
+revoke select on public.projects from anon;
+grant select (
+  id, slug, title, vehicle_kind, vehicle_year, vehicle_make, vehicle_model,
+  service_category, problem, work_performed, result, parts_used, description,
+  project_date, is_published, created_at, updated_at
+) on public.projects to anon;
