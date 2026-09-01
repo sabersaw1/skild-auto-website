@@ -16,6 +16,15 @@ const STALE_MS = 12 * 60 * 60 * 1000;
 /** At most one background refresh per 12h, so page loads stay fast. */
 async function refreshIfStale() {
   try {
+    // Preferred: official Business Profile API (free, our own location, all reviews).
+    const { hasGbpCredentials, getGbpSettings, syncGbpReviews } = await import("./gbp-reviews.server");
+    if (hasGbpCredentials()) {
+      const g = await getGbpSettings();
+      const lastG = g.last_synced_at ? new Date(g.last_synced_at).getTime() : 0;
+      if (Date.now() - lastG >= STALE_MS) await syncGbpReviews();
+      return;
+    }
+    // Fallback: Places API (New), only if a key is configured.
     const { getReviewSettings, hasPlacesKey, syncGoogleReviews } = await import("./google-reviews.server");
     if (!hasPlacesKey()) return;
     const s = await getReviewSettings();
@@ -26,6 +35,7 @@ async function refreshIfStale() {
     /* never block the public page on Google */
   }
 }
+
 
 export const listPublicReviews = createServerFn({ method: "GET" }).handler(async () => {
   await refreshIfStale();
