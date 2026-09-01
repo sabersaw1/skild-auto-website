@@ -126,6 +126,24 @@ function AdminGallery() {
     await load(active?.id);
   }
 
+  /** Swap sort_order with the neighbouring photo of the same type. */
+  async function movePhoto(photo: Photo, dir: -1 | 1) {
+    if (!active) return;
+    const group = active.project_photos
+      .filter((p) => p.image_type === photo.image_type)
+      .sort((a, b) => a.sort_order - b.sort_order);
+    const i = group.findIndex((p) => p.id === photo.id);
+    const j = i + dir;
+    if (i < 0 || j < 0 || j >= group.length) return;
+    setBusy(true);
+    const a = group[i], b = group[j];
+    await skildSupabase.from("project_photos").update({ sort_order: b.sort_order }).eq("id", a.id);
+    await skildSupabase.from("project_photos").update({ sort_order: a.sort_order }).eq("id", b.id);
+    setBusy(false);
+    await load(active.id);
+  }
+
+
   return (
     <div>
       <header className="flex flex-wrap items-end justify-between gap-4">
