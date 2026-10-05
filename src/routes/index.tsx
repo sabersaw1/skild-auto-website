@@ -1,14 +1,15 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Bike, Car, ArrowRight } from "lucide-react";
+import { Bike, Car, ArrowRight, Phone } from "lucide-react";
+import { BUSINESS, telHref } from "@/lib/business";
 import mainBg from "@/assets/main-bg.jpg";
 import skildLogo from "@/assets/skild-logo.png";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Skild Auto — Built for the road. Ready for anything." },
-      { name: "description", content: "Choose your experience: mobile automotive repair or motorcycle service. Skild Auto, Salt Lake City." },
+      { title: "Skild Auto — Mobile Mechanic in Salt Lake City | Auto & Moto Repair" },
+      { name: "description", content: "Mobile mechanic for cars and motorcycles in Salt Lake City. Diagnostics, repairs and maintenance at your home or work. Call or get a free quote." },
       { property: "og:title", content: "Skild Auto" },
       { property: "og:description", content: "Mobile auto and moto service brought to you in Salt Lake City." },
       { property: "og:url", content: "https://www.skildauto.com/" },
@@ -20,7 +21,6 @@ export const Route = createFileRoute("/")({
 
 function Splash() {
   const [revealed, setRevealed] = useState(false);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const t = setTimeout(() => setRevealed(true), 250);
@@ -85,15 +85,33 @@ function Splash() {
             label="Auto"
             sub="Mobile automotive repair"
             icon={<Car className="h-6 w-6 sm:h-7 sm:w-7" />}
-            onClick={() => navigate({ to: "/auto" })}
+            to="/auto"
             primary
           />
           <ModeCard
             label="Moto"
             sub="Motorcycle service & performance"
             icon={<Bike className="h-6 w-6 sm:h-7 sm:w-7" />}
-            onClick={() => navigate({ to: "/moto" })}
+            to="/moto"
           />
+        </div>
+
+        <div
+          className={`flex w-full max-w-3xl flex-row justify-center gap-2 transition-all delay-700 duration-1000 sm:gap-4 ${revealed ? "opacity-100" : "opacity-0"}`}
+        >
+          <a
+            href={telHref}
+            aria-label={`Call or text ${BUSINESS.phone}`}
+            className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-brand-red px-3 py-2.5 text-xs font-semibold sm:flex-none sm:px-5 sm:py-3 sm:text-sm uppercase tracking-widest text-white transition hover:brightness-110"
+          >
+            <Phone className="h-4 w-4" /> Call<span className="hidden sm:inline"> {BUSINESS.phone}</span>
+          </a>
+          <Link
+            to="/quote"
+            className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg border border-border bg-card/80 px-3 py-2.5 text-xs font-semibold sm:flex-none sm:px-5 sm:py-3 sm:text-sm uppercase tracking-widest transition hover:border-brand-red"
+          >
+            Free quote <ArrowRight className="h-4 w-4" />
+          </Link>
         </div>
 
         <Link
@@ -109,11 +127,11 @@ function Splash() {
 }
 
 function ModeCard({
-  label, sub, icon, onClick, primary,
-}: { label: string; sub: string; icon: React.ReactNode; onClick: () => void; primary?: boolean }) {
+  label, sub, icon, to, primary,
+}: { label: string; sub: string; icon: React.ReactNode; to: "/auto" | "/moto"; primary?: boolean }) {
   return (
-    <button
-      onClick={onClick}
+    <Link
+      to={to}
       className={`shine-border group relative overflow-hidden rounded-xl border border-border bg-card/80 p-5 text-left backdrop-blur transition-all hover:-translate-y-1 hover:border-brand-red sm:p-8 ${primary ? "shadow-glow" : ""}`}
     >
       <div className="absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-brand-red to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
@@ -125,6 +143,6 @@ function ModeCard({
       </div>
       <div className="mt-4 font-display text-2xl sm:mt-6 sm:text-4xl">{label}</div>
       <div className="mt-1 text-[11px] uppercase tracking-widest text-muted-foreground sm:text-sm">{sub}</div>
-    </button>
+    </Link>
   );
 }
