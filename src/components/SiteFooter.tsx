@@ -23,6 +23,7 @@ export function SiteFooter() {
             <li><Link to="/auto" className="hover:text-foreground">Auto</Link></li>
             <li><Link to="/moto" className="hover:text-foreground">Moto</Link></li>
             <li><Link to="/services" className="hover:text-foreground">Services</Link></li>
+            <li><Link to="/prices" className="hover:text-foreground">Prices</Link></li>
             <li><Link to="/about" className="hover:text-foreground">About</Link></li>
             <li><Link to="/reviews" className="hover:text-foreground">Reviews</Link></li>
           </ul>
