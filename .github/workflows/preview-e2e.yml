@@ -1,0 +1,34 @@
+# Booking smoke test on every Vercel preview (Johnny HQ, Skild Phase 2).
+# Vercel reports each finished deployment to GitHub; this runs Playwright against that preview.
+# The test never submits a booking. Previews are behind Vercel login, so it needs the
+# "Protection Bypass for Automation" secret, stored as the Actions secret HQ_VERCEL_BYPASS.
+# Until that secret exists, the job skips itself (it does not fail).
+name: Preview booking test
+on:
+  deployment_status:
+permissions:
+  contents: read
+  deployments: read
+
+jobs:
+  e2e:
+    if: github.event.deployment_status.state == 'success' && contains(github.event.deployment_status.environment, 'Preview')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    container:
+      image: mcr.microsoft.com/playwright:v1.55.0-noble
+    env:
+      BASE_URL: ${{ github.event.deployment_status.target_url }}
+      VERCEL_BYPASS: ${{ secrets.HQ_VERCEL_BYPASS }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Skip when the bypass secret isn't set yet
+        id: gate
+        run: |
+          if [ -z "$VERCEL_BYPASS" ]; then echo "HQ_VERCEL_BYPASS not set yet: skipping"; echo "run=no" >> "$GITHUB_OUTPUT"; else echo "run=yes" >> "$GITHUB_OUTPUT"; fi
+      - name: Booking smoke test
+        if: steps.gate.outputs.run == 'yes'
+        run: |
+          mkdir -p /tmp/pw && cd /tmp/pw && npm init -y >/dev/null && npm i -s @playwright/test@1.55.0 >/dev/null
+          cp -r "$GITHUB_WORKSPACE/e2e" /tmp/pw/
+          HOME=/root npx playwright test e2e --reporter=line --retries=1
