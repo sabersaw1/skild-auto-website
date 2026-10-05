@@ -25,15 +25,18 @@ test("contact page shows the phone number", async ({ page }) => {
 test("schedule shows days and bookable times (no submit)", async ({ page }) => {
   await page.goto("/schedule");
   await expect(page.getByText("Choose a day")).toBeVisible();
-  const dayButtons = page.locator("div.grid.grid-cols-7 button");
+  // data-testid on the new picker; the class selector covers the current live markup.
+  const DAYS = '[data-testid="day"], div.grid.grid-cols-7 button';
+  const dayButtons = page.locator(DAYS);
   await expect(dayButtons.first()).toBeVisible({ timeout: 20000 });
   await expect(page.getByText("couldn't load the schedule")).toHaveCount(0);
   expect(await dayButtons.count()).toBeGreaterThanOrEqual(7);
   // First day with openings; if this week is full, look one week ahead.
-  let open = page.locator("div.grid.grid-cols-7 button:not([disabled])");
+  const OPEN = '[data-testid="day"]:not([disabled]), div.grid.grid-cols-7 button:not([disabled])';
+  let open = page.locator(OPEN);
   if ((await open.count()) === 0) {
     await page.getByLabel("Next week").click();
-    open = page.locator("div.grid.grid-cols-7 button:not([disabled])");
+    open = page.locator(OPEN);
   }
   expect(await open.count(), "at least one bookable day in the next two weeks").toBeGreaterThan(0);
   await open.first().click();

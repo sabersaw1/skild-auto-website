@@ -29,6 +29,8 @@ jobs:
         run: bunx tsc --noEmit
       - name: Build
         run: bun run build
+      - name: Unit tests
+        run: if grep -q '"test":' package.json; then bun run test; else echo "no unit tests yet"; fi
       - name: Lint (report only for now)
         run: bun run lint
         continue-on-error: true
@@ -69,3 +71,7 @@ jobs:
           shopt -s nullglob
           for f in $(ls supabase/migrations/*.sql | grep -v '\.down\.sql$' | sort); do psql -v ON_ERROR_STOP=1 -q -f "$f"; done
           psql -At -c "select count(*) || ' public tables' from information_schema.tables where table_schema = 'public'"
+      - name: Database tests (booking rules etc.)
+        run: |
+          shopt -s nullglob
+          for f in supabase/tests/*.sql; do echo "test: $f"; psql -v ON_ERROR_STOP=1 -f "$f"; done
