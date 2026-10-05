@@ -1,0 +1,34 @@
+{
+  "_comment": "THE one Skild Auto price sheet (public prices). The website, the CRM and Johnny HQ's agents all read this file. Change prices only by pull request (Johnny merges). Internal rules (the $70/hr floor, approvals) live in Johnny HQ's Company Records, not here.",
+  "version": 1,
+  "updated": "2026-09-25",
+  "labor": { "service": "Labor", "price": "$89/hr", "note": "1 hour minimum, then 15-minute steps" },
+  "auto": [
+    { "service": "Diagnostic / check-engine", "price": "$69", "note": "waived if you approve the repair on the same visit" },
+    { "service": "Oil change, conventional or blend", "price": "$59", "note": "up to 5 qt + filter + 20-point check" },
+    { "service": "Oil change, full synthetic", "price": "$79", "note": "up to 5 qt + filter + 20-point check" },
+    { "service": "Brake pads, per axle", "price": "$169", "note": "standard ceramic pads" },
+    { "service": "Brake pads + rotors, per axle", "price": "$259", "note": "standard parts" },
+    { "service": "Battery test", "price": "Free" },
+    { "service": "Battery install", "price": "$29", "note": "+ battery at store shelf price" },
+    { "service": "Pre-purchase inspection", "price": "$89" },
+    { "service": "Starter, alternator, suspension, electrical, engine", "price": "Book time × $89", "note": "+ parts; exact quote first" }
+  ],
+  "moto": [
+    { "service": "Moto diagnostic", "price": "$69" },
+    { "service": "Basic service", "price": "$89", "note": "oil + filter + chain adjust + inspection; oil at cost" },
+    { "service": "Ride-Ready inspection", "price": "$59" },
+    { "service": "Moto labor", "price": "$89/hr" },
+    { "service": "Performance upgrades / custom builds", "price": "Quoted per project" }
+  ],
+  "fees": [
+    { "item": "Travel", "price": "Free", "note": "within 20 miles of downtown Salt Lake City, then $1.50/mile" },
+    { "item": "After hours", "price": "+$39", "note": "outside regular hours or on Sunday, when available" }
+  ],
+  "promises": [
+    "Parts at the local parts store's shelf price, no markup",
+    "12-month / 12,000-mile warranty on parts and labor we supply",
+    "We beat any written local quote for the same job by 5%",
+    "Flat prices cover most cars, small SUVs and minivans; trucks, European, performance and seized hardware get a quote first"
+  ]
+}

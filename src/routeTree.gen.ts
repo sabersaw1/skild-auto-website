@@ -9,101 +9,42 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as ServicesRouteImport } from './routes/services'
-import { Route as ServiceAreaRouteImport } from './routes/service-area'
-import { Route as ScheduleRouteImport } from './routes/schedule'
-import { Route as ReviewsRouteImport } from './routes/reviews'
-import { Route as QuoteRouteImport } from './routes/quote'
-import { Route as MotoRouteImport } from './routes/moto'
-import { Route as ContactRouteImport } from './routes/contact'
-import { Route as ConfirmRouteImport } from './routes/confirm'
-import { Route as BookingRouteImport } from './routes/booking'
-import { Route as AutoRouteImport } from './routes/auto'
-import { Route as ApparelRouteImport } from './routes/apparel'
-import { Route as AdminRouteImport } from './routes/admin'
-import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as GalleryIndexRouteImport } from './routes/gallery.index'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as ApparelRouteImport } from './routes/apparel'
+import { Route as AutoRouteImport } from './routes/auto'
+import { Route as BookingRouteImport } from './routes/booking'
+import { Route as ConfirmRouteImport } from './routes/confirm'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as MotoRouteImport } from './routes/moto'
+import { Route as PricesRouteImport } from './routes/prices'
+import { Route as QuoteRouteImport } from './routes/quote'
+import { Route as ReviewsRouteImport } from './routes/reviews'
+import { Route as ScheduleRouteImport } from './routes/schedule'
+import { Route as ServiceAreaRouteImport } from './routes/service-area'
+import { Route as ServicesRouteImport } from './routes/services'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
-import { Route as GallerySlugRouteImport } from './routes/gallery.$slug'
-import { Route as AdminTasksRouteImport } from './routes/admin.tasks'
-import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
-import { Route as AdminQuotesRouteImport } from './routes/admin.quotes'
-import { Route as AdminGalleryRouteImport } from './routes/admin.gallery'
-import { Route as AdminCustomersRouteImport } from './routes/admin.customers'
 import { Route as AdminAppointmentsRouteImport } from './routes/admin.appointments'
-import { Route as ApiPublicSkildConfigRouteImport } from './routes/api/public/skild-config'
-import { Route as ApiPublicSendQuoteRouteImport } from './routes/api/public/send-quote'
-import { Route as ApiPublicCloudinarySignRouteImport } from './routes/api/public/cloudinary-sign'
+import { Route as AdminCustomersRouteImport } from './routes/admin.customers'
+import { Route as AdminGalleryRouteImport } from './routes/admin.gallery'
+import { Route as AdminQuotesRouteImport } from './routes/admin.quotes'
+import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
+import { Route as AdminTasksRouteImport } from './routes/admin.tasks'
+import { Route as GalleryIndexRouteImport } from './routes/gallery.index'
+import { Route as GallerySlugRouteImport } from './routes/gallery.$slug'
 import { Route as ApiPublicCalendlyWebhookRouteImport } from './routes/api/public/calendly-webhook'
-import { Route as ApiPublicGoogleStatusRouteImport } from './routes/api/public/google.status'
-import { Route as ApiPublicGoogleOauthCallbackRouteImport } from './routes/api/public/google.oauth-callback'
+import { Route as ApiPublicCloudinarySignRouteImport } from './routes/api/public/cloudinary-sign'
+import { Route as ApiPublicSendQuoteRouteImport } from './routes/api/public/send-quote'
+import { Route as ApiPublicSkildConfigRouteImport } from './routes/api/public/skild-config'
 import { Route as ApiPublicGoogleDiagnoseRouteImport } from './routes/api/public/google.diagnose'
+import { Route as ApiPublicGoogleOauthCallbackRouteImport } from './routes/api/public/google.oauth-callback'
+import { Route as ApiPublicGoogleStatusRouteImport } from './routes/api/public/google.status'
 
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ServicesRoute = ServicesRouteImport.update({
-  id: '/services',
-  path: '/services',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ServiceAreaRoute = ServiceAreaRouteImport.update({
-  id: '/service-area',
-  path: '/service-area',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ScheduleRoute = ScheduleRouteImport.update({
-  id: '/schedule',
-  path: '/schedule',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ReviewsRoute = ReviewsRouteImport.update({
-  id: '/reviews',
-  path: '/reviews',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const QuoteRoute = QuoteRouteImport.update({
-  id: '/quote',
-  path: '/quote',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MotoRoute = MotoRouteImport.update({
-  id: '/moto',
-  path: '/moto',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ContactRoute = ContactRouteImport.update({
-  id: '/contact',
-  path: '/contact',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ConfirmRoute = ConfirmRouteImport.update({
-  id: '/confirm',
-  path: '/confirm',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BookingRoute = BookingRouteImport.update({
-  id: '/booking',
-  path: '/booking',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AutoRoute = AutoRouteImport.update({
-  id: '/auto',
-  path: '/auto',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApparelRoute = ApparelRouteImport.update({
-  id: '/apparel',
-  path: '/apparel',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -111,14 +52,74 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
-const GalleryIndexRoute = GalleryIndexRouteImport.update({
-  id: '/gallery/',
-  path: '/gallery/',
+const ApparelRoute = ApparelRouteImport.update({
+  id: '/apparel',
+  path: '/apparel',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AutoRoute = AutoRouteImport.update({
+  id: '/auto',
+  path: '/auto',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BookingRoute = BookingRouteImport.update({
+  id: '/booking',
+  path: '/booking',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConfirmRoute = ConfirmRouteImport.update({
+  id: '/confirm',
+  path: '/confirm',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MotoRoute = MotoRouteImport.update({
+  id: '/moto',
+  path: '/moto',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PricesRoute = PricesRouteImport.update({
+  id: '/prices',
+  path: '/prices',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QuoteRoute = QuoteRouteImport.update({
+  id: '/quote',
+  path: '/quote',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReviewsRoute = ReviewsRouteImport.update({
+  id: '/reviews',
+  path: '/reviews',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ScheduleRoute = ScheduleRouteImport.update({
+  id: '/schedule',
+  path: '/schedule',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ServiceAreaRoute = ServiceAreaRouteImport.update({
+  id: '/service-area',
+  path: '/service-area',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ServicesRoute = ServicesRouteImport.update({
+  id: '/services',
+  path: '/services',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
@@ -126,29 +127,9 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
-const GallerySlugRoute = GallerySlugRouteImport.update({
-  id: '/gallery/$slug',
-  path: '/gallery/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminTasksRoute = AdminTasksRouteImport.update({
-  id: '/tasks',
-  path: '/tasks',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminSettingsRoute = AdminSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminQuotesRoute = AdminQuotesRouteImport.update({
-  id: '/quotes',
-  path: '/quotes',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminGalleryRoute = AdminGalleryRouteImport.update({
-  id: '/gallery',
-  path: '/gallery',
+const AdminAppointmentsRoute = AdminAppointmentsRouteImport.update({
+  id: '/appointments',
+  path: '/appointments',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminCustomersRoute = AdminCustomersRouteImport.update({
@@ -156,24 +137,34 @@ const AdminCustomersRoute = AdminCustomersRouteImport.update({
   path: '/customers',
   getParentRoute: () => AdminRoute,
 } as any)
-const AdminAppointmentsRoute = AdminAppointmentsRouteImport.update({
-  id: '/appointments',
-  path: '/appointments',
+const AdminGalleryRoute = AdminGalleryRouteImport.update({
+  id: '/gallery',
+  path: '/gallery',
   getParentRoute: () => AdminRoute,
 } as any)
-const ApiPublicSkildConfigRoute = ApiPublicSkildConfigRouteImport.update({
-  id: '/api/public/skild-config',
-  path: '/api/public/skild-config',
+const AdminQuotesRoute = AdminQuotesRouteImport.update({
+  id: '/quotes',
+  path: '/quotes',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSettingsRoute = AdminSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminTasksRoute = AdminTasksRouteImport.update({
+  id: '/tasks',
+  path: '/tasks',
+  getParentRoute: () => AdminRoute,
+} as any)
+const GalleryIndexRoute = GalleryIndexRouteImport.update({
+  id: '/gallery/',
+  path: '/gallery/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicSendQuoteRoute = ApiPublicSendQuoteRouteImport.update({
-  id: '/api/public/send-quote',
-  path: '/api/public/send-quote',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicCloudinarySignRoute = ApiPublicCloudinarySignRouteImport.update({
-  id: '/api/public/cloudinary-sign',
-  path: '/api/public/cloudinary-sign',
+const GallerySlugRoute = GallerySlugRouteImport.update({
+  id: '/gallery/$slug',
+  path: '/gallery/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicCalendlyWebhookRoute =
@@ -182,9 +173,24 @@ const ApiPublicCalendlyWebhookRoute =
     path: '/api/public/calendly-webhook',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiPublicGoogleStatusRoute = ApiPublicGoogleStatusRouteImport.update({
-  id: '/api/public/google/status',
-  path: '/api/public/google/status',
+const ApiPublicCloudinarySignRoute = ApiPublicCloudinarySignRouteImport.update({
+  id: '/api/public/cloudinary-sign',
+  path: '/api/public/cloudinary-sign',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicSendQuoteRoute = ApiPublicSendQuoteRouteImport.update({
+  id: '/api/public/send-quote',
+  path: '/api/public/send-quote',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicSkildConfigRoute = ApiPublicSkildConfigRouteImport.update({
+  id: '/api/public/skild-config',
+  path: '/api/public/skild-config',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicGoogleDiagnoseRoute = ApiPublicGoogleDiagnoseRouteImport.update({
+  id: '/api/public/google/diagnose',
+  path: '/api/public/google/diagnose',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicGoogleOauthCallbackRoute =
@@ -193,9 +199,9 @@ const ApiPublicGoogleOauthCallbackRoute =
     path: '/api/public/google/oauth-callback',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiPublicGoogleDiagnoseRoute = ApiPublicGoogleDiagnoseRouteImport.update({
-  id: '/api/public/google/diagnose',
-  path: '/api/public/google/diagnose',
+const ApiPublicGoogleStatusRoute = ApiPublicGoogleStatusRouteImport.update({
+  id: '/api/public/google/status',
+  path: '/api/public/google/status',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -209,6 +215,7 @@ export interface FileRoutesByFullPath {
   '/confirm': typeof ConfirmRoute
   '/contact': typeof ContactRoute
   '/moto': typeof MotoRoute
+  '/prices': typeof PricesRoute
   '/quote': typeof QuoteRoute
   '/reviews': typeof ReviewsRoute
   '/schedule': typeof ScheduleRoute
@@ -241,6 +248,7 @@ export interface FileRoutesByTo {
   '/confirm': typeof ConfirmRoute
   '/contact': typeof ContactRoute
   '/moto': typeof MotoRoute
+  '/prices': typeof PricesRoute
   '/quote': typeof QuoteRoute
   '/reviews': typeof ReviewsRoute
   '/schedule': typeof ScheduleRoute
@@ -275,6 +283,7 @@ export interface FileRoutesById {
   '/confirm': typeof ConfirmRoute
   '/contact': typeof ContactRoute
   '/moto': typeof MotoRoute
+  '/prices': typeof PricesRoute
   '/quote': typeof QuoteRoute
   '/reviews': typeof ReviewsRoute
   '/schedule': typeof ScheduleRoute
@@ -310,6 +319,7 @@ export interface FileRouteTypes {
     | '/confirm'
     | '/contact'
     | '/moto'
+    | '/prices'
     | '/quote'
     | '/reviews'
     | '/schedule'
@@ -342,6 +352,7 @@ export interface FileRouteTypes {
     | '/confirm'
     | '/contact'
     | '/moto'
+    | '/prices'
     | '/quote'
     | '/reviews'
     | '/schedule'
@@ -375,6 +386,7 @@ export interface FileRouteTypes {
     | '/confirm'
     | '/contact'
     | '/moto'
+    | '/prices'
     | '/quote'
     | '/reviews'
     | '/schedule'
@@ -409,6 +421,7 @@ export interface RootRouteChildren {
   ConfirmRoute: typeof ConfirmRoute
   ContactRoute: typeof ContactRoute
   MotoRoute: typeof MotoRoute
+  PricesRoute: typeof PricesRoute
   QuoteRoute: typeof QuoteRoute
   ReviewsRoute: typeof ReviewsRoute
   ScheduleRoute: typeof ScheduleRoute
@@ -428,95 +441,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/services': {
-      id: '/services'
-      path: '/services'
-      fullPath: '/services'
-      preLoaderRoute: typeof ServicesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/service-area': {
-      id: '/service-area'
-      path: '/service-area'
-      fullPath: '/service-area'
-      preLoaderRoute: typeof ServiceAreaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/schedule': {
-      id: '/schedule'
-      path: '/schedule'
-      fullPath: '/schedule'
-      preLoaderRoute: typeof ScheduleRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/reviews': {
-      id: '/reviews'
-      path: '/reviews'
-      fullPath: '/reviews'
-      preLoaderRoute: typeof ReviewsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/quote': {
-      id: '/quote'
-      path: '/quote'
-      fullPath: '/quote'
-      preLoaderRoute: typeof QuoteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/moto': {
-      id: '/moto'
-      path: '/moto'
-      fullPath: '/moto'
-      preLoaderRoute: typeof MotoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/contact': {
-      id: '/contact'
-      path: '/contact'
-      fullPath: '/contact'
-      preLoaderRoute: typeof ContactRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/confirm': {
-      id: '/confirm'
-      path: '/confirm'
-      fullPath: '/confirm'
-      preLoaderRoute: typeof ConfirmRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/booking': {
-      id: '/booking'
-      path: '/booking'
-      fullPath: '/booking'
-      preLoaderRoute: typeof BookingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auto': {
-      id: '/auto'
-      path: '/auto'
-      fullPath: '/auto'
-      preLoaderRoute: typeof AutoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/apparel': {
-      id: '/apparel'
-      path: '/apparel'
-      fullPath: '/apparel'
-      preLoaderRoute: typeof ApparelRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -526,18 +455,102 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/gallery/': {
-      id: '/gallery/'
-      path: '/gallery'
-      fullPath: '/gallery/'
-      preLoaderRoute: typeof GalleryIndexRouteImport
+    '/apparel': {
+      id: '/apparel'
+      path: '/apparel'
+      fullPath: '/apparel'
+      preLoaderRoute: typeof ApparelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auto': {
+      id: '/auto'
+      path: '/auto'
+      fullPath: '/auto'
+      preLoaderRoute: typeof AutoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/booking': {
+      id: '/booking'
+      path: '/booking'
+      fullPath: '/booking'
+      preLoaderRoute: typeof BookingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/confirm': {
+      id: '/confirm'
+      path: '/confirm'
+      fullPath: '/confirm'
+      preLoaderRoute: typeof ConfirmRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/moto': {
+      id: '/moto'
+      path: '/moto'
+      fullPath: '/moto'
+      preLoaderRoute: typeof MotoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/prices': {
+      id: '/prices'
+      path: '/prices'
+      fullPath: '/prices'
+      preLoaderRoute: typeof PricesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/quote': {
+      id: '/quote'
+      path: '/quote'
+      fullPath: '/quote'
+      preLoaderRoute: typeof QuoteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reviews': {
+      id: '/reviews'
+      path: '/reviews'
+      fullPath: '/reviews'
+      preLoaderRoute: typeof ReviewsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/schedule': {
+      id: '/schedule'
+      path: '/schedule'
+      fullPath: '/schedule'
+      preLoaderRoute: typeof ScheduleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/service-area': {
+      id: '/service-area'
+      path: '/service-area'
+      fullPath: '/service-area'
+      preLoaderRoute: typeof ServiceAreaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/services': {
+      id: '/services'
+      path: '/services'
+      fullPath: '/services'
+      preLoaderRoute: typeof ServicesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/': {
@@ -547,39 +560,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/gallery/$slug': {
-      id: '/gallery/$slug'
-      path: '/gallery/$slug'
-      fullPath: '/gallery/$slug'
-      preLoaderRoute: typeof GallerySlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/tasks': {
-      id: '/admin/tasks'
-      path: '/tasks'
-      fullPath: '/admin/tasks'
-      preLoaderRoute: typeof AdminTasksRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/settings': {
-      id: '/admin/settings'
-      path: '/settings'
-      fullPath: '/admin/settings'
-      preLoaderRoute: typeof AdminSettingsRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/quotes': {
-      id: '/admin/quotes'
-      path: '/quotes'
-      fullPath: '/admin/quotes'
-      preLoaderRoute: typeof AdminQuotesRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/gallery': {
-      id: '/admin/gallery'
-      path: '/gallery'
-      fullPath: '/admin/gallery'
-      preLoaderRoute: typeof AdminGalleryRouteImport
+    '/admin/appointments': {
+      id: '/admin/appointments'
+      path: '/appointments'
+      fullPath: '/admin/appointments'
+      preLoaderRoute: typeof AdminAppointmentsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/customers': {
@@ -589,32 +574,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCustomersRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/admin/appointments': {
-      id: '/admin/appointments'
-      path: '/appointments'
-      fullPath: '/admin/appointments'
-      preLoaderRoute: typeof AdminAppointmentsRouteImport
+    '/admin/gallery': {
+      id: '/admin/gallery'
+      path: '/gallery'
+      fullPath: '/admin/gallery'
+      preLoaderRoute: typeof AdminGalleryRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/api/public/skild-config': {
-      id: '/api/public/skild-config'
-      path: '/api/public/skild-config'
-      fullPath: '/api/public/skild-config'
-      preLoaderRoute: typeof ApiPublicSkildConfigRouteImport
+    '/admin/quotes': {
+      id: '/admin/quotes'
+      path: '/quotes'
+      fullPath: '/admin/quotes'
+      preLoaderRoute: typeof AdminQuotesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/settings': {
+      id: '/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AdminSettingsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/tasks': {
+      id: '/admin/tasks'
+      path: '/tasks'
+      fullPath: '/admin/tasks'
+      preLoaderRoute: typeof AdminTasksRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/gallery/': {
+      id: '/gallery/'
+      path: '/gallery'
+      fullPath: '/gallery/'
+      preLoaderRoute: typeof GalleryIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/send-quote': {
-      id: '/api/public/send-quote'
-      path: '/api/public/send-quote'
-      fullPath: '/api/public/send-quote'
-      preLoaderRoute: typeof ApiPublicSendQuoteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/cloudinary-sign': {
-      id: '/api/public/cloudinary-sign'
-      path: '/api/public/cloudinary-sign'
-      fullPath: '/api/public/cloudinary-sign'
-      preLoaderRoute: typeof ApiPublicCloudinarySignRouteImport
+    '/gallery/$slug': {
+      id: '/gallery/$slug'
+      path: '/gallery/$slug'
+      fullPath: '/gallery/$slug'
+      preLoaderRoute: typeof GallerySlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/calendly-webhook': {
@@ -624,11 +623,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicCalendlyWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/google/status': {
-      id: '/api/public/google/status'
-      path: '/api/public/google/status'
-      fullPath: '/api/public/google/status'
-      preLoaderRoute: typeof ApiPublicGoogleStatusRouteImport
+    '/api/public/cloudinary-sign': {
+      id: '/api/public/cloudinary-sign'
+      path: '/api/public/cloudinary-sign'
+      fullPath: '/api/public/cloudinary-sign'
+      preLoaderRoute: typeof ApiPublicCloudinarySignRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/send-quote': {
+      id: '/api/public/send-quote'
+      path: '/api/public/send-quote'
+      fullPath: '/api/public/send-quote'
+      preLoaderRoute: typeof ApiPublicSendQuoteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/skild-config': {
+      id: '/api/public/skild-config'
+      path: '/api/public/skild-config'
+      fullPath: '/api/public/skild-config'
+      preLoaderRoute: typeof ApiPublicSkildConfigRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/google/diagnose': {
+      id: '/api/public/google/diagnose'
+      path: '/api/public/google/diagnose'
+      fullPath: '/api/public/google/diagnose'
+      preLoaderRoute: typeof ApiPublicGoogleDiagnoseRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/google/oauth-callback': {
@@ -638,11 +658,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicGoogleOauthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/google/diagnose': {
-      id: '/api/public/google/diagnose'
-      path: '/api/public/google/diagnose'
-      fullPath: '/api/public/google/diagnose'
-      preLoaderRoute: typeof ApiPublicGoogleDiagnoseRouteImport
+    '/api/public/google/status': {
+      id: '/api/public/google/status'
+      path: '/api/public/google/status'
+      fullPath: '/api/public/google/status'
+      preLoaderRoute: typeof ApiPublicGoogleStatusRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -680,6 +700,7 @@ const rootRouteChildren: RootRouteChildren = {
   ConfirmRoute: ConfirmRoute,
   ContactRoute: ContactRoute,
   MotoRoute: MotoRoute,
+  PricesRoute: PricesRoute,
   QuoteRoute: QuoteRoute,
   ReviewsRoute: ReviewsRoute,
   ScheduleRoute: ScheduleRoute,
