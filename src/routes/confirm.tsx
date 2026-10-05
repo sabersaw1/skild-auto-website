@@ -4,7 +4,7 @@ import { Reveal } from "@/components/Reveal";
 import { useEffect, useState } from "react";
 import { Calendar, Wrench, MapPin, User, Phone, Mail, Pencil, ChevronRight } from "lucide-react";
 import { loadQuote, resolvedMake, resolvedModel, type QuoteData, EMPTY_QUOTE } from "@/lib/quote-storage";
-import { getQuoteId, getSlot, clearBooking } from "@/lib/skild-booking";
+import { getQuoteId, getSlot, clearBooking, getIdempotencyKey } from "@/lib/skild-booking";
 import { createAppointment } from "@/lib/booking.functions";
 
 export const Route = createFileRoute("/confirm")({
@@ -37,9 +37,10 @@ function ConfirmPage() {
       setErr("Missing quote or time. Please start over.");
       return;
     }
+    if (busy) return; // second tap while the first is still sending
     setBusy(true); setErr(null);
     try {
-      const r = await createAppointment({ data: { quoteId, startISO: slot } });
+      const r = await createAppointment({ data: { quoteId, startISO: slot, idempotencyKey: getIdempotencyKey(quoteId, slot) } });
       if (!r.ok) {
         setErr(r.error || "Could not book that slot.");
         setBusy(false);

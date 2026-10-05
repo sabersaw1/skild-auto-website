@@ -296,9 +296,11 @@ export async function isGoogleConnected(): Promise<boolean> {
 }
 
 /** Returns busy intervals in [fromISO, toISO) from Google Calendar. Empty if not connected. */
+/** Busy times on the business calendar plus any extra calendars (e.g. the technician's shared free/busy). */
 export async function getGoogleBusy(
   fromISO: string,
   toISO: string,
+  extraCalendarIds: string[] = [],
 ): Promise<{ start: Date; end: Date }[]> {
   try {
     if (!(await isGoogleConnected())) return [];
@@ -313,7 +315,7 @@ export async function getGoogleBusy(
       body: JSON.stringify({
         timeMin: fromISO,
         timeMax: toISO,
-        items: [{ id: auth.calendarId }],
+        items: [auth.calendarId, ...extraCalendarIds.filter((id) => id !== auth.calendarId)].map((id) => ({ id })),
       }),
     });
     if (!res.ok) {
@@ -323,7 +325,7 @@ export async function getGoogleBusy(
     const data = (await res.json()) as {
       calendars?: Record<string, { busy?: { start: string; end: string }[] }>;
     };
-    const busy = data.calendars?.[auth.calendarId]?.busy ?? [];
+    const busy = Object.values(data.calendars ?? {}).flatMap((c) => c.busy ?? []);
     return busy.map((b) => ({ start: new Date(b.start), end: new Date(b.end) }));
   } catch (err) {
     console.error("[google-calendar] getGoogleBusy error", err);

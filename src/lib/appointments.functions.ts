@@ -43,6 +43,7 @@ function eventInputFor(a: Awaited<ReturnType<typeof loadAppointmentForSync>>) {
     `Service: ${a.quote?.requested_service || "—"}`,
   ];
   if (a.quote?.description) lines.push("", "Notes:", a.quote.description);
+  lines.push("", "CRM: https://www.skildauto.com/admin/appointments");
   return {
     summary: `Skild Auto — ${a.customer?.full_name || "Appointment"} (${a.quote?.requested_service || "Service"})`,
     description: lines.join("\n"),
@@ -53,31 +54,34 @@ function eventInputFor(a: Awaited<ReturnType<typeof loadAppointmentForSync>>) {
   };
 }
 
+/**
+ * Create/update the Google Calendar event for a booking. Server-only (called by createAppointment);
+ * returns true when the event exists in Google afterwards. Never throws.
+ */
+export async function syncAppointmentToGoogleInternal(appointmentId: string): Promise<boolean> {
+  const a = await loadAppointmentForSync(appointmentId);
+  const { createGoogleEvent, updateGoogleEvent, isGoogleConnected } = await import("./google-calendar.server");
+  if (!(await isGoogleConnected())) return false;
+  const input = eventInputFor(a);
+  if (a.google_event_id) return await updateGoogleEvent(a.google_event_id, input);
+  const ev = await createGoogleEvent(input);
+  if (!ev) return false;
+  const { getSkildAdmin } = await import("./skild-supabase.server");
+  await getSkildAdmin().from("appointments").update({ google_event_id: ev.eventId }).eq("id", a.id);
+  return true;
+}
+
+// Admin-only (the admin UI's "sync to Google" button). Always requires the admin's token:
+// before, a missing token skipped the check, so anyone could trigger a sync.
 export const syncAppointmentToGoogle = createServerFn({ method: "POST" })
-  .inputValidator((d: { appointmentId: string; accessToken?: string }) =>
-    z.object({ appointmentId: z.string().uuid(), accessToken: z.string().optional() }).parse(d),
+  .inputValidator((d: { appointmentId: string; accessToken: string }) =>
+    z.object({ appointmentId: z.string().uuid(), accessToken: z.string().min(1) }).parse(d),
   )
   .handler(async ({ data }) => {
-    // Called both from admin UI (with token) and from createAppointment (server-to-server, no token).
-    if (data.accessToken) {
-      const { requireSkildAdmin } = await import("./admin-guard.server");
-      await requireSkildAdmin(data.accessToken);
-    }
-    const a = await loadAppointmentForSync(data.appointmentId);
-    const { createGoogleEvent, updateGoogleEvent, isGoogleConnected } =
-      await import("./google-calendar.server");
-    if (!(await isGoogleConnected())) return { ok: false as const, reason: "not_connected" };
-    const { getSkildAdmin } = await import("./skild-supabase.server");
-    const sb = getSkildAdmin();
-    const input = eventInputFor(a);
-    if (a.google_event_id) {
-      const ok = await updateGoogleEvent(a.google_event_id, input);
-      return { ok, eventId: a.google_event_id };
-    }
-    const ev = await createGoogleEvent(input);
-    if (!ev) return { ok: false as const };
-    await sb.from("appointments").update({ google_event_id: ev.eventId }).eq("id", a.id);
-    return { ok: true as const, eventId: ev.eventId, htmlLink: ev.htmlLink };
+    const { requireSkildAdmin } = await import("./admin-guard.server");
+    await requireSkildAdmin(data.accessToken);
+    const ok = await syncAppointmentToGoogleInternal(data.appointmentId);
+    return ok ? { ok: true as const } : { ok: false as const };
   });
 
 export const setAppointmentStatus = createServerFn({ method: "POST" })
