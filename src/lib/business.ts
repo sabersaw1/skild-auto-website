@@ -13,7 +13,7 @@ export const BUSINESS = {
   instagramUrl: "https://www.instagram.com/skildauto",
   website: "https://skildauto.com",
   calendlyUrl: "https://calendly.com/skildauto/30min",
-  hours: "Mon–Sat · 7:00 AM – 7:00 PM",
+  hours: "Mon–Fri 8 AM – 8 PM · Sat 9 AM – 8 PM",
 } as const;
 
 export const telHref = `tel:${BUSINESS.phoneE164}`;

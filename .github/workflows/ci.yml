@@ -1,0 +1,78 @@
+# CI (Johnny HQ, Skild Phase 2 safety net). Runs on every pull request and on main.
+# Blocking: install, type check, build, database migrations on a throwaway Postgres
+# that holds the production schema (no data): HQ's "staging" (both free Supabase slots are in use).
+# Report-only for now: lint (600+ formatting findings predate HQ; a cleanup PR will make it blocking).
+name: CI
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Build + types
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Install
+        run: bun install --frozen-lockfile
+      - name: Type check
+        run: bunx tsc --noEmit
+      - name: Build
+        run: bun run build
+      - name: Unit tests
+        run: if grep -q '"test":' package.json; then bun run test; else echo "no unit tests yet"; fi
+      - name: Lint (report only for now)
+        run: bun run lint
+        continue-on-error: true
+
+  db:
+    name: Database migrations (staging copy)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: ci
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      PGHOST: localhost
+      PGUSER: postgres
+      PGPASSWORD: ci
+      PGDATABASE: postgres
+    steps:
+      - uses: actions/checkout@v4
+      - name: Load the production schema (structure only, no data)
+        run: |
+          psql -v ON_ERROR_STOP=1 -q -f supabase/schema/auth-stub.sql
+          psql -v ON_ERROR_STOP=1 -q -f supabase/schema/production-public.sql
+      - name: Apply every migration (up)
+        run: |
+          shopt -s nullglob
+          for f in supabase/migrations/*.sql; do case "$f" in *.down.sql) continue;; esac; echo "up: $f"; psql -v ON_ERROR_STOP=1 -q -f "$f"; done
+      - name: Roll every migration back (down), newest first
+        run: |
+          shopt -s nullglob
+          downs=(supabase/migrations/*.down.sql)
+          for (( i=${#downs[@]}-1; i>=0; i-- )); do echo "down: ${downs[$i]}"; psql -v ON_ERROR_STOP=1 -q -f "${downs[$i]}"; done
+      - name: Apply again (up after down must work)
+        run: |
+          shopt -s nullglob
+          for f in supabase/migrations/*.sql; do case "$f" in *.down.sql) continue;; esac; psql -v ON_ERROR_STOP=1 -q -f "$f"; done
+          psql -At -c "select count(*) || ' public tables' from information_schema.tables where table_schema = 'public'"
+      - name: Database tests (booking rules etc.)
+        run: |
+          shopt -s nullglob
+          for f in supabase/tests/*.sql; do echo "test: $f"; psql -v ON_ERROR_STOP=1 -f "$f"; done
