@@ -27,11 +27,12 @@ function shell(title: string, inner: string) {
   </div>`;
 }
 
-async function resendSend(payload: Record<string, unknown>) {
+/** Sends through Resend. Returns true only when Resend accepted the email (callers retry on false). */
+async function resendSend(payload: Record<string, unknown>): Promise<boolean> {
   const key = process.env.RESEND_API_KEY;
   if (!key) {
     console.warn("[email] RESEND_API_KEY not set");
-    return;
+    return false;
   }
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -41,10 +42,18 @@ async function resendSend(payload: Record<string, unknown>) {
   if (!res.ok) {
     const t = await res.text().catch(() => "");
     console.error("[email] resend failed", res.status, t);
+    return false;
   }
+  return true;
 }
 
-export async function sendBookingEmails(appointmentId: string) {
+export type BookingEmailResult = { admin: boolean; customer: boolean | null };
+
+/** Admin notice + customer confirmation (with an "add to calendar" file). */
+export async function sendBookingEmails(
+  appointmentId: string,
+  which: { admin: boolean; customer: boolean } = { admin: true, customer: true },
+): Promise<BookingEmailResult> {
   const sb = getSkildAdmin();
   const { data: appt, error } = await sb
     .from("appointments")
@@ -106,7 +115,7 @@ export async function sendBookingEmails(appointmentId: string) {
     <h3 style="margin:20px 0 6px;color:#dc1e28;font-size:13px;letter-spacing:.18em;text-transform:uppercase">Photos</h3>
     ${photoList}
   `;
-  await resendSend({
+  const admin = !which.admin ? true : await resendSend({
     from: process.env.QUOTE_FROM_EMAIL || "Skild Auto <onboarding@resend.dev>",
     to: [process.env.QUOTE_TO_EMAIL || "skildauto@gmail.com"],
     reply_to: c.email || undefined,
@@ -115,7 +124,17 @@ export async function sendBookingEmails(appointmentId: string) {
   });
 
   // ---- Customer confirmation ----
-  if (c.email) {
+  let customer: boolean | null = null;
+  if (c.email && which.customer) {
+    const { buildIcs } = await import("./ics");
+    const ics = buildIcs({
+      uid: appt.id,
+      startISO: appt.start_at,
+      endISO: appt.end_at,
+      summary: `Skild Auto: ${q.requested_service || "service"} (${vehicleLine})`,
+      description: "Your Skild Auto technician comes to you. Questions or changes: call 801-584-9804 or reply to the email.",
+      location: c.location || undefined,
+    });
     const custInner = `
       <p style="font-size:14px">Hi ${esc(c.full_name?.split(" ")[0] || "there")},</p>
       <p style="font-size:14px">Thanks for booking with Skild Auto. We've received your request and will confirm shortly.</p>
@@ -125,13 +144,16 @@ export async function sendBookingEmails(appointmentId: string) {
         ["Vehicle", vehicleLine],
         ["Where", c.location || "—"],
       ])}
-      <p style="margin-top:16px;font-size:13px;color:#9b8e94">Need to change anything? Reply to this email or call 801-584-9804.</p>
+      <p style="margin-top:16px;font-size:13px;color:#9b8e94">All times are Mountain Time (Salt Lake City). The attached file adds the appointment to your calendar.</p>
+      <p style="margin-top:8px;font-size:13px;color:#9b8e94">Need to change anything? Reply to this email or call 801-584-9804.</p>
     `;
-    await resendSend({
+    customer = await resendSend({
       from: process.env.QUOTE_FROM_EMAIL || "Skild Auto <onboarding@resend.dev>",
       to: [c.email],
       subject: `Your Skild Auto booking · ${when}`,
       html: shell("Booking received", custInner),
+      attachments: [{ filename: "skild-auto-booking.ics", content: Buffer.from(ics).toString("base64"), content_type: "text/calendar" }],
     });
   }
+  return { admin, customer };
 }

@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { PageLayout } from "@/components/PageLayout";
 import { Reveal } from "@/components/Reveal";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock } from "lucide-react";
 import { getAvailableDays, getAvailableSlots } from "@/lib/booking.functions";
 import { getQuoteId, setSlot } from "@/lib/skild-booking";
@@ -57,6 +57,7 @@ function SchedulePage() {
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [weekStart, setWeekStart] = useState<Date>(() => startOfWeek(new Date()));
   const [err, setErr] = useState<string | null>(null);
+  const timesRef = useRef<HTMLDivElement | null>(null);
 
   // Hydrate quoteId from sessionStorage (browser only).
   useEffect(() => {
@@ -148,15 +149,24 @@ function SchedulePage() {
                 ><ChevronRight className="h-4 w-4" /></button>
               </div>
             </div>
-            <div className="mt-5 grid grid-cols-7 gap-2">
+            {days.length === 0 && !err && <p className="mt-5 text-sm text-muted-foreground">Loading days…</p>}
+            <div className="mt-5 grid grid-cols-4 gap-2 sm:grid-cols-7">
               {visibleDays.map((d) => {
                 const active = selectedDate === d.date;
                 return (
                   <button
                     key={d.date}
+                    type="button"
+                    data-testid="day"
                     disabled={!d.hasSlots}
-                    onClick={() => setSelectedDate(d.date)}
-                    className={`flex flex-col items-center rounded-md border p-2 text-xs transition ${
+                    aria-pressed={active}
+                    aria-label={`${dateFromYmd(d.date).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}${d.hasSlots ? ", times available" : ", fully booked or closed"}`}
+                    onClick={() => {
+                      setSelectedDate(d.date);
+                      // On phones the times are below the days: bring them into view.
+                      setTimeout(() => timesRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+                    }}
+                    className={`flex min-h-16 flex-col items-center justify-center rounded-md border p-2 text-xs transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-red ${
                       active ? "border-brand-red bg-brand-red/10 text-brand-red shadow-glow"
                         : d.hasSlots ? "border-border bg-background hover:border-brand-red/60"
                         : "border-border/40 bg-background/40 text-muted-foreground/50"
@@ -172,10 +182,11 @@ function SchedulePage() {
           </div>
 
           {/* Slot picker */}
-          <div className="rounded-2xl border border-border bg-card p-6 shadow-elevated">
+          <div ref={timesRef} className="scroll-mt-24 rounded-2xl border border-border bg-card p-6 shadow-elevated">
             <h2 className="flex items-center gap-2 font-display text-lg">
               <Clock className="h-5 w-5 text-brand-red" /> Available times
             </h2>
+            <p className="mt-1 text-xs text-muted-foreground">All times are Mountain Time (Salt Lake City).</p>
             {!selectedDate && (
               <p className="mt-4 text-sm text-muted-foreground">Pick a day to see times.</p>
             )}
@@ -186,12 +197,15 @@ function SchedulePage() {
               <p className="mt-4 text-sm text-muted-foreground">No slots remaining for this day.</p>
             )}
             {selectedDate && slots.length > 0 && (
-              <div className="mt-5 grid grid-cols-3 gap-2 sm:grid-cols-4">
+              <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3" role="list" aria-label="Available times">
                 {slots.map((s) => (
                   <button
                     key={s}
+                    type="button"
+                    data-testid="slot"
+                    aria-label={`Book ${fmtTime(s)} on ${selectedDate ? fmtWeekday(selectedDate) + " " + fmtMonthDay(selectedDate) : ""} (Mountain Time)`}
                     onClick={() => picked(s)}
-                    className="rounded-md border border-border bg-background py-2.5 text-sm font-bold uppercase tracking-wider transition hover:border-brand-red hover:bg-brand-red/10 hover:text-brand-red"
+                    className="min-h-12 rounded-md border border-border bg-background py-3 text-base font-bold uppercase tracking-wider transition hover:border-brand-red hover:bg-brand-red/10 hover:text-brand-red focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-red"
                   >{fmtTime(s)}</button>
                 ))}
               </div>
