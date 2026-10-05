@@ -61,15 +61,16 @@ jobs:
       - name: Apply every migration (up)
         run: |
           shopt -s nullglob
-          for f in $(ls supabase/migrations/*.sql | grep -v '\.down\.sql$' | sort); do echo "up: $f"; psql -v ON_ERROR_STOP=1 -q -f "$f"; done
+          for f in supabase/migrations/*.sql; do case "$f" in *.down.sql) continue;; esac; echo "up: $f"; psql -v ON_ERROR_STOP=1 -q -f "$f"; done
       - name: Roll every migration back (down), newest first
         run: |
           shopt -s nullglob
-          for f in $(ls supabase/migrations/*.down.sql | sort -r); do echo "down: $f"; psql -v ON_ERROR_STOP=1 -q -f "$f"; done
+          downs=(supabase/migrations/*.down.sql)
+          for (( i=${#downs[@]}-1; i>=0; i-- )); do echo "down: ${downs[$i]}"; psql -v ON_ERROR_STOP=1 -q -f "${downs[$i]}"; done
       - name: Apply again (up after down must work)
         run: |
           shopt -s nullglob
-          for f in $(ls supabase/migrations/*.sql | grep -v '\.down\.sql$' | sort); do psql -v ON_ERROR_STOP=1 -q -f "$f"; done
+          for f in supabase/migrations/*.sql; do case "$f" in *.down.sql) continue;; esac; psql -v ON_ERROR_STOP=1 -q -f "$f"; done
           psql -At -c "select count(*) || ' public tables' from information_schema.tables where table_schema = 'public'"
       - name: Database tests (booking rules etc.)
         run: |
