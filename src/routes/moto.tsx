@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageLayout } from "@/components/PageLayout";
 import { FeatureStrip } from "@/components/FeatureStrip";
 import { Reveal } from "@/components/Reveal";
-import mainBg from "@/assets/main-bg.jpg";
+import mainBg from "@/assets/main-bg.webp";
 import { ArrowRight, Bike, Wrench, Gauge, Sparkles, Settings, Stethoscope } from "lucide-react";
 
 export const Route = createFileRoute("/moto")({

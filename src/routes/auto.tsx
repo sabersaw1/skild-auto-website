@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageLayout } from "@/components/PageLayout";
 import { FeatureStrip } from "@/components/FeatureStrip";
 import { Reveal } from "@/components/Reveal";
-import mobileBg from "@/assets/mobile-bg.jpg";
+import mobileBg from "@/assets/mobile-bg.webp";
 import { ArrowRight, Wrench, Gauge, Battery, Zap, ShieldCheck, Stethoscope } from "lucide-react";
 
 export const Route = createFileRoute("/auto")({

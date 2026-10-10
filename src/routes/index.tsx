@@ -2,8 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Bike, Car, ArrowRight, Phone } from "lucide-react";
 import { BUSINESS, telHref } from "@/lib/business";
-import mainBg from "@/assets/main-bg.jpg";
-import skildLogo from "@/assets/skild-logo.png";
+import mainBg from "@/assets/main-bg.webp";
+import skildLogo from "@/assets/skild-logo.webp";
 
 export const Route = createFileRoute("/")({
   head: () => ({
