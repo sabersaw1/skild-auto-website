@@ -8,6 +8,7 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
+import { inject } from "@vercel/analytics";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -150,6 +151,10 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  // Vercel Web Analytics: cookie-less page-view counts (shown in the Vercel dashboard).
+  useEffect(() => {
+    inject();
+  }, []);
   return (
     <QueryClientProvider client={queryClient}>
       <Outlet />
