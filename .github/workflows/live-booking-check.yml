@@ -1,0 +1,33 @@
+# Live booking check (Johnny HQ). Moved here from the HQ server on 2026-10-10 (Johnny: "disk A"), so the server needs no
+# 3.6 GB browser image. Runs the same smoke test as the preview check, against the LIVE site:
+#   - every hour, after every production deploy (Vercel reports it), and on demand.
+# It NEVER clicks a time or submits a booking. HQ's Uptime Monitor and post-deploy rollback watch read the result
+# (two failures in a row → alert; a failure right after a deploy → automatic rollback). Public repo: Actions minutes are free.
+name: Live booking check
+on:
+  schedule:
+    - cron: "35 * * * *"
+  deployment_status:
+  workflow_dispatch:
+permissions:
+  contents: read
+  deployments: read
+concurrency:
+  group: live-booking-check
+  cancel-in-progress: false
+jobs:
+  live:
+    if: github.event_name != 'deployment_status' || (github.event.deployment_status.state == 'success' && contains(github.event.deployment_status.environment, 'Production'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    container:
+      image: mcr.microsoft.com/playwright:v1.55.0-noble
+    env:
+      BASE_URL: https://www.skildauto.com
+    steps:
+      - uses: actions/checkout@v4
+      - name: Booking smoke test (live site, never submits)
+        run: |
+          mkdir -p /tmp/pw && cd /tmp/pw && npm init -y >/dev/null && npm i -s @playwright/test@1.55.0 >/dev/null
+          cp -r "$GITHUB_WORKSPACE/e2e" /tmp/pw/
+          HOME=/root npx playwright test e2e --reporter=line --retries=1
