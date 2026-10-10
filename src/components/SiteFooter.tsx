@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Instagram, Phone, Mail, MapPin, Clock } from "lucide-react";
-import skildLogo from "@/assets/skild-logo.png";
+import skildLogo from "@/assets/skild-logo-nav.webp";
 import { BUSINESS, mailHref, telHref } from "@/lib/business";
 
 export function SiteFooter() {

@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { Menu, X, Phone } from "lucide-react";
-import skildLogo from "@/assets/skild-logo.png";
+import skildLogo from "@/assets/skild-logo-nav.webp";
 import { BUSINESS, telHref } from "@/lib/business";
 
 
