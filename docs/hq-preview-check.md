@@ -1,0 +1,1 @@
+Preview booking test check, opened by Johnny HQ on 2026-10-12 to prove HQ_VERCEL_BYPASS works. No site change; this PR is closed without merging.
