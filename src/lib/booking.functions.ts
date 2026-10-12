@@ -100,8 +100,13 @@ export const getAvailableSlots = createServerFn({ method: "POST" })
 
 // ─────────────────────────────────────────────────────────────────────────
 type PgError = { code?: string; message?: string } | null;
+// Postgres says 42703; Supabase's API layer (PostgREST) says PGRST204 "Could not find the 'x' column of
+// 'appointments' in the schema cache". Missing PGRST204 here broke every booking while the 2026-10-05
+// migration wasn't applied in production (SEV1 2026-10-10).
 const isMissingColumn = (e: PgError) =>
-  e?.code === "42703" || /column .* does not exist/i.test(e?.message ?? "");
+  e?.code === "42703" ||
+  e?.code === "PGRST204" ||
+  /column .* does not exist|could not find the .* column/i.test(e?.message ?? "");
 
 export const createAppointment = createServerFn({ method: "POST" })
   .inputValidator((d: { quoteId: string; startISO: string; idempotencyKey?: string }) =>
@@ -175,7 +180,11 @@ export const createAppointment = createServerFn({ method: "POST" })
         .maybeSingle();
       if (prev) return { ok: true as const, appointmentId: prev.id, duplicate: true };
     }
-    if (ins.error || !ins.data) throw ins.error ?? new Error("Insert failed");
+    if (ins.error || !ins.data) {
+      // Never fail silently: the real error goes to the server log (Vercel), the customer gets a way through.
+      console.error("[createAppointment] booking insert failed", { code: ins.error?.code, message: ins.error?.message });
+      throw new Error("We couldn't save your booking. Please call or text 801-584-9804 and we'll book you right away.");
+    }
     const apptId = ins.data.id as string;
 
     await sb.from("quotes").update({ status: "scheduled" }).eq("id", quote.id);
